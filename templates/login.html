@@ -135,11 +135,11 @@
 
                 <!-- Password with eye toggle -->
                 <div class="mb-4">
-                    <label class="form-label d-flex justify-content-between align-items-center">
-                        <span>Password</span>
-                        <i class="fa-regular fa-eye text-muted" id="togglePassword" style="cursor: pointer;"></i>
-                    </label>
-                    <input type="password" name="password" id="passwordInput" class="form-control shadow-none" placeholder="••••••••" required>
+                    <label class="form-label">Password</label>
+                    <div class="position-relative">
+                        <input type="password" name="password" id="passwordInput" class="form-control shadow-none pe-5" placeholder="••••••••" required>
+                        <i class="fa-regular fa-eye text-muted position-absolute top-50 end-0 translate-middle-y me-3" id="togglePassword" style="cursor: pointer; z-index: 10;"></i>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-signin w-100 shadow-sm">Sign In</button>
