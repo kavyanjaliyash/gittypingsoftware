@@ -1,0 +1,262 @@
+{% extends "student/base.html" %}
+{% block content %}
+
+<!-- Link to your separate Nudi mapping script -->
+<script src="{{ url_for('static', filename='js/nudi-mapper.js') }}"></script>
+
+<style>
+    /* Force main container to stretch full screen width */
+    .portal-container {
+        max-width: 98% !important;
+        padding: 0 10px !important;
+    }
+
+    #typing-text-box {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        scroll-behavior: smooth;
+        background-color: #f8fafc;
+        border: 3px solid #cbd5e1 !important;
+        border-radius: 16px;
+        padding: 30px 20px;
+        min-height: 160px;
+        align-items: center;
+    }
+
+    #typing-text-box::-webkit-scrollbar {
+        height: 8px;
+    }
+    #typing-text-box::-webkit-scrollbar-thumb {
+        background: #0284c7;
+        border-radius: 4px;
+    }
+
+    /* Dramatically increased block size and font size */
+    #typing-text-box span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 75px;
+        height: 85px;
+        margin-right: 12px;
+        border: 3px solid #cbd5e1;
+        border-radius: 12px;
+        background-color: #ffffff;
+        font-size: 2.8rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: all 0.1s ease;
+    }
+</style>
+
+<div class="lesson-container">
+    <div class="card shadow-sm p-4 bg-white mb-4">
+        <h3 class="mb-1 text-primary fw-bold">{{ lesson.lesson_title }}</h3>
+        <p class="text-muted mb-0">{{ lesson.lesson_description }}</p>
+    </div>
+
+    {% if screens %}
+    <div class="card shadow-sm p-4 bg-white">
+        <h5 id="screen-title" class="text-secondary mb-3 fw-semibold"></h5>
+        
+        <!-- Typing Display Area with Larger Letter Blocks & Horizontal Scroll -->
+        <div id="typing-text-box" class="mb-4 shadow-inner">
+        </div>
+
+        <!-- Hidden Input to capture keystrokes -->
+        <textarea id="typing-input" class="form-control mb-3 p-3 fs-5" rows="2" placeholder="Click here and start typing the text above..."></textarea>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <span class="me-4 fs-5 text-secondary">Time: <strong id="timer" class="text-dark">0</strong>s</span>
+                <span class="me-4 fs-5 text-secondary">WPM: <strong id="wpm" class="text-dark">0</strong></span>
+                <span class="fs-5 text-secondary">Accuracy: <strong id="accuracy" class="text-dark">100</strong>%</span>
+            </div>
+            <button id="next-screen-btn" class="btn btn-success px-4 py-2 fs-5" style="display:none;">Next Screen &rarr;</button>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">No typing screens available for this lesson yet. Please check back later.</div>
+    <a href="/student/dashboard" class="btn btn-secondary mt-3">Back to Dashboard</a>
+    {% endif %}
+
+    <!-- Linking to a student dashboard route -->
+    <a href="{{ url_for('student.dashboard') }}">Back to Dashboard</a>
+
+    <!-- Linking a CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </div>
+
+<script>
+    const screens = [
+        {% for s in screens %}
+        {
+            id: {{ s.screen_id }},
+            title: "{{ s.screen_title }}",
+            content: {{ s.screen_content | tojson | safe }}
+        },
+        {% endfor %}
+    ];
+
+    const lessonId = {{ lesson.lesson_id }};
+    let currentScreenIdx = 0;
+    let timer = null;
+    let secondsElapsed = 0;
+    let isStarted = false;
+    let finalWpm = 0;
+    let finalMistakes = 0;
+    let finalSeconds = 0;
+
+    const titleEl = document.getElementById("screen-title");
+    const textBoxEl = document.getElementById("typing-text-box");
+    const inputEl = document.getElementById("typing-input");
+    const timerEl = document.getElementById("timer");
+    const wpmEl = document.getElementById("wpm");
+    const accuracyEl = document.getElementById("accuracy");
+    const nextBtn = document.getElementById("next-screen-btn");
+
+    function loadScreen(idx) {
+        if (idx >= screens.length) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/student/lesson/${lessonId}/complete`;
+
+            const fields = { 
+                wpm: finalWpm, 
+                mistakes: finalMistakes, 
+                seconds: finalSeconds 
+            };
+
+            for (const key in fields) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = fields[key];
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+            return;
+        }
+
+        const screen = screens[idx];
+        titleEl.innerText = screen.title;
+        
+        textBoxEl.innerHTML = "";
+        
+        // Use Intl.Segmenter to group Kannada characters, matras, and combination keys correctly into blocks
+        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+        const segments = segmenter.segment(screen.content);
+
+        for (let segment of segments) {
+            const span = document.createElement("span");
+            span.innerText = segment.segment;
+            textBoxEl.appendChild(span);
+        }
+
+        inputEl.value = "";
+        inputEl.disabled = false;
+        inputEl.focus();
+        nextBtn.style.display = "none";
+        isStarted = false;
+        secondsElapsed = 0;
+        clearInterval(timer);
+        timerEl.innerText = "0";
+        wpmEl.innerText = "0";
+        accuracyEl.innerText = "100";
+    }
+
+    if (screens.length > 0) {
+        loadScreen(0);
+
+        inputEl.addEventListener("input", () => {
+            if (!isStarted) {
+                isStarted = true;
+                timer = setInterval(() => {
+                    secondsElapsed++;
+                    timerEl.innerText = secondsElapsed;
+                }, 1000);
+            }
+
+            const screen = screens[currentScreenIdx];
+            const targetText = screen.content;
+            const typedText = inputEl.value;
+            const spans = textBoxEl.querySelectorAll("span");
+
+            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+            const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
+            const typedSegments = Array.from(segmenter.segment(typedText)).map(s => s.segment);
+
+            let correctCount = 0;
+            let mistakeCount = 0;
+
+            for (let i = 0; i < spans.length; i++) {
+                if (i < typedSegments.length) {
+                    if (typedSegments[i] === targetSegments[i]) {
+                        // Correct block -> Green
+                        spans[i].style.color = "#059669";
+                        spans[i].style.backgroundColor = "#d1e7dd";
+                        spans[i].style.borderColor = "#10b981";
+                        correctCount++;
+                    } else if (i === typedSegments.length - 1 && typedSegments.length <= targetSegments.length) {
+                        // Active block currently being typed -> Neutral white/gray to support multi-key composition
+                        spans[i].style.color = "#1e293b";
+                        spans[i].style.backgroundColor = "#ffffff";
+                        spans[i].style.borderColor = "#cbd5e1";
+                    } else {
+                        // Confirmed mistake -> Red
+                        spans[i].style.color = "#dc2626";
+                        spans[i].style.backgroundColor = "#fee2e2";
+                        spans[i].style.borderColor = "#ef4444";
+                        mistakeCount++;
+                    }
+                } else {
+                    // Untyped future blocks -> Neutral
+                    spans[i].style.color = "#1e293b";
+                    spans[i].style.backgroundColor = "#ffffff";
+                    spans[i].style.borderColor = "#cbd5e1";
+                }
+            }
+
+            // Auto scroll active block into view
+            if (typedSegments.length < spans.length) {
+                spans[typedSegments.length].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+
+            const minutes = secondsElapsed > 0 ? secondsElapsed / 60 : 1 / 60;
+            const wordsTyped = typedText.trim().split(/\s+/).filter(Boolean).length;
+            const wpm = Math.round(wordsTyped / minutes);
+            wpmEl.innerText = wpm >= 0 ? wpm : 0;
+
+            const accuracy = typedSegments.length > 0 ? Math.max(0, Math.round((correctCount / (correctCount + mistakeCount)) * 100)) : 100;
+            accuracyEl.innerText = accuracy;
+
+            finalWpm = wpm >= 0 ? wpm : 0;
+            finalMistakes = mistakeCount;
+            finalSeconds = secondsElapsed;
+
+            // Unlock next screen when fully typed
+            if (typedSegments.length >= targetSegments.length || typedText.length >= targetText.length) {
+                if (spans.length > 0) {
+                    const lastSpan = spans[spans.length - 1];
+                    lastSpan.style.color = "#059669";
+                    lastSpan.style.backgroundColor = "#d1e7dd";
+                    lastSpan.style.borderColor = "#10b981";
+                }
+                clearInterval(timer);
+                inputEl.disabled = true;
+                nextBtn.style.display = "inline-block";
+            }
+        });
+
+        nextBtn.addEventListener("click", () => {
+            currentScreenIdx++;
+            loadScreen(currentScreenIdx);
+        });
+    }
+</script>
+
+{% endblock %}

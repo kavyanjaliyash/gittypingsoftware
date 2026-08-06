@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<div class="container-fluid py-4 px-4">
+    <!-- Header Banner -->
+    <div class="p-4 mb-4 rounded-4 text-white shadow-sm d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+        <div>
+            <h1 class="fw-bold mb-2 fs-2"><i class="fa-solid fa-user-graduate me-2"></i>Student Management</h1>
+            <p class="text-white-50 mb-0 fs-6">Register new typing students, assign courses, manage login credentials, and track activity.</p>
+        </div>
+        <div>
+            <!-- Trigger Register Student Modal -->
+            <button type="button" class="btn btn-light fw-semibold px-4 py-2.5 rounded-3 shadow-sm text-primary border-0 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                <i class="fa-solid fa-plus"></i> <span>Register New Student</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-dark">
+                    <thead class="table-light text-secondary text-uppercase fs-7 fw-bold" style="letter-spacing: 0.5px;">
+                        <tr>
+                            <th class="py-3 px-4">Reg No</th>
+                            <th class="py-3 px-4">Student Name</th>
+                            <th class="py-3 px-4">Username / Login ID</th>
+                            <th class="py-3 px-4">Branch</th>
+                            <th class="py-3 px-4">Course(s)</th>
+                            <th class="py-3 px-4">Mobile</th>
+                            <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        {% set s_id = student.id if student.id is defined else student.student_id %}
+                        <tr>
+                            <td class="py-3 px-4"><span class="badge bg-light text-secondary border px-2.5 py-1.5 rounded-2 fw-semibold">{{ student.registration_no }}</span></td>
+                            <td class="py-3 px-4 fw-bold text-dark">{{ student.student_name }}</td>
+                            <td class="py-3 px-4 text-primary fw-semibold">{{ student.user.username if student.user else '-' }}</td>
+                            <td class="py-3 px-4 text-muted">{{ student.branch.branch_name if student.branch else 'GIT Hoskote' }}</td>
+                            <td class="py-3 px-4">
+                                <span class="badge bg-primary bg-opacity-10 text-primary px-2.5 py-1 rounded-2 me-1 fw-semibold">{{ student.course or 'English & Kannada Typing' }}</span>
+                            </td>
+                            <td class="py-3 px-4 text-muted">{{ student.mobile }}</td>
+                            <td class="py-3 px-4">
+                                <span class="badge bg-success bg-opacity-10 text-success px-3 py-1.5 rounded-pill fw-semibold">{{ student.status or 'Active' }}</span>
+                            </td>
+                            <td class="py-3 px-4 text-end">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <!-- Edit Trigger Modal -->
+                                    <button type="button" class="btn btn-outline-primary btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#editStudentModal{{ s_id }}">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </button>
+                                    <!-- Reset Password Trigger Modal -->
+                                    <button type="button" class="btn btn-outline-info btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ s_id }}">
+                                        <i class="fa-solid fa-key"></i> Password
+                                    </button>
+                                    <!-- Delete Trigger Modal -->
+                                    <button type="button" class="btn btn-outline-danger btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#deleteStudentModal{{ s_id }}">
+                                        <i class="fa-solid fa-trash-can"></i> Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Student Modal Popup -->
+                        <div class="modal fade" id="editStudentModal{{ s_id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                        <h5 class="fw-bold text-dark"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Edit Student</h5>
+                                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form action="{{ url_for('admin.update_student', student_id=s_id) }}" method="POST">
+                                        <div class="modal-body p-4">
+                                            <div class="row">
+                                                <!-- First Name -->
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small fw-bold text-secondary">First Name</label>
+                                                    <input type="text" class="form-control rounded-3" name="first_name" value="{{ student.student_name.split(' ')[0] if student.student_name else '' }}" required>
+                                                </div>
+                                                <!-- Last Name -->
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small fw-bold text-secondary">Last Name</label>
+                                                    <input type="text" class="form-control rounded-3" name="last_name" value="{{ student.student_name.split(' ')[1:] | join(' ') if student.student_name else '' }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <!-- Registration Number -->
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small fw-bold text-secondary">Registration Number</label>
+                                                    <input type="text" class="form-control rounded-3" name="registration_no" value="{{ student.registration_no }}" required>
+                                                </div>
+                                                <!-- Email ID -->
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small fw-bold text-secondary">Email ID</label>
+                                                    <input type="email" class="form-control rounded-3" name="email" value="{{ student.email or '' }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <!-- Date of Birth -->
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small fw-bold text-secondary">Date of Birth (DOB)</label>
+                                                    <input type="date" class="form-control rounded-3" name="dob" value="{{ student.dob.strftime('%Y-%m-%d') if student.dob else '' }}">
+                                                </div>
+                                                <!-- Mobile Number -->
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small fw-bold text-secondary">Mobile Number</label>
+                                                    <input type="text" class="form-control rounded-3" name="mobile" value="{{ student.mobile }}" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <!-- Branch Selection -->
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small fw-bold text-secondary">Branch</label>
+                                                    <select class="form-control rounded-3" name="branch_id" required>
+                                                        {% for branch in branches %}
+                                                        <option value="{{ branch.id if branch.id is defined else branch.branch_id }}" {% if student.branch_id == (branch.id if branch.id is defined else branch.branch_id) %}selected{% endif %}>{{ branch.branch_name if branch.branch_name is defined else branch.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <!-- Trainer Selection -->
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small fw-bold text-secondary">Assigned Trainer</label>
+                                                    <select class="form-control rounded-3" name="faculty_id" required>
+                                                        {% for faculty in faculties %}
+                                                        <option value="{{ faculty.id if faculty.id is defined else faculty.faculty_id }}" {% if student.faculty_id == (faculty.id if faculty.id is defined else faculty.faculty_id) %}selected{% endif %}>{{ faculty.name if faculty.name is defined else faculty.faculty_name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <!-- Status -->
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small fw-bold text-secondary">Status</label>
+                                                    <select class="form-control rounded-3" name="status">
+                                                        <option value="Active" {% if student.status == 'Active' %}selected{% endif %}>Active</option>
+                                                        <option value="Inactive" {% if student.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0 px-4 pb-4">
+                                            <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">Update Student</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reset Password Modal Popup -->
+                        <div class="modal fade" id="resetPasswordModal{{ s_id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                        <h5 class="fw-bold text-info"><i class="fa-solid fa-key me-2"></i>Reset Student Password</h5>
+                                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form action="{{ url_for('admin.reset_student_password', student_id=s_id) }}" method="POST">
+                                        <div class="modal-body p-4">
+                                            <p class="text-muted small mb-3">This will reset the password for <strong>{{ student.student_name }}</strong> back to their registration number.</p>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-secondary">New Default Password (Reg No)</label>
+                                                <input type="text" class="form-control rounded-3 bg-light fw-bold text-dark" name="new_password" value="{{ student.registration_no }}" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0 px-4 pb-4">
+                                            <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-info text-white rounded-3 px-4 fw-semibold">Reset Password</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Student Confirmation Modal Popup -->
+                        <div class="modal fade" id="deleteStudentModal{{ s_id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                        <h5 class="fw-bold text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Confirm Delete</h5>
+                                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <p class="text-muted mb-0">Are you sure you want to delete student <strong>{{ student.student_name }}</strong>? This action cannot be undone.</p>
+                                    </div>
+                                    <div class="modal-footer border-0 px-4 pb-4">
+                                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{{ url_for('admin.delete_student', student_id=s_id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger rounded-3 px-4 fw-semibold">Yes, Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">No students found. Click "Register New Student" to add one.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Register New Student Modal Popup -->
+<div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <h5 class="fw-bold text-dark"><i class="fa-solid fa-user-plus text-primary me-2"></i>Register New Student</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('admin.students') }}" method="POST">
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <!-- First Name -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-secondary">First Name</label>
+                            <input type="text" class="form-control rounded-3" id="firstNameInput" name="first_name" required placeholder="e.g. Kavya">
+                        </div>
+                        <!-- Last Name -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-secondary">Last Name</label>
+                            <input type="text" class="form-control rounded-3" id="lastNameInput" name="last_name" required placeholder="e.g. M">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Registration Number -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-secondary">Registration Number</label>
+                            <input type="text" class="form-control rounded-3" id="regNoInput" name="registration_no" required placeholder="e.g. 151625">
+                        </div>
+                        <!-- Email ID -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-secondary">Email ID</label>
+                            <input type="email" class="form-control rounded-3" name="email" placeholder="e.g. kavya@gmail.com">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Date of Birth -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-secondary">Date of Birth (DOB)</label>
+                            <input type="date" class="form-control rounded-3" name="dob">
+                        </div>
+                        <!-- Mobile Number -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-secondary">Mobile Number</label>
+                            <input type="text" class="form-control rounded-3" name="mobile" required placeholder="e.g. 9999999999">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Branch Selection -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-secondary">Branch</label>
+                            <select class="form-control rounded-3" name="branch_id" required>
+                                <option value="">Select Branch</option>
+                                {% for branch in branches %}
+                                <option value="{{ branch.id if branch.id is defined else branch.branch_id }}">{{ branch.branch_name if branch.branch_name is defined else branch.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- Trainer Selection -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-secondary">Assigned Trainer</label>
+                            <select class="form-control rounded-3" name="faculty_id" required>
+                                <option value="">Select Trainer</option>
+                                {% for faculty in faculties %}
+                                <option value="{{ faculty.id if faculty.id is defined else faculty.faculty_id }}">{{ faculty.name if faculty.name is defined else faculty.faculty_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Auto-Generated Username -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-secondary">Auto-Generated Username (First_RegNo)</label>
+                            <input type="text" class="form-control rounded-3 bg-light fw-bold text-primary" id="autoUsernameInput" readonly placeholder="Auto-generated">
+                        </div>
+                        <!-- Default Password -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-secondary">Default Password (Reg No)</label>
+                            <input type="text" class="form-control rounded-3 bg-light fw-bold text-dark" id="autoPasswordInput" readonly placeholder="Matches Reg No">
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="status" value="Active">
+                </div>
+                <div class="modal-footer border-0 px-4 pb-4">
+                    <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">Register Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript to auto-generate username (first_regno) and password (regno) -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const firstNameInput = document.getElementById('firstNameInput');
+        const regInput = document.getElementById('regNoInput');
+        const usernameInput = document.getElementById('autoUsernameInput');
+        const passwordInput = document.getElementById('autoPasswordInput');
+
+        function updateCredentials() {
+            const fName = firstNameInput.value.trim().toLowerCase().replace(/\s+/g, '');
+            const regNo = regInput.value.trim();
+            
+            if (fName && regNo) {
+                usernameInput.value = `${fName}_${regNo}`;
+            } else if (fName) {
+                usernameInput.value = `${fName}_`;
+            } else {
+                usernameInput.value = '';
+            }
+            
+            passwordInput.value = regNo;
+        }
+
+        if (firstNameInput && regInput) {
+            firstNameInput.addEventListener('input', updateCredentials);
+            regInput.addEventListener('input', updateCredentials);
+        }
+    });
+</script>
+{% endblock %}

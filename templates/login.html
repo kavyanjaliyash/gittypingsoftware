@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Global IT Education - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0284c7 0%, #38bdf8 50%, #0369a1 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+        .main-card {
+            width: 100%;
+            max-width: 900px;
+            min-height: 520px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .left-panel {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .right-panel {
+            background: #f8fafc;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .form-control, .form-select {
+            background-color: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 11px 15px;
+            font-size: 0.95rem;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #ffffff;
+            border-color: #0284c7;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+        }
+        .form-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #475569;
+            letter-spacing: 0.5px;
+        }
+        .btn-signin {
+            background-color: #0284c7;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        .btn-signin:hover {
+            background-color: #0369a1;
+            color: white;
+            transform: translateY(-1px);
+        }
+        .brand-logo {
+            max-height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container d-flex align-items-center justify-content-center">
+    <div class="row main-card w-100 m-0">
+        
+        <!-- Left Banner Panel -->
+        <div class="col-md-5 left-panel">
+            <div>
+                <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Global IT Logo" style="max-height: 80px; width: auto; object-fit: contain;" onerror="this.style.display='none'; document.getElementById('fallback-title').style.display='block';">
+                <h3 id="fallback-title" class="fw-bold m-0 text-primary" style="display:none;"><i class="fa-solid fa-globe me-2"></i>Global IT</h3>
+            </div>
+            <div class="my-4">
+                <h2 class="fw-bold mb-3 lh-sm text-dark">Learn. Practice.</h2>
+                <div class="d-flex flex-column gap-2 mt-4 text-secondary fs-6 fw-semibold">
+                    <div><i class="fa-solid fa-check text-success me-2"></i> English Typing</div>
+                    <div><i class="fa-solid fa-check text-success me-2"></i> Kannada Typing</div>
+                </div>
+            </div>
+            <div class="text-muted small">
+                &copy; 2026 Global IT Systems
+            </div>
+        </div>
+
+        <!-- Right Form Panel -->
+        <div class="col-md-7 right-panel">
+            <div class="mb-4">
+                <h3 class="fw-bold text-dark mb-1">Welcome Back 👋</h3>
+                <p class="text-muted small">Please select your role and enter your credentials.</p>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} py-2 small rounded-3 mb-3 border-0">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="/login">
+                <!-- Role -->
+                <div class="mb-3">
+                    <label class="form-label">Role</label>
+                    <select name="role" class="form-select shadow-none" required>
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <!-- Username -->
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control shadow-none" placeholder="Enter username" required>
+                </div>
+
+                <!-- Password with eye toggle -->
+                <div class="mb-4">
+                    <label class="form-label d-flex justify-content-between align-items-center">
+                        <span>Password</span>
+                        <i class="fa-regular fa-eye text-muted" id="togglePassword" style="cursor: pointer;"></i>
+                    </label>
+                    <input type="password" name="password" id="passwordInput" class="form-control shadow-none" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn btn-signin w-100 shadow-sm">Sign In</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const passwordInput = document.querySelector('#passwordInput');
+
+    togglePassword.addEventListener('click', function () {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+</script>
+
+</body>
+</html>
