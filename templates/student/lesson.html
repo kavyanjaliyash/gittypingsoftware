@@ -13,13 +13,12 @@
 
     #typing-text-box {
         display: flex;
+        flex-wrap: wrap;
         overflow-x: auto;
-        white-space: nowrap;
-        scroll-behavior: smooth;
         background-color: #f8fafc;
         border: 3px solid #cbd5e1 !important;
         border-radius: 16px;
-        padding: 30px 20px;
+        padding: 25px 20px;
         min-height: 160px;
         align-items: center;
     }
@@ -40,6 +39,7 @@
         min-width: 75px;
         height: 85px;
         margin-right: 12px;
+        margin-bottom: 12px;
         border: 3px solid #cbd5e1;
         border-radius: 12px;
         background-color: #ffffff;
@@ -147,14 +147,28 @@
         
         textBoxEl.innerHTML = "";
         
-        // Use Intl.Segmenter to group Kannada characters, matras, and combination keys correctly into blocks
+        // Normalize newlines (\r\n -> \n) and segment graphemes
+        const normalizedContent = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
         const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-        const segments = segmenter.segment(screen.content);
+        const segments = Array.from(segmenter.segment(normalizedContent)).map(s => s.segment);
 
-        for (let segment of segments) {
+        for (let seg of segments) {
             const span = document.createElement("span");
-            span.innerText = segment.segment;
+            if (seg === '\n') {
+                span.innerText = '↵';
+                span.title = "Enter Key";
+                span.style.color = "#0284c7";
+            } else {
+                span.innerText = seg;
+            }
             textBoxEl.appendChild(span);
+
+            if (seg === '\n') {
+                const lineBreak = document.createElement("div");
+                lineBreak.style.flexBasis = "100%";
+                lineBreak.style.height = "0";
+                textBoxEl.appendChild(lineBreak);
+            }
         }
 
         inputEl.value = "";
@@ -182,8 +196,8 @@
             }
 
             const screen = screens[currentScreenIdx];
-            const targetText = screen.content;
-            const typedText = inputEl.value;
+            const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            const typedText = inputEl.value.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
             const spans = textBoxEl.querySelectorAll("span");
 
             const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
@@ -201,13 +215,8 @@
                         spans[i].style.backgroundColor = "#d1e7dd";
                         spans[i].style.borderColor = "#10b981";
                         correctCount++;
-                    } else if (i === typedSegments.length - 1 && typedSegments.length <= targetSegments.length) {
-                        // Active block currently being typed -> Neutral white/gray to support multi-key composition
-                        spans[i].style.color = "#1e293b";
-                        spans[i].style.backgroundColor = "#ffffff";
-                        spans[i].style.borderColor = "#cbd5e1";
                     } else {
-                        // Confirmed mistake -> Red
+                        // Immediate mistake -> Red
                         spans[i].style.color = "#dc2626";
                         spans[i].style.backgroundColor = "#fee2e2";
                         spans[i].style.borderColor = "#ef4444";
@@ -215,7 +224,11 @@
                     }
                 } else {
                     // Untyped future blocks -> Neutral
-                    spans[i].style.color = "#1e293b";
+                    if (targetSegments[i] === '\n') {
+                        spans[i].style.color = "#0284c7";
+                    } else {
+                        spans[i].style.color = "#1e293b";
+                    }
                     spans[i].style.backgroundColor = "#ffffff";
                     spans[i].style.borderColor = "#cbd5e1";
                 }
@@ -231,7 +244,8 @@
             const wpm = Math.round(wordsTyped / minutes);
             wpmEl.innerText = wpm >= 0 ? wpm : 0;
 
-            const accuracy = typedSegments.length > 0 ? Math.max(0, Math.round((correctCount / (correctCount + mistakeCount)) * 100)) : 100;
+            const totalAttempted = correctCount + mistakeCount;
+            const accuracy = totalAttempted > 0 ? Math.max(0, Math.round((correctCount / totalAttempted) * 100)) : 100;
             accuracyEl.innerText = accuracy;
 
             finalWpm = wpm >= 0 ? wpm : 0;
