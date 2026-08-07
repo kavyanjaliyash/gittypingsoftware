@@ -1,51 +1,395 @@
 {% extends "student/base.html" %}
 {% block content %}
-<div class="container-fluid">
-    <h2>Welcome, {{ student.student_name }}!</h2>
-    <p class="text-muted">Registration No: <strong>{{ student.registration_no }}</strong> | Branch ID: {{ student.branch_id }}</p>
+<style>
+    .profile-hero-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        padding: 24px 32px;
+        margin-bottom: 28px;
+    }
 
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm bg-white">
-                <h5 class="text-primary">Best Speeds</h5>
-                <p class="mb-1">English: <strong>{{ student.english_wpm }} WPM</strong></p>
-                <p class="mb-0">Kannada: <strong>{{ student.kannada_wpm }} WPM</strong></p>
-            </div>
-        </div>
-    </div>
+    .sprout-avatar-container {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        background: #e0f2fe;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 4px solid #ffffff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
 
-    <hr class="my-4">
+    .stat-pill {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 8px 16px;
+    }
 
-    <div class="row mt-4">
-        <h3>Typing Lessons & Curriculum</h3>
-        <p class="text-muted">Select a lesson to begin your typing practice.</p>
+    .daily-goal-ring {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: conic-gradient(#f59e0b 35%, #e2e8f0 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .daily-goal-inner {
+        width: 66px;
+        height: 66px;
+        background: #ffffff;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
 
-        {% for c in courses %}
-        <div class="col-md-12 mb-4">
-            <div class="card shadow-sm bg-white border-success">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">{{ c.course_name }}</h4>
+    /* Course Sidebar Tab Buttons */
+    .course-tab-btn {
+        width: 100%;
+        text-align: left;
+        border-radius: 14px;
+        padding: 16px 20px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: none;
+        transition: all 0.2s ease;
+        margin-bottom: 12px;
+        cursor: pointer;
+    }
+    .course-tab-btn.active {
+        background: #0284c7;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+    }
+    .course-tab-btn.inactive {
+        background: #ffffff;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+    }
+    .course-tab-btn.inactive:hover {
+        background: #f8fafc;
+    }
+
+    .play-badge-yellow {
+        background: #f59e0b;
+        color: #ffffff;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+    }
+
+    .play-badge-gray {
+        background: #93c5fd;
+        color: #ffffff;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+    }
+
+    /* Main Right Course Panel (Matching Image `#0284c7`) */
+    .course-main-panel {
+        background: #0284c7;
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 8px 24px rgba(2, 132, 199, 0.2);
+        color: #ffffff;
+    }
+
+    .lesson-item-card {
+        border-radius: 18px;
+        padding: 20px 24px;
+        margin-bottom: 16px;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    .lesson-item-card.completed-card {
+        background: #65a30d;
+        color: #ffffff;
+    }
+    .lesson-item-card.white-card {
+        background: #ffffff;
+        color: #1e293b;
+    }
+
+    .number-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .btn-resume-yellow {
+        background: #f59e0b;
+        color: #1e293b;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+    }
+    .btn-resume-yellow:hover {
+        background: #d97706;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .btn-cert-white {
+        background: rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 10px;
+        padding: 8px 18px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    .btn-cert-white:hover {
+        background: #ffffff;
+        color: #0284c7;
+    }
+</style>
+
+<div class="container-fluid px-0">
+
+    <!-- Top Profile & Stats Hero Bar (Matching Image Header) -->
+    <div class="profile-hero-card">
+        <div class="row align-items-center g-4">
+            
+            <!-- Left: Avatar & Sprout Progress -->
+            <div class="col-lg-5 col-md-12 d-flex align-items-center gap-3">
+                <div class="sprout-avatar-container">
+                    <i class="fa-solid fa-seedling fs-1 text-success"></i>
                 </div>
-                <div class="card-body">
-                    {% if c.lessons %}
-                    <div class="list-group">
-                        {% for l in c.lessons %}
-                        <a href="/student/lesson/{{ l.lesson_id }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="mb-1">Lesson {{ l.display_order }}: {{ l.lesson_title }}</h5>
-                                <p class="mb-0 text-muted small">{{ l.lesson_description }}</p>
-                            </div>
-                            <span class="btn btn-outline-success btn-sm">Start Practice &rarr;</span>
-                        </a>
-                        {% endfor %}
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-primary px-2.5 py-1 rounded-2 font-monospace">Typing Sprout (2/5)</span>
+                        <span class="text-muted small font-monospace">4,600 xp to go</span>
                     </div>
-                    {% else %}
-                    <p class="text-muted mb-0">No lessons available for this course yet.</p>
-                    {% endif %}
+                    <h4 class="fw-bold text-dark mb-0">{{ student.student_name }}</h4>
+                    <span class="text-muted small">Reg No: <strong>{{ student.reg_no or '151625' }}</strong> • Branch ID: {{ student.branch_id or '1' }}</span>
                 </div>
             </div>
+
+            <!-- Center & Right: Speed, Accuracy & Daily Goal -->
+            <div class="col-lg-7 col-md-12 d-flex flex-wrap align-items-center justify-content-lg-end gap-3">
+                <div class="stat-pill">
+                    <i class="fa-solid fa-bolt fs-4 text-warning"></i>
+                    <div>
+                        <div class="text-muted fs-7 text-uppercase fw-semibold">Avg. Speed</div>
+                        <div class="fw-bold text-dark fs-5">{{ student.english_wpm or 24 }} <small class="fs-7 text-muted">WPM</small></div>
+                    </div>
+                </div>
+
+                <div class="stat-pill">
+                    <i class="fa-solid fa-bullseye fs-4 text-danger"></i>
+                    <div>
+                        <div class="text-muted fs-7 text-uppercase fw-semibold">Avg. Acc.</div>
+                        <div class="fw-bold text-dark fs-5">98%</div>
+                    </div>
+                </div>
+
+                <div class="stat-pill">
+                    <i class="fa-regular fa-clock fs-4 text-success"></i>
+                    <div>
+                        <div class="text-muted fs-7 text-uppercase fw-semibold">Typing Time</div>
+                        <div class="fw-bold text-dark fs-5">03:41</div>
+                    </div>
+                </div>
+
+                <!-- Daily Goal Ring -->
+                <div class="d-flex align-items-center gap-2 bg-light p-2 rounded-4 border">
+                    <div class="daily-goal-ring">
+                        <div class="daily-goal-inner">
+                            <span class="text-uppercase fw-bold text-warning" style="font-size: 0.6rem; letter-spacing: 0.5px;">DAILY GOAL</span>
+                            <span class="fw-bold text-dark fs-7">03:41</span>
+                            <span class="text-muted" style="font-size: 0.65rem;">/15:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        {% endfor %}
+
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top text-muted small">
+            <div>
+                <span class="fw-bold text-dark">GIT - Trainer Harshith Kumar's Class</span> | <a href="#" class="text-primary text-decoration-none">Class Scoreboard</a>
+            </div>
+            <div>
+                <i class="fa-solid fa-fire text-secondary me-1"></i> You have no active streaks
+            </div>
+        </div>
     </div>
+
+    <!-- Main Layout Grid: Left Sidebar + Right Course Panel -->
+    <div class="row g-4">
+        
+        <!-- Left Sidebar: Learn to Type Course Tabs -->
+        <div class="col-lg-3 col-md-4">
+            <h6 class="fw-bold text-muted text-uppercase fs-7 mb-3" style="letter-spacing: 1px;">Learn to Type</h6>
+            
+            {% for c in courses %}
+            <button class="course-tab-btn {% if loop.first %}active{% else %}inactive{% endif %}" onclick="switchCourseTab({{ c.course_id }}, this)">
+                <div class="d-flex align-items-center gap-2">
+                    {% if 'Kannada' in c.course_name %}
+                    <i class="fa-solid fa-language me-1"></i>
+                    {% else %}
+                    <i class="fa-solid fa-keyboard me-1"></i>
+                    {% endif %}
+                    <span>{{ c.course_name }}</span>
+                </div>
+                <div class="{% if loop.first %}play-badge-yellow{% else %}play-badge-gray{% endif %}">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Right Course Display Panel (Matching Blue `#0284c7` Design) -->
+        <div class="col-lg-9 col-md-8">
+            {% for c in courses %}
+            <div id="course-panel-{{ c.course_id }}" class="course-main-panel {% if not loop.first %}d-none{% endif %}">
+                
+                <!-- Course Top Bar: Overall Progress & Certificate Button -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between pb-3 mb-4 border-bottom border-white border-opacity-25 gap-3">
+                    <div class="d-flex align-items-center gap-3 flex-grow-1" style="max-width: 400px;">
+                        <div class="progress flex-grow-1 bg-white bg-opacity-25" style="height: 18px; border-radius: 10px;">
+                            <div class="progress-bar bg-white" role="progressbar" style="width: {{ course_stats[c.course_id].pct }}%;" aria-valuenow="{{ course_stats[c.course_id].pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <span class="fw-bold text-white fs-6 font-monospace">{{ course_stats[c.course_id].pct }}% Complete</span>
+                    </div>
+
+                    <!-- Print Certificate Button (Enabled for Kannada & English Courses) -->
+                    <div>
+                        <a href="/student/certificate/{{ c.course_id }}" target="_blank" class="btn-cert-white d-inline-flex align-items-center gap-2">
+                            <i class="fa-solid fa-award"></i> Print Unit Certificate
+                        </a>
+                    </div>
+                </div>
+
+                <h4 class="fw-bold text-white mb-4 fs-4">Getting Started</h4>
+
+                <!-- Lessons List -->
+                {% if c.lessons %}
+                <div class="lessons-container">
+                    {% for l in c.lessons %}
+                    {% set is_completed = (completed_lesson_ids and l.lesson_id in completed_lesson_ids) %}
+                    {% set prog = progress_map.get(l.lesson_id) %}
+                    
+                    <div class="lesson-item-card {% if is_completed %}completed-card{% else %}white-card{% endif %} shadow-sm">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="number-circle">
+                                    {{ l.display_order }}
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-1 fs-5">{{ l.lesson_title }}</h5>
+                                    <div class="fs-7 opacity-75 d-flex align-items-center gap-3">
+                                        <span>Avg Speed: <strong>{% if prog %}{{ prog.wpm or 20 }}{% else %}20{% endif %} WPM</strong></span>
+                                        <span>Avg Acc: <strong>{% if prog %}{{ prog.accuracy|round|int or 100 }}{% else %}100{% endif %}%</strong></span>
+                                        <span>Time: <strong>{% if prog %}{% if prog.time_taken >= 60 %}{{ (prog.time_taken // 60) }}:{{ "%02d"|format(prog.time_taken % 60) }}{% else %}0:{{ "%02d"|format(prog.time_taken) }}{% endif %}{% else %}0:57{% endif %}</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <a href="/student/lesson/{{ l.lesson_id }}" class="btn-resume-yellow text-decoration-none">
+                                    <i class="fa-solid fa-play"></i>
+                                    <span>{% if is_completed %}Retry{% else %}Resume{% endif %}</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Segmented Progress Bar at bottom of Lesson Card -->
+                        <div class="d-flex gap-1 mt-3 rounded-2 overflow-hidden bg-black bg-opacity-10 p-1" style="height: 12px;">
+                            {% for screen in l.screens %}
+                            <div class="flex-fill rounded-1 {% if is_completed %}bg-white{% else %}bg-primary opacity-50{% endif %}"></div>
+                            {% else %}
+                            <div class="flex-fill rounded-1 bg-white opacity-50"></div>
+                            <div class="flex-fill rounded-1 bg-white opacity-50"></div>
+                            <div class="flex-fill rounded-1 bg-white opacity-50"></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5 bg-white bg-opacity-10 rounded-4">
+                    <p class="mb-0 text-white opacity-75">No lessons configured for this course yet.</p>
+                </div>
+                {% endif %}
+
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
 </div>
+
+<script>
+    function switchCourseTab(courseId, btn) {
+        // Toggle tab buttons
+        document.querySelectorAll(".course-tab-btn").forEach(b => {
+            b.classList.remove("active");
+            b.classList.add("inactive");
+            const badge = b.querySelector(".play-badge-yellow");
+            if (badge) {
+                badge.classList.remove("play-badge-yellow");
+                badge.classList.add("play-badge-gray");
+            }
+        });
+
+        btn.classList.remove("inactive");
+        btn.classList.add("active");
+        const badge = btn.querySelector(".play-badge-gray");
+        if (badge) {
+            badge.classList.remove("play-badge-gray");
+            badge.classList.add("play-badge-yellow");
+        }
+
+        // Toggle course main panels
+        document.querySelectorAll(".course-main-panel").forEach(p => {
+            p.classList.add("d-none");
+        });
+
+        const activePanel = document.getElementById(`course-panel-${courseId}`);
+        if (activePanel) {
+            activePanel.classList.remove("d-none");
+        }
+    }
+</script>
 {% endblock %}

@@ -1,34 +1,103 @@
 {% extends "student/base.html" %}
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm text-center p-4 bg-white border-success">
-                <div class="card-body">
-                    <h2 class="text-success mb-3">Lesson Completed! 🎉</h2>
-                    <p class="text-muted mb-4">You have successfully completed <strong>{{ lesson.lesson_title }}</strong>.</p>
-                    
-                    <div class="row text-start mb-4 bg-light p-3 rounded">
-                        <div class="col-6 mb-2"><strong>Speed:</strong></div>
-                        <div class="col-6 mb-2 text-end text-primary">{{ wpm }} WPM</div>
-                        
-                        <div class="col-6 mb-2"><strong>Mistakes / Errors:</strong></div>
-                        <div class="col-6 mb-2 text-end text-danger">{{ mistakes }}</div>
-                        
-                        <div class="col-6"><strong>Time Taken:</strong></div>
-                        <div class="col-6 text-end text-secondary">{{ seconds }} seconds</div>
-                    </div>
+<style>
+    .completion-container {
+        max-width: 620px;
+        width: 100%;
+    }
+    .star-icon {
+        font-size: 3.5rem;
+        color: #e2e8f0;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.08));
+    }
+    .star-icon.active {
+        color: #f59e0b;
+        transform: scale(1.15);
+        filter: drop-shadow(0 6px 12px rgba(245, 158, 11, 0.4));
+    }
+    .stars-card {
+        background: linear-gradient(135deg, #fffdf0 0%, #fffbeb 100%);
+        border: 2px solid #fef08a;
+        border-radius: 24px;
+        padding: 32px 24px 24px 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-continue {
+        background: #f59e0b;
+        color: #ffffff;
+        border: none;
+        transition: all 0.2s ease;
+    }
+    .btn-continue:hover {
+        background: #d97706;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4) !important;
+    }
+</style>
 
-                    <div class="d-flex justify-content-between">
-                        <a href="/student/dashboard" class="btn btn-outline-secondary">Back to Dashboard</a>
-                        
-                        {% if next_lesson %}
-                        <a href="/student/lesson/{{ next_lesson.lesson_id }}" class="btn btn-success">Next Lesson &rarr;</a>
-                        {% else %}
-                        <a href="/student/dashboard" class="btn btn-success">Course Completed! Finish</a>
-                        {% endif %}
+<div class="d-flex justify-content-center align-items-center py-4 w-100">
+    <div class="completion-container">
+        <div class="card border-0 shadow-lg text-center p-4 bg-white rounded-4 overflow-hidden">
+            <div class="card-body p-4">
+                
+                <!-- Headline -->
+                {% if stars == 3 %}
+                    <h2 class="fw-bold text-dark mb-3 fs-2">Super job! 🎉</h2>
+                {% elif stars == 2 %}
+                    <h2 class="fw-bold text-dark mb-3 fs-2">Great job! 👏</h2>
+                {% else %}
+                    <h2 class="fw-bold text-dark mb-3 fs-2">Keep practicing! 💪</h2>
+                {% endif %}
+
+                <!-- Stars Display Box (Matching Image 2) -->
+                <div class="stars-card mb-4 shadow-sm">
+                    <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                        <i class="fa-solid fa-star star-icon {% if stars >= 1 %}active{% endif %}"></i>
+                        <i class="fa-solid fa-star star-icon {% if stars >= 2 %}active{% endif %}" style="font-size: 4.5rem; transform: translateY(-8px);"></i>
+                        <i class="fa-solid fa-star star-icon {% if stars >= 3 %}active{% endif %}"></i>
                     </div>
+                    <h5 class="fw-bold text-dark mb-1 fs-4">
+                        {% if stars == 3 %}
+                            You earned all stars!
+                        {% else %}
+                            You earned {{ stars }}/3 stars!
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted small mb-0 fw-semibold">You earned {{ stars }}/3 stars for accuracy!</p>
                 </div>
+
+                <!-- Stats summary (Matching Image 2) -->
+                <div class="mb-4">
+                    <h4 class="fw-bold text-dark fs-4 mb-2">
+                        Your speed was <span class="text-success fs-3">{{ wpm }} WPM</span> with <span class="text-success fs-3">{{ accuracy }}% accuracy</span>.
+                    </h4>
+                    <p class="text-muted small mb-0">
+                        You've typed for <strong>{% if seconds >= 60 %}{{ (seconds // 60) }}:{{ "%02d"|format(seconds % 60) }}{% else %}0:{{ "%02d"|format(seconds) }}{% endif %}</strong> on this lesson with an average speed of <strong>{{ wpm }} WPM</strong> and <strong>{{ accuracy }}% accuracy</strong>.
+                    </p>
+                </div>
+
+                <hr class="my-4 border-slate-200">
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between align-items-center gap-3">
+                    <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary btn-lg rounded-4 px-4 py-2.5 fw-bold d-inline-flex align-items-center gap-2 fs-6">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back to Dashboard</span>
+                    </a>
+
+                    {% if next_lesson %}
+                    <a href="/student/lesson/{{ next_lesson.lesson_id }}" class="btn btn-continue btn-lg rounded-4 px-4 py-2.5 fw-bold shadow d-inline-flex align-items-center gap-2 fs-6">
+                        <span>Continue</span> <i class="fa-solid fa-chevron-right fs-6"></i>
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('student.dashboard') }}" class="btn btn-success btn-lg rounded-4 px-4 py-2.5 fw-bold text-white shadow d-inline-flex align-items-center gap-2 fs-6">
+                        <i class="fa-solid fa-circle-check"></i> Complete
+                    </a>
+                    {% endif %}
+                </div>
+
             </div>
         </div>
     </div>

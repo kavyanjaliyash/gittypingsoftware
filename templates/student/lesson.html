@@ -13,14 +13,15 @@
 
     #typing-text-box {
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 12px;
         overflow-x: auto;
         background-color: #f8fafc;
         border: 3px solid #cbd5e1 !important;
         border-radius: 16px;
         padding: 25px 20px;
         min-height: 160px;
-        align-items: center;
+        width: 100%;
     }
 
     #typing-text-box::-webkit-scrollbar {
@@ -31,7 +32,7 @@
         border-radius: 4px;
     }
 
-    /* Dramatically increased block size and font size */
+    /* Block size and font size */
     #typing-text-box span {
         display: inline-flex;
         align-items: center;
@@ -39,7 +40,6 @@
         min-width: 75px;
         height: 85px;
         margin-right: 12px;
-        margin-bottom: 12px;
         border: 3px solid #cbd5e1;
         border-radius: 12px;
         background-color: #ffffff;
@@ -49,45 +49,305 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         transition: all 0.1s ease;
     }
+
+    /* Virtual On-Screen Keyboard Styles */
+    .virtual-keyboard {
+        background: #cbd5e1;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        user-select: none;
+    }
+    .keyboard-row {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+    .keyboard-row:last-child {
+        margin-bottom: 0;
+    }
+    .keyboard-key {
+        background: #ffffff;
+        border: 1px solid #94a3b8;
+        border-radius: 8px;
+        min-width: 44px;
+        height: 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.92rem;
+        color: #334155;
+        box-shadow: 0 3px 0 #94a3b8;
+        transition: all 0.15s ease;
+        line-height: 1.1;
+        text-align: center;
+    }
+    .keyboard-key.key-wide { min-width: 70px; font-size: 0.8rem; text-transform: lowercase; }
+    .keyboard-key.key-extra-wide { min-width: 90px; font-size: 0.8rem; }
+    .keyboard-key.key-spacebar { width: 320px; font-size: 0.85rem; text-transform: lowercase; }
+
+    /* Highlighted Active Key */
+    .keyboard-key.key-active {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+        border-color: #0284c7 !important;
+        box-shadow: 0 3px 0 #0369a1 !important;
+        transform: translateY(2px);
+    }
+
+    /* Pause Toast Popup (Positioned on Bottom Right) */
+    .pause-toast {
+        position: fixed !important;
+        bottom: 30px !important;
+        right: 30px !important;
+        left: auto !important;
+        z-index: 99999 !important;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        border-left: 6px solid #0284c7;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+    }
+    .pause-toast.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    .pause-toast-icon {
+        font-size: 2.2rem;
+        color: #0284c7;
+    }
+    .pause-toast-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+    .pause-toast-sub {
+        font-size: 0.92rem;
+        color: #64748b;
+        margin: 0;
+    }
 </style>
 
-<div class="lesson-container">
-    <div class="card shadow-sm p-4 bg-white mb-4">
-        <h3 class="mb-1 text-primary fw-bold">{{ lesson.lesson_title }}</h3>
-        <p class="text-muted mb-0">{{ lesson.lesson_description }}</p>
+<!-- Timer Paused Floating Toast Popup (Positioned on Bottom Right) -->
+<div id="pause-toast" class="pause-toast" style="right: 30px !important; left: auto !important;">
+    <div class="pause-toast-icon">
+        <i class="fa-solid fa-stopwatch-20"></i>
+    </div>
+    <div>
+        <h6 class="pause-toast-title">The timer has been paused.</h6>
+        <p class="pause-toast-sub">Resume typing to continue.</p>
+    </div>
+</div>
+
+{% if (lesson.course and 'Kannada' in lesson.course.course_name) or 'Kannada' in lesson.lesson_title %}
+<!-- Nudi Activation & Verification Modal -->
+<div id="nudi-modal-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); z-index: 999999; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden text-center" style="max-width: 650px; width: 100%; background: #ffffff;">
+        <div class="card-header border-0 bg-warning bg-opacity-15 py-3 px-4 text-start d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-warning bg-opacity-20 text-warning d-flex align-items-center justify-content-center" style="width: 54px; height: 54px; flex-shrink: 0;">
+                <i class="fa-solid fa-keyboard fs-3"></i>
+            </div>
+            <div>
+                <h5 class="fw-bold text-dark mb-0">Kannada Nudi Activation Required</h5>
+                <p class="text-muted small mb-0">Please verify Nudi software is active before starting your lesson practice.</p>
+            </div>
+        </div>
+
+        <div class="card-body p-4 text-start">
+            <!-- Educational Steps Box -->
+            <div class="p-3 bg-light rounded-3 border mb-4">
+                <h6 class="fw-bold text-primary mb-2 fs-6"><i class="fa-solid fa-circle-info me-2"></i>How to enable Kannada Nudi typing:</h6>
+                <ol class="mb-0 text-dark small ps-3">
+                    <li class="mb-1.5">Open your <strong>Nudi Software</strong> (Nudi Direct / Nudi IME) on your computer.</li>
+                    <li class="mb-1.5">Press the <strong>Scroll Lock</strong> key (or toggle key) to switch Nudi ON.</li>
+                    <li>Verify activation by typing key 'a' in the test box below.</li>
+                </ol>
+            </div>
+
+            <!-- Interactive Test Input Field -->
+            <div class="p-4 bg-white border border-2 border-warning rounded-4 text-center shadow-sm">
+                <label for="nudi-test-input" class="fw-bold text-dark mb-1 d-block">Test your Nudi activation below:</label>
+                <p class="text-muted fs-7 mb-2">Press key <strong>'a'</strong> in the box below (must produce <strong>'ಅ'</strong>):</p>
+                
+                <input type="text" id="nudi-test-input" class="form-control form-control-lg text-center fs-3 font-monospace fw-bold border-2 mb-3 rounded-3" placeholder="Type key 'a' here..." style="max-width: 340px; margin: 0 auto; border-color: #f59e0b !important;">
+                
+                <div id="nudi-status-badge" class="alert alert-warning py-2 px-3 mb-0 d-inline-block fw-bold small">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i> Waiting for keypress...
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer border-0 bg-light p-3 px-4 d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary rounded-3 px-3.5 py-2 fw-semibold">
+                <i class="fa-solid fa-arrow-left"></i> Dashboard
+            </a>
+            <div class="d-flex gap-2">
+                <button id="bypass-nudi-btn" type="button" class="btn btn-outline-primary rounded-3 px-3 py-2 fw-semibold">
+                    I Have Enabled Nudi
+                </button>
+                <button id="start-kannada-practice-btn" type="button" class="btn btn-success rounded-3 px-4 py-2 fw-bold disabled" disabled style="opacity: 0.6; cursor: not-allowed;">
+                    <span>Start Practice</span> <i class="fa-solid fa-arrow-right ms-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="lesson-container w-100">
+    <!-- Top Header Bar with Back to Dashboard Button (Matching Image 2) -->
+    <div class="d-flex align-items-center justify-content-between text-white px-3.5 py-2.5 rounded-3 mb-4 shadow-sm" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-light text-primary btn-sm rounded-3 fw-bold px-3 py-1.5 shadow-sm d-inline-flex align-items-center gap-2" title="Back to Dashboard">
+                <i class="fa-solid fa-arrow-left fs-6"></i> <span>Back to Dashboard</span>
+            </a>
+            <h5 class="mb-0 fw-bold fs-6 text-white text-truncate">
+                {{ lesson.lesson_title }} <span id="screen-subtitle" class="text-white-50 ms-2 fs-7 fw-normal"></span>
+            </h5>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-white text-primary rounded-pill px-3 py-1.5 font-monospace fw-bold" id="top-screen-counter">Screen 1 of {{ screens|length }}</span>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 bg-white rounded-4 mb-4">
+        <h4 class="mb-1 text-primary fw-bold"><i class="fa-solid fa-keyboard me-2"></i>{{ lesson.lesson_title }}</h4>
+        <p class="text-muted small mb-0">{{ lesson.lesson_description or 'Follow the letter prompts below and practice your touch typing speed.' }}</p>
+    </div>
+
+    <!-- Lesson Progress Bar Card -->
+    <div class="card border-0 shadow-sm p-4 bg-white rounded-4 mb-4 w-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0 fs-5">Lesson Progress</h5>
+            <span id="progress-text" class="text-muted fw-semibold font-monospace">0/0 Screens Completed</span>
+        </div>
+        <div id="progress-bar-container" class="d-flex gap-1.5 w-100 rounded-3 overflow-hidden p-1 bg-light border" style="min-height: 42px;">
+        </div>
     </div>
 
     {% if screens %}
-    <div class="card shadow-sm p-4 bg-white">
-        <h5 id="screen-title" class="text-secondary mb-3 fw-semibold"></h5>
+    <div class="card border-0 shadow-sm p-4 bg-white rounded-4 w-100">
+        <h6 id="screen-title" class="text-muted text-uppercase fs-7 fw-bold mb-3" style="letter-spacing: 0.5px;"></h6>
         
-        <!-- Typing Display Area with Larger Letter Blocks & Horizontal Scroll -->
+        <!-- Typing Display Area with Larger Letter Blocks & Full Width Stretch -->
         <div id="typing-text-box" class="mb-4 shadow-inner">
         </div>
 
-        <!-- Hidden Input to capture keystrokes -->
-        <textarea id="typing-input" class="form-control mb-3 p-3 fs-5" rows="2" placeholder="Click here and start typing the text above..."></textarea>
-
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <span class="me-4 fs-5 text-secondary">Time: <strong id="timer" class="text-dark">0</strong>s</span>
-                <span class="me-4 fs-5 text-secondary">WPM: <strong id="wpm" class="text-dark">0</strong></span>
-                <span class="fs-5 text-secondary">Accuracy: <strong id="accuracy" class="text-dark">100</strong>%</span>
+        <!-- On-Screen Virtual Keyboard with Live Key Highlighting -->
+        <div id="virtual-keyboard" class="virtual-keyboard mb-4 shadow-sm">
+            <!-- Row 1: Numbers & Symbols -->
+            <div class="keyboard-row">
+                <div class="keyboard-key" data-key="`">~<br>`</div>
+                <div class="keyboard-key" data-key="1">!<br>1</div>
+                <div class="keyboard-key" data-key="2">@<br>2</div>
+                <div class="keyboard-key" data-key="3">#<br>3</div>
+                <div class="keyboard-key" data-key="4">$<br>4</div>
+                <div class="keyboard-key" data-key="5">%<br>5</div>
+                <div class="keyboard-key" data-key="6">^<br>6</div>
+                <div class="keyboard-key" data-key="7">&amp;<br>7</div>
+                <div class="keyboard-key" data-key="8">*<br>8</div>
+                <div class="keyboard-key" data-key="9">(<br>9</div>
+                <div class="keyboard-key" data-key="0">)<br>0</div>
+                <div class="keyboard-key" data-key="-">_<br>-</div>
+                <div class="keyboard-key" data-key="=">+<br>=</div>
+                <div class="keyboard-key key-wide" data-key="Backspace">delete ⌫</div>
             </div>
-            <button id="next-screen-btn" class="btn btn-success px-4 py-2 fs-5" style="display:none;">Next Screen &rarr;</button>
+
+            <!-- Row 2: QWERTY -->
+            <div class="keyboard-row">
+                <div class="keyboard-key key-wide" data-key="Tab">tab ⇥</div>
+                <div class="keyboard-key" data-key="q">Q</div>
+                <div class="keyboard-key" data-key="w">W</div>
+                <div class="keyboard-key" data-key="e">E</div>
+                <div class="keyboard-key" data-key="r">R</div>
+                <div class="keyboard-key" data-key="t">T</div>
+                <div class="keyboard-key" data-key="y">Y</div>
+                <div class="keyboard-key" data-key="u">U</div>
+                <div class="keyboard-key" data-key="i">I</div>
+                <div class="keyboard-key" data-key="o">O</div>
+                <div class="keyboard-key" data-key="p">P</div>
+                <div class="keyboard-key" data-key="[">{<br>[</div>
+                <div class="keyboard-key" data-key="]">}<br>]</div>
+                <div class="keyboard-key" data-key="\">|<br>\</div>
+            </div>
+
+            <!-- Row 3: Home Row -->
+            <div class="keyboard-row">
+                <div class="keyboard-key key-extra-wide" data-key="CapsLock">caps lock ⇪</div>
+                <div class="keyboard-key" data-key="a">A</div>
+                <div class="keyboard-key" data-key="s">S</div>
+                <div class="keyboard-key" data-key="d">D</div>
+                <div class="keyboard-key" data-key="f">F</div>
+                <div class="keyboard-key" data-key="g">G</div>
+                <div class="keyboard-key" data-key="h">H</div>
+                <div class="keyboard-key" data-key="j">J</div>
+                <div class="keyboard-key" data-key="k">K</div>
+                <div class="keyboard-key" data-key="l">L</div>
+                <div class="keyboard-key" data-key=";">:<br>;</div>
+                <div class="keyboard-key" data-key="'">"<br>'</div>
+                <div class="keyboard-key key-extra-wide" data-key="Enter">enter ↵</div>
+            </div>
+
+            <!-- Row 4: Bottom Row -->
+            <div class="keyboard-row">
+                <div class="keyboard-key key-extra-wide" data-key="Shift">shift ⇧</div>
+                <div class="keyboard-key" data-key="z">Z</div>
+                <div class="keyboard-key" data-key="x">X</div>
+                <div class="keyboard-key" data-key="c">C</div>
+                <div class="keyboard-key" data-key="v">V</div>
+                <div class="keyboard-key" data-key="b">B</div>
+                <div class="keyboard-key" data-key="n">N</div>
+                <div class="keyboard-key" data-key="m">M</div>
+                <div class="keyboard-key" data-key=",">&lt;<br>,</div>
+                <div class="keyboard-key" data-key=".">&gt;<br>.</div>
+                <div class="keyboard-key" data-key="/">?<br>/</div>
+                <div class="keyboard-key key-extra-wide" data-key="Shift">shift ⇧</div>
+            </div>
+
+            <!-- Row 5: Spacebar -->
+            <div class="keyboard-row">
+                <div class="keyboard-key key-spacebar" data-key="Space">space</div>
+            </div>
+        </div>
+
+        <!-- Input Area to capture keystrokes -->
+        <textarea id="typing-input" class="form-control mb-4 p-3 fs-5 rounded-3 border-2 shadow-none" rows="2" placeholder="Click here and start typing the text above..."></textarea>
+
+        <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 border">
+            <div class="d-flex gap-4 align-items-center">
+                <span class="fs-6 text-muted fw-semibold"><i class="fa-regular fa-clock text-primary me-1"></i> Time: <strong id="timer" class="text-dark fs-5">0</strong>s</span>
+                <span class="fs-6 text-muted fw-semibold"><i class="fa-solid fa-gauge-high text-success me-1"></i> WPM: <strong id="wpm" class="text-dark fs-5">0</strong></span>
+                <span class="fs-6 text-muted fw-semibold"><i class="fa-solid fa-bullseye text-warning me-1"></i> Accuracy: <strong id="accuracy" class="text-dark fs-5">100</strong>%</span>
+            </div>
+            <div class="d-flex gap-2">
+                <button id="retry-btn" type="button" class="btn btn-outline-secondary px-3 py-2 fw-semibold rounded-3 shadow-sm d-flex align-items-center gap-1">
+                    <i class="fa-solid fa-rotate-right"></i> Retry
+                </button>
+                <button id="next-screen-btn" type="button" class="btn btn-success px-4 py-2 fw-bold rounded-3 shadow-sm d-flex align-items-center gap-1 disabled" disabled>
+                    <span id="next-btn-text">Next Screen</span> <i id="next-btn-icon" class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
         </div>
     </div>
     {% else %}
-    <div class="alert alert-warning">No typing screens available for this lesson yet. Please check back later.</div>
-    <a href="/student/dashboard" class="btn btn-secondary mt-3">Back to Dashboard</a>
-    {% endif %}
-
-    <!-- Linking to a student dashboard route -->
-    <a href="{{ url_for('student.dashboard') }}">Back to Dashboard</a>
-
-    <!-- Linking a CSS file -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <div class="alert alert-warning rounded-3 border-0 shadow-sm p-4 text-center">
+        <i class="fa-solid fa-triangle-exclamation fs-3 mb-2 d-block"></i>
+        No typing screens available for this lesson yet. Please check back later.
     </div>
+    {% endif %}
+</div>
 
 <script>
     const screens = [
@@ -102,12 +362,13 @@
 
     const lessonId = {{ lesson.lesson_id }};
     let currentScreenIdx = 0;
-    let timer = null;
+    let timerInterval = null;
+    let inactivityTimeout = null;
+    let isTimerRunning = false;
     let secondsElapsed = 0;
-    let isStarted = false;
-    let finalWpm = 0;
-    let finalMistakes = 0;
-    let finalSeconds = 0;
+    let cumulativeWords = 0;
+    let cumulativeMistakes = 0;
+    let cumulativeSeconds = 0;
 
     const titleEl = document.getElementById("screen-title");
     const textBoxEl = document.getElementById("typing-text-box");
@@ -116,85 +377,295 @@
     const wpmEl = document.getElementById("wpm");
     const accuracyEl = document.getElementById("accuracy");
     const nextBtn = document.getElementById("next-screen-btn");
+    const retryBtn = document.getElementById("retry-btn");
+    const nextBtnText = document.getElementById("next-btn-text");
 
-    function loadScreen(idx) {
-        if (idx >= screens.length) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/student/lesson/${lessonId}/complete`;
+    function stopTimerInterval() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        isTimerRunning = false;
+    }
 
-            const fields = { 
-                wpm: finalWpm, 
-                mistakes: finalMistakes, 
-                seconds: finalSeconds 
-            };
+    function startTimerInterval() {
+        stopTimerInterval();
+        isTimerRunning = true;
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            timerEl.innerText = secondsElapsed;
+        }, 1000);
 
-            for (const key in fields) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = fields[key];
-                form.appendChild(input);
-            }
+        const toast = document.getElementById("pause-toast");
+        if (toast) toast.classList.remove("show");
+    }
 
-            document.body.appendChild(form);
-            form.submit();
+    function pauseTimerState() {
+        stopTimerInterval();
+        const toast = document.getElementById("pause-toast");
+        if (toast) toast.classList.add("show");
+    }
+
+    function handleKeystrokeActivity(isFinished) {
+        if (inactivityTimeout) {
+            clearTimeout(inactivityTimeout);
+            inactivityTimeout = null;
+        }
+
+        if (isFinished) {
+            stopTimerInterval();
+            const toast = document.getElementById("pause-toast");
+            if (toast) toast.classList.remove("show");
             return;
         }
+
+        if (!isTimerRunning) {
+            startTimerInterval();
+        }
+
+        inactivityTimeout = setTimeout(() => {
+            pauseTimerState();
+        }, 3000);
+    }
+
+    function updateProgressBar(idx) {
+        const container = document.getElementById("progress-bar-container");
+        const progressText = document.getElementById("progress-text");
+        if (!container || !progressText) return;
+
+        progressText.innerText = `${idx}/${screens.length} Screens Completed`;
+        container.innerHTML = "";
+
+        screens.forEach((s, i) => {
+            const block = document.createElement("div");
+            block.className = "flex-fill d-flex align-items-center justify-content-center fw-bold fs-7 rounded-2 py-2 transition-all";
+            block.innerText = (i + 1);
+
+            if (i <= idx) {
+                // Completed or Active Current -> Blue (#0284c7)
+                block.style.background = "#0284c7";
+                block.style.color = "#ffffff";
+                if (i === idx) {
+                    block.style.boxShadow = "0 2px 6px rgba(2, 132, 199, 0.4)";
+                }
+            } else {
+                // Remaining -> Light Gray (#e2e8f0)
+                block.style.background = "#e2e8f0";
+                block.style.color = "#64748b";
+            }
+            container.appendChild(block);
+        });
+    }
+
+    function updateKeyboardHighlighting(targetSegments, typedSegments) {
+        document.querySelectorAll(".keyboard-key").forEach(k => k.classList.remove("key-active"));
+        if (!targetSegments) return;
+
+        let activeIdx = typedSegments.length;
+        let remainingStr = "";
+
+        // Check if user is in the middle of typing a multi-character grapheme (e.g. 'ಅಂ' -> typed 'ಅ')
+        if (activeIdx > 0 && activeIdx - 1 < targetSegments.length) {
+            const prevTyped = typedSegments[activeIdx - 1];
+            const prevTarget = targetSegments[activeIdx - 1];
+            if (prevTyped !== prevTarget && prevTarget.startsWith(prevTyped)) {
+                activeIdx = activeIdx - 1;
+                remainingStr = prevTarget.substring(prevTyped.length);
+            }
+        }
+
+        if (activeIdx >= targetSegments.length) return;
+
+        if (!remainingStr) {
+            remainingStr = targetSegments[activeIdx];
+        }
+
+        if (remainingStr === '\n') {
+            document.querySelectorAll('[data-key="Enter"]').forEach(k => k.classList.add("key-active"));
+            return;
+        }
+        if (remainingStr === ' ') {
+            document.querySelectorAll('[data-key="Space"]').forEach(k => k.classList.add("key-active"));
+            return;
+        }
+
+        let nextChar = remainingStr[0];
+        let keyChar = nextChar;
+
+        if (window.nudiReverseMap) {
+            if (window.nudiReverseMap[remainingStr]) {
+                keyChar = window.nudiReverseMap[remainingStr][0];
+            } else if (window.nudiReverseMap[nextChar]) {
+                keyChar = window.nudiReverseMap[nextChar];
+            }
+        }
+
+        const shiftSymbols = {
+            '~':'`', '!':'1', '@':'2', '#':'3', '$':'4', '%':'5', '^':'6', '&':'7', '*':'8', '(':'9', ')':'0', '_':'-', '+':'=',
+            '{':'[', '}':']', '|':'\\', ':':';', '"':'\'', '<':',', '>':'.', '?':'/'
+        };
+
+        let isShifted = false;
+        let lookupKey = keyChar;
+
+        if (keyChar >= 'A' && keyChar <= 'Z') {
+            isShifted = true;
+            lookupKey = keyChar.toLowerCase();
+        } else if (shiftSymbols[keyChar]) {
+            isShifted = true;
+            lookupKey = shiftSymbols[keyChar];
+        }
+
+        if (isShifted) {
+            document.querySelectorAll('[data-key="Shift"]').forEach(k => k.classList.add("key-active"));
+        }
+
+        try {
+            document.querySelectorAll(`[data-key="${CSS.escape(lookupKey.toLowerCase())}"]`).forEach(k => k.classList.add("key-active"));
+        } catch (e) {}
+    }
+
+    function loadScreen(idx) {
+        currentScreenIdx = idx;
+        updateProgressBar(idx);
+
+        const topCounter = document.getElementById("top-screen-counter");
+        if (topCounter) topCounter.innerText = `Screen ${idx + 1} of ${screens.length}`;
+        const subTitle = document.getElementById("screen-subtitle");
+        if (subTitle) subTitle.innerText = `• Screen ${idx + 1} of ${screens.length}`;
 
         const screen = screens[idx];
         titleEl.innerText = screen.title;
         
         textBoxEl.innerHTML = "";
         
-        // Normalize newlines (\r\n -> \n) and segment graphemes
+        // Normalize newlines (\r\n -> \n) and split into lines so wrapping ONLY occurs when \n exists
         const normalizedContent = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        const lines = normalizedContent.split('\n');
         const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-        const segments = Array.from(segmenter.segment(normalizedContent)).map(s => s.segment);
 
-        for (let seg of segments) {
-            const span = document.createElement("span");
-            if (seg === '\n') {
-                span.innerText = '↵';
-                span.title = "Enter Key";
-                span.style.color = "#0284c7";
-            } else {
+        lines.forEach((lineText, lineIdx) => {
+            const rowEl = document.createElement("div");
+            rowEl.className = "d-flex flex-nowrap align-items-center w-100 py-1";
+            rowEl.style.overflowX = "auto";
+
+            const lineSegments = Array.from(segmenter.segment(lineText)).map(s => s.segment);
+            lineSegments.forEach(seg => {
+                const span = document.createElement("span");
                 span.innerText = seg;
-            }
-            textBoxEl.appendChild(span);
+                rowEl.appendChild(span);
+            });
 
-            if (seg === '\n') {
-                const lineBreak = document.createElement("div");
-                lineBreak.style.flexBasis = "100%";
-                lineBreak.style.height = "0";
-                textBoxEl.appendChild(lineBreak);
+            // Append Enter symbol block if there is a newline after this line
+            if (lineIdx < lines.length - 1) {
+                const enterSpan = document.createElement("span");
+                enterSpan.innerText = '↵';
+                enterSpan.title = "Press Enter Key";
+                enterSpan.style.color = "#0284c7";
+                rowEl.appendChild(enterSpan);
             }
-        }
+
+            textBoxEl.appendChild(rowEl);
+        });
+
+        const targetSegs = Array.from(segmenter.segment(normalizedContent)).map(s => s.segment);
+        updateKeyboardHighlighting(targetSegs, []);
 
         inputEl.value = "";
         inputEl.disabled = false;
         inputEl.focus();
-        nextBtn.style.display = "none";
-        isStarted = false;
+        
+        // Highlight 1st block in solid blue immediately upon load
+        const initialSpans = textBoxEl.querySelectorAll("span");
+        if (initialSpans.length > 0) {
+            initialSpans[0].style.color = "#ffffff";
+            initialSpans[0].style.backgroundColor = "#0284c7";
+            initialSpans[0].style.borderColor = "#0284c7";
+            initialSpans[0].style.boxShadow = "0 4px 12px rgba(2, 132, 199, 0.35)";
+        }
+
+        // Disable next button until typed correctly
+        nextBtn.disabled = true;
+        nextBtn.classList.add("disabled");
+        if (idx === screens.length - 1) {
+            nextBtnText.innerText = "Finish & Save Lesson";
+        } else {
+            nextBtnText.innerText = "Next Screen";
+        }
+
+        stopTimerInterval();
+        if (inactivityTimeout) {
+            clearTimeout(inactivityTimeout);
+            inactivityTimeout = null;
+        }
         secondsElapsed = 0;
-        clearInterval(timer);
         timerEl.innerText = "0";
         wpmEl.innerText = "0";
         accuracyEl.innerText = "100";
+        const toast = document.getElementById("pause-toast");
+        if (toast) toast.classList.remove("show");
+    }
+
+    // Nudi Modal & Verification Logic
+    const nudiTestInput = document.getElementById("nudi-test-input");
+    const nudiStatusBadge = document.getElementById("nudi-status-badge");
+    const startKannadaBtn = document.getElementById("start-kannada-practice-btn");
+    const bypassNudiBtn = document.getElementById("bypass-nudi-btn");
+    const nudiModalOverlay = document.getElementById("nudi-modal-overlay");
+
+    if (nudiTestInput) {
+        if (inputEl) inputEl.disabled = true;
+
+        nudiTestInput.addEventListener("input", () => {
+            const val = nudiTestInput.value;
+            const containsKannada = /[\u0C80-\u0CFF]/.test(val);
+            
+            if (containsKannada) {
+                nudiStatusBadge.className = "alert alert-success py-2 px-3 mb-0 d-inline-block fw-bold small";
+                nudiStatusBadge.innerHTML = `<i class="fa-solid fa-circle-check me-1"></i> Nudi is ACTIVE! Verified Kannada typing.`;
+                startKannadaBtn.disabled = false;
+                startKannadaBtn.classList.remove("disabled");
+                startKannadaBtn.style.opacity = "1";
+                startKannadaBtn.style.cursor = "pointer";
+                startKannadaBtn.classList.add("shadow");
+            } else if (val.length > 0) {
+                nudiStatusBadge.className = "alert alert-danger py-2 px-3 mb-0 d-inline-block fw-bold small";
+                nudiStatusBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> Nudi is OFF! You typed ASCII. Press Scroll Lock.`;
+                startKannadaBtn.disabled = true;
+                startKannadaBtn.classList.add("disabled");
+                startKannadaBtn.style.opacity = "0.6";
+                startKannadaBtn.style.cursor = "not-allowed";
+            } else {
+                nudiStatusBadge.className = "alert alert-warning py-2 px-3 mb-0 d-inline-block fw-bold small";
+                nudiStatusBadge.innerHTML = `<i class="fa-solid fa-circle-exclamation me-1"></i> Waiting for keypress...`;
+                startKannadaBtn.disabled = true;
+                startKannadaBtn.classList.add("disabled");
+                startKannadaBtn.style.opacity = "0.6";
+                startKannadaBtn.style.cursor = "not-allowed";
+            }
+        });
+
+        startKannadaBtn.addEventListener("click", () => {
+            if (nudiModalOverlay) nudiModalOverlay.style.display = "none";
+            if (inputEl) {
+                inputEl.disabled = false;
+                inputEl.focus();
+            }
+        });
+
+        bypassNudiBtn.addEventListener("click", () => {
+            if (nudiModalOverlay) nudiModalOverlay.style.display = "none";
+            if (inputEl) {
+                inputEl.disabled = false;
+                inputEl.focus();
+            }
+        });
     }
 
     if (screens.length > 0) {
         loadScreen(0);
 
         inputEl.addEventListener("input", () => {
-            if (!isStarted) {
-                isStarted = true;
-                timer = setInterval(() => {
-                    secondsElapsed++;
-                    timerEl.innerText = secondsElapsed;
-                }, 1000);
-            }
-
             const screen = screens[currentScreenIdx];
             const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
             const typedText = inputEl.value.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -203,6 +674,8 @@
             const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
             const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
             const typedSegments = Array.from(segmenter.segment(typedText)).map(s => s.segment);
+
+            updateKeyboardHighlighting(targetSegments, typedSegments);
 
             let correctCount = 0;
             let mistakeCount = 0;
@@ -214,16 +687,30 @@
                         spans[i].style.color = "#059669";
                         spans[i].style.backgroundColor = "#d1e7dd";
                         spans[i].style.borderColor = "#10b981";
+                        spans[i].style.boxShadow = "none";
                         correctCount++;
+                    } else if (i === typedSegments.length - 1 && targetSegments[i].startsWith(typedSegments[i])) {
+                        // Active block in-progress multi-key combination -> Active Blue Neutral
+                        spans[i].style.color = "#ffffff";
+                        spans[i].style.backgroundColor = "#0284c7";
+                        spans[i].style.borderColor = "#0284c7";
+                        spans[i].style.boxShadow = "0 4px 12px rgba(2, 132, 199, 0.35)";
                     } else {
-                        // Immediate mistake -> Red
+                        // Confirmed mistake -> Red
                         spans[i].style.color = "#dc2626";
                         spans[i].style.backgroundColor = "#fee2e2";
                         spans[i].style.borderColor = "#ef4444";
+                        spans[i].style.boxShadow = "none";
                         mistakeCount++;
                     }
+                } else if (i === typedSegments.length) {
+                    // Current Active Block to be typed -> Solid Blue (Like Image 2)
+                    spans[i].style.color = "#ffffff";
+                    spans[i].style.backgroundColor = "#0284c7";
+                    spans[i].style.borderColor = "#0284c7";
+                    spans[i].style.boxShadow = "0 4px 12px rgba(2, 132, 199, 0.35)";
                 } else {
-                    // Untyped future blocks -> Neutral
+                    // Untyped future blocks -> Neutral White
                     if (targetSegments[i] === '\n') {
                         spans[i].style.color = "#0284c7";
                     } else {
@@ -231,6 +718,7 @@
                     }
                     spans[i].style.backgroundColor = "#ffffff";
                     spans[i].style.borderColor = "#cbd5e1";
+                    spans[i].style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05)";
                 }
             }
 
@@ -240,35 +728,109 @@
             }
 
             const minutes = secondsElapsed > 0 ? secondsElapsed / 60 : 1 / 60;
-            const wordsTyped = typedText.trim().split(/\s+/).filter(Boolean).length;
-            const wpm = Math.round(wordsTyped / minutes);
+            const wordsTyped = typedSegments.length / 5;
+            const wpm = secondsElapsed >= 2 ? Math.round(wordsTyped / minutes) : 0;
             wpmEl.innerText = wpm >= 0 ? wpm : 0;
 
             const totalAttempted = correctCount + mistakeCount;
             const accuracy = totalAttempted > 0 ? Math.max(0, Math.round((correctCount / totalAttempted) * 100)) : 100;
             accuracyEl.innerText = accuracy;
 
-            finalWpm = wpm >= 0 ? wpm : 0;
-            finalMistakes = mistakeCount;
-            finalSeconds = secondsElapsed;
+            // Complete screen once all target segments have been typed
+            const isFinished = typedSegments.length >= targetSegments.length;
 
-            // Unlock next screen when fully typed
-            if (typedSegments.length >= targetSegments.length || typedText.length >= targetText.length) {
-                if (spans.length > 0) {
-                    const lastSpan = spans[spans.length - 1];
-                    lastSpan.style.color = "#059669";
-                    lastSpan.style.backgroundColor = "#d1e7dd";
-                    lastSpan.style.borderColor = "#10b981";
-                }
-                clearInterval(timer);
+            handleKeystrokeActivity(isFinished);
+
+            if (isFinished) {
                 inputEl.disabled = true;
-                nextBtn.style.display = "inline-block";
+                nextBtn.disabled = false;
+                nextBtn.classList.remove("disabled");
+                nextBtn.style.opacity = "1";
+                nextBtn.style.cursor = "pointer";
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.classList.add("disabled");
+                nextBtn.style.opacity = "0.6";
+                nextBtn.style.cursor = "not-allowed";
             }
         });
 
-        nextBtn.addEventListener("click", () => {
-            currentScreenIdx++;
+        // Block Backspace and Delete keys to prevent editing typed mistakes
+        inputEl.addEventListener("keydown", (e) => {
+            if (!isFinishedScreen()) {
+                handleKeystrokeActivity(false);
+            }
+            if (e.key === "Backspace" || e.key === "Delete") {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        function isFinishedScreen() {
+            const screen = screens[currentScreenIdx];
+            if (!screen) return true;
+            const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            const typedText = inputEl.value.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+            const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
+            const typedSegments = Array.from(segmenter.segment(typedText)).map(s => s.segment);
+            return typedSegments.length >= targetSegments.length;
+        }
+
+        retryBtn.addEventListener("click", () => {
             loadScreen(currentScreenIdx);
+        });
+
+        nextBtn.addEventListener("click", () => {
+            if (nextBtn.disabled) return;
+
+            // Accumulate performance metrics for this screen
+            const typedText = inputEl.value.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            const screen = screens[currentScreenIdx];
+            const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+            const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
+            const typedSegments = Array.from(segmenter.segment(typedText)).map(s => s.segment);
+            
+            const wordsTyped = typedSegments.length / 5;
+            let mistakeCount = 0;
+            for (let i = 0; i < typedSegments.length; i++) {
+                if (typedSegments[i] !== targetSegments[i]) mistakeCount++;
+            }
+
+            cumulativeWords += wordsTyped;
+            cumulativeMistakes += mistakeCount;
+            cumulativeSeconds += secondsElapsed;
+
+            if (currentScreenIdx < screens.length - 1) {
+                // Move to next screen
+                loadScreen(currentScreenIdx + 1);
+            } else {
+                // Last screen completed -> Submit form and save data to DB
+                const totalMinutes = cumulativeSeconds > 0 ? cumulativeSeconds / 60 : 1 / 60;
+                const lessonWpm = Math.round(cumulativeWords / totalMinutes);
+                
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/student/lesson/${lessonId}/complete`;
+
+                const fields = { 
+                    wpm: lessonWpm, 
+                    mistakes: cumulativeMistakes, 
+                    seconds: cumulativeSeconds 
+                };
+
+                for (const key in fields) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = fields[key];
+                    form.appendChild(input);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+            }
         });
     }
 </script>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate of Completion - {{ student.student_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f1f5f9;
+            font-family: 'Montserrat', sans-serif;
+            color: #0f172a;
+        }
+
+        .cert-outer-wrapper {
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        .cert-card {
+            background: #ffffff;
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(2, 132, 199, 0.25);
+            position: relative;
+            border: 10px solid #0284c7;
+            outline: 3px solid #f59e0b;
+            outline-offset: -14px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Subtle background watermark logo */
+        .cert-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.035;
+            pointer-events: none;
+            width: 500px;
+        }
+
+        .cert-logo {
+            max-height: 75px;
+            margin-bottom: 24px;
+        }
+
+        .cert-main-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #0284c7;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .cert-subtitle-tag {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 28px;
+        }
+
+        .cert-certify-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .cert-student-name {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4.2rem;
+            font-weight: 700;
+            color: #0284c7;
+            margin: 10px 0;
+            display: inline-block;
+            padding: 0 30px;
+            text-shadow: 0 2px 4px rgba(2, 132, 199, 0.15);
+        }
+
+        .cert-course-name {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 16px 0;
+        }
+
+        /* Performance Metrics Box */
+        .cert-metrics-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1.5px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 16px 36px;
+            display: inline-flex;
+            gap: 48px;
+            margin: 24px 0 36px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .metric-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #0284c7;
+        }
+
+        .metric-lbl {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 1px;
+        }
+
+        /* Footer (CEO Formal Signature & Ribbon Gold Seal) */
+        .cert-digital-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding: 0 20px;
+        }
+
+        .ceo-signature-block {
+            text-align: left;
+        }
+
+        .ceo-formal-name {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .ceo-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .ceo-org {
+            font-size: 0.82rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .gold-seal {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 2.2rem;
+            box-shadow: 0 8px 20px rgba(217, 119, 6, 0.4);
+            border: 4px solid #fef3c7;
+        }
+
+        .date-block {
+            text-align: right;
+        }
+
+        .date-val {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .date-lbl {
+            font-size: 0.82rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white;
+            }
+            .cert-outer-wrapper {
+                margin: 0;
+                max-width: 100%;
+            }
+            .cert-card {
+                box-shadow: none;
+                border-width: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Action Bar (Hidden when printing) -->
+    <div class="container no-print mt-4 mb-2">
+        <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-4 shadow-sm">
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary rounded-3 fw-semibold px-4 py-2">
+                <i class="fa-solid fa-arrow-left me-2"></i> Back to Dashboard
+            </a>
+            <button onclick="window.print()" class="btn btn-primary rounded-3 fw-bold px-4 py-2 shadow-sm d-flex align-items-center gap-2" style="background-color: #0284c7;">
+                <i class="fa-solid fa-print"></i> Print / Download Certificate
+            </button>
+        </div>
+    </div>
+
+    <!-- Certificate Frame -->
+    <div class="cert-outer-wrapper">
+        <div class="cert-card">
+            
+            <!-- Watermark Logo in Background -->
+            <img src="/static/logo.png" alt="Watermark" class="cert-watermark" onerror="this.src='/static/images/logo.png'">
+
+            <!-- Header Logo -->
+            <div>
+                <img src="/static/logo.png" alt="Global IT Education Logo" class="cert-logo" onerror="this.src='/static/images/logo.png'">
+            </div>
+
+            <div class="cert-main-title">Certificate of Completion</div>
+            <div class="cert-subtitle-tag">Global IT Education {{ course.course_name }}</div>
+
+            <p class="cert-certify-text">This is to certify that</p>
+            <div class="cert-student-name">{{ student.student_name }}</div>
+
+            <p class="text-muted small mb-1 mt-2">for successfully completing all modules and touch typing requirements for:</p>
+
+            <div class="cert-course-name">
+                <i class="fa-solid fa-award text-warning me-2"></i>{{ course.course_name }}
+            </div>
+
+            <!-- Performance Metrics Box -->
+            <div class="cert-metrics-box shadow-sm">
+                <div class="text-center">
+                    <div class="metric-val">{{ avg_wpm }} WPM</div>
+                    <div class="metric-lbl">Average Speed</div>
+                </div>
+                <div class="text-center">
+                    <div class="metric-val">{{ avg_accuracy }}%</div>
+                    <div class="metric-lbl">Accuracy</div>
+                </div>
+                <div class="text-center">
+                    <div class="metric-val">{{ student.reg_no or '151625' }}</div>
+                    <div class="metric-lbl">Registration No</div>
+                </div>
+            </div>
+
+            <!-- Footer (Formal CEO Signature & Ribbon Gold Seal) -->
+            <div class="cert-digital-footer">
+                <div class="ceo-signature-block">
+                    <div class="ceo-formal-name">Naveena S L</div>
+                    <div class="ceo-title">CEO</div>
+                    <div class="ceo-org">Global IT Education</div>
+                </div>
+
+                <!-- Ribbon Gold Seal -->
+                <div class="gold-seal">
+                    <i class="fa-solid fa-ribbon"></i>
+                </div>
+
+                <div class="date-block">
+                    <div class="date-val">{{ completion_date }}</div>
+                    <div class="date-lbl">Date of Issue</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
