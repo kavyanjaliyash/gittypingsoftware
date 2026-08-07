@@ -26,6 +26,8 @@ def login():
             user_role = user.role.lower()
             if user_role == 'admin':
                 return redirect(url_for('admin.dashboard'))
+            elif user_role in ['branch', 'branch_admin', 'branch admin']:
+                return redirect(url_for('admin.branches'))
             elif user_role == 'faculty':
                 return redirect(url_for('admin.faculty'))
             elif user_role == 'student':

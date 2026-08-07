@@ -17,6 +17,9 @@ class Branch(db.Model):
     phone = db.Column(db.String(15))
     email = db.Column(db.String(100))
     status = db.Column(db.String(20), default="Active")
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=True)
+
+    user = db.relationship("User", backref="branches")
 
 class Faculty(db.Model):
     __tablename__ = "faculty"

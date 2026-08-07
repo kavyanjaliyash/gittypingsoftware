@@ -26,11 +26,30 @@ def branches():
         phone = request.form.get("phone")
         email = request.form.get("email")
         status = request.form.get("status", "Active")
+        username = request.form.get("username")
+        password = request.form.get("password")
         
-        new_branch = Branch(branch_name=branch_name, branch_code=branch_code, phone=phone, email=email, status=status)
+        user_id = None
+        if username and password:
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user:
+                flash("A user with this username already exists!", "danger")
+                return redirect(url_for("admin.branches"))
+            
+            user = User(
+                role="Branch",
+                username=username,
+                password_hash=password,
+                status="Active"
+            )
+            db.session.add(user)
+            db.session.commit()
+            user_id = user.user_id
+
+        new_branch = Branch(branch_name=branch_name, branch_code=branch_code, phone=phone, email=email, status=status, user_id=user_id)
         db.session.add(new_branch)
         db.session.commit()
-        flash("Branch added successfully!", "success")
+        flash("Branch added successfully with login credentials!", "success")
         return redirect(url_for("admin.branches"))
         
     all_branches = Branch.query.all()
@@ -44,8 +63,39 @@ def update_branch(branch_id):
     branch.phone = request.form.get("phone")
     branch.email = request.form.get("email")
     branch.status = request.form.get("status", "Active")
+
+    username = request.form.get("username")
+    if username:
+        if branch.user:
+            branch.user.username = username
+        else:
+            password = request.form.get("password") or "123456"
+            user = User(role="Branch", username=username, password_hash=password, status="Active")
+            db.session.add(user)
+            db.session.commit()
+            branch.user_id = user.user_id
+
     db.session.commit()
     flash("Branch updated successfully!", "success")
+    return redirect(url_for("admin.branches"))
+
+@admin_bp.route("/branch/reset-password/<int:branch_id>", methods=["POST"])
+def reset_branch_password(branch_id):
+    branch = Branch.query.get_or_404(branch_id)
+    if branch.user:
+        branch.user.password_hash = request.form["password"]
+        db.session.commit()
+        flash("Branch password updated successfully!", "success")
+    else:
+        # Create user if missing
+        password = request.form["password"]
+        username = branch.branch_code.lower()
+        user = User(role="Branch", username=username, password_hash=password, status="Active")
+        db.session.add(user)
+        db.session.commit()
+        branch.user_id = user.user_id
+        db.session.commit()
+        flash("Branch login user created and password set!", "success")
     return redirect(url_for("admin.branches"))
 
 @admin_bp.route("/branch/delete/<int:branch_id>", methods=["POST"])
@@ -55,6 +105,11 @@ def delete_branch(branch_id):
     # Delete related records first to prevent foreign key constraint conflicts
     Faculty.query.filter_by(branch_id=branch_id).delete()
     Student.query.filter_by(branch_id=branch_id).delete()
+
+    if branch.user_id:
+        user = User.query.get(branch.user_id)
+        if user:
+            db.session.delete(user)
     
     db.session.delete(branch)
     db.session.commit()

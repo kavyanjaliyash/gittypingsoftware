@@ -26,6 +26,7 @@
                         <tr>
                             <th class="py-3 px-4">ID / Code</th>
                             <th class="py-3 px-4">Branch Name</th>
+                            <th class="py-3 px-4">Username / Login ID</th>
                             <th class="py-3 px-4">Phone</th>
                             <th class="py-3 px-4">Email</th>
                             <th class="py-3 px-4">Status</th>
@@ -42,6 +43,7 @@
                             </a>
                         </td>
                         <td class="py-3 px-4 fw-bold text-dark">{{ branch.branch_name if branch.branch_name is defined else branch.name }}</td>
+                        <td class="py-3 px-4 text-primary fw-semibold">{{ branch.user.username if branch.user else '-' }}</td>
                         <td class="py-3 px-4 text-muted">{{ branch.phone if branch.phone is defined else '-' }}</td>
                         <td class="py-3 px-4 text-muted">{{ branch.email if branch.email is defined else '-' }}</td>
                         <td class="py-3 px-4">
@@ -52,6 +54,10 @@
                                 <!-- Edit Trigger Modal -->
                                 <button type="button" class="btn btn-outline-primary btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#editBranchModal{{ b_id }}">
                                     <i class="fa-solid fa-pen-to-square"></i> Edit
+                                </button>
+                                <!-- Reset Password Trigger Modal -->
+                                <button type="button" class="btn btn-outline-warning btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ b_id }}">
+                                    <i class="fa-solid fa-key"></i> Password
                                 </button>
                                 <!-- Delete Trigger Modal -->
                                 <button type="button" class="btn btn-outline-danger btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#deleteBranchModal{{ b_id }}">
@@ -80,6 +86,10 @@
                                             <input type="text" class="form-control rounded-3" name="branch_code" value="{{ branch.branch_code if branch.branch_code is defined else branch.code }}" required>
                                         </div>
                                         <div class="mb-3">
+                                            <label class="form-label small fw-bold text-secondary">Username / Login ID</label>
+                                            <input type="text" class="form-control rounded-3" name="username" value="{{ branch.user.username if branch.user else '' }}" placeholder="Enter username">
+                                        </div>
+                                        <div class="mb-3">
                                             <label class="form-label small fw-bold text-secondary">Phone</label>
                                             <input type="text" class="form-control rounded-3" name="phone" value="{{ branch.phone if branch.phone is defined and branch.phone else '' }}">
                                         </div>
@@ -98,6 +108,30 @@
                                     <div class="modal-footer border-0 px-4 pb-4">
                                         <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
                                         <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reset Password Modal -->
+                    <div class="modal fade" id="resetPasswordModal{{ b_id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                    <h5 class="fw-bold text-warning"><i class="fa-solid fa-key me-2"></i>Reset Branch Password</h5>
+                                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="{{ url_for('admin.reset_branch_password', branch_id=b_id) }}" method="POST">
+                                    <div class="modal-body p-4">
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-secondary">New Password</label>
+                                            <input type="password" class="form-control rounded-3" name="password" required placeholder="Enter new password">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-0 px-4 pb-4">
+                                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-warning rounded-3 px-4 fw-semibold text-white">Update Password</button>
                                     </div>
                                 </form>
                             </div>
@@ -124,6 +158,10 @@
                             </div>
                         </div>
                     </div>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No branches found. Click "Add New Branch" to create one.</td>
+                    </tr>
                     {% endfor %}
                     </tbody>
                 </table>
@@ -149,6 +187,14 @@
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-secondary">Branch Code</label>
                         <input type="text" class="form-control rounded-3" name="code" required placeholder="e.g. HSK003">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Username / Login ID</label>
+                        <input type="text" class="form-control rounded-3" name="username" required placeholder="Enter login username">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Password</label>
+                        <input type="password" class="form-control rounded-3" name="password" required placeholder="Enter login password">
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-secondary">Phone</label>
