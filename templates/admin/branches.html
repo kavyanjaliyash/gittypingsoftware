@@ -61,6 +61,49 @@
                         </td>
                     </tr>
 
+                    <!-- Edit Branch Modal -->
+                    <div class="modal fade" id="editBranchModal{{ b_id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                    <h5 class="fw-bold text-dark"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Edit Branch</h5>
+                                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="{{ url_for('admin.update_branch', branch_id=b_id) }}" method="POST">
+                                    <div class="modal-body p-4">
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-secondary">Branch Name</label>
+                                            <input type="text" class="form-control rounded-3" name="branch_name" value="{{ branch.branch_name if branch.branch_name is defined else branch.name }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-secondary">Branch Code</label>
+                                            <input type="text" class="form-control rounded-3" name="branch_code" value="{{ branch.branch_code if branch.branch_code is defined else branch.code }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-secondary">Phone</label>
+                                            <input type="text" class="form-control rounded-3" name="phone" value="{{ branch.phone if branch.phone is defined and branch.phone else '' }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-secondary">Email</label>
+                                            <input type="email" class="form-control rounded-3" name="email" value="{{ branch.email if branch.email is defined and branch.email else '' }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-secondary">Status</label>
+                                            <select class="form-control rounded-3" name="status" required>
+                                                <option value="Active" {% if branch.status == 'Active' %}selected{% endif %}>Active</option>
+                                                <option value="Inactive" {% if branch.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-0 px-4 pb-4">
+                                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Delete Branch Confirmation Modal -->
                     <div class="modal fade" id="deleteBranchModal{{ b_id }}" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">

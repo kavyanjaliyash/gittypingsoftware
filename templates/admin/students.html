@@ -41,7 +41,7 @@
                             <td class="py-3 px-4"><span class="badge bg-light text-secondary border px-2.5 py-1.5 rounded-2 fw-semibold">{{ student.registration_no }}</span></td>
                             <td class="py-3 px-4 fw-bold text-dark">{{ student.student_name }}</td>
                             <td class="py-3 px-4 text-primary fw-semibold">{{ student.user.username if student.user else '-' }}</td>
-                            <td class="py-3 px-4 text-muted">{{ student.branch.branch_name if student.branch else 'GIT Hoskote' }}</td>
+                            <td class="py-3 px-4 text-muted">{{ student.branch.branch_name if student.branch else '-' }}</td>
                             <td class="py-3 px-4">
                                 <span class="badge bg-primary bg-opacity-10 text-primary px-2.5 py-1 rounded-2 me-1 fw-semibold">{{ student.course or 'English & Kannada Typing' }}</span>
                             </td>

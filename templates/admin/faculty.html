@@ -41,12 +41,10 @@
                             <td class="py-3 px-4 fw-bold text-primary">{{ fac.faculty_code or ('GIT' ~ '%04d' | format(f_id)) }}</td>
                             <td class="py-3 px-4 fw-bold text-dark">{{ fac.faculty_name }}</td>
                             <td class="py-3 px-4 text-muted">
-                                {% set user = User.query.get(fac.user_id) if 'User' in globals() else None %}
-                                {{ user.username if user else '-' }}
+                                {{ fac.user.username if fac.user else '-' }}
                             </td>
                             <td class="py-3 px-4">
-                                {% set b = Branch.query.get(fac.branch_id) if fac.branch_id else None %}
-                                {{ b.branch_name if b else '-' }}
+                                {{ fac.branch.branch_name if fac.branch else '-' }}
                             </td>
                             <td class="py-3 px-4 text-muted">{{ fac.mobile or '-' }}</td>
                             <td class="py-3 px-4 text-muted">{{ fac.email or '-' }}</td>

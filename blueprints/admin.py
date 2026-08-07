@@ -9,9 +9,13 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 def dashboard():
     # Query all active students from the database
     all_students = Student.query.all()
+    all_branches = Branch.query.all()
     
-    # Pass students to the dashboard template
-    return render_template("admin/dashboard.html", students=all_students)
+    # Sort branches by number of students enrolled (most active first)
+    sorted_branches = sorted(all_branches, key=lambda b: len(b.students), reverse=True) if all_branches else []
+    
+    # Pass students and branches to the dashboard template
+    return render_template("admin/dashboard.html", students=all_students, branches=sorted_branches)
 
 # --- BRANCH MANAGEMENT ---
 @admin_bp.route("/branches", methods=["GET", "POST"])
@@ -35,12 +39,13 @@ def branches():
 @admin_bp.route("/branch/update/<int:branch_id>", methods=["POST"])
 def update_branch(branch_id):
     branch = Branch.query.get_or_404(branch_id)
-    branch.branch_name = request.form["branch_name"]
-    branch.branch_code = request.form["branch_code"]
-    branch.phone = request.form["phone"]
-    branch.email = request.form["email"]
-    branch.status = request.form["status"]
+    branch.branch_name = request.form.get("branch_name") or request.form.get("name")
+    branch.branch_code = request.form.get("branch_code") or request.form.get("code")
+    branch.phone = request.form.get("phone")
+    branch.email = request.form.get("email")
+    branch.status = request.form.get("status", "Active")
     db.session.commit()
+    flash("Branch updated successfully!", "success")
     return redirect(url_for("admin.branches"))
 
 @admin_bp.route("/branch/delete/<int:branch_id>", methods=["POST"])

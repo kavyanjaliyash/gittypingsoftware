@@ -64,17 +64,34 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="py-3 px-3 fw-bold text-dark">GIT Hoskote</td>
-                            <td class="py-3 px-3"><span class="badge bg-light text-secondary border px-2.5 py-1 rounded-2 fw-semibold">HSK002</span></td>
-                            <td class="py-3 px-3 text-muted">9071717162</td>
-                            <td class="py-3 px-3"><span class="badge bg-success bg-opacity-10 text-success px-3 py-1.5 rounded-pill fw-semibold">Active</span></td>
-                            <td class="py-3 px-3 text-end">
-                                <a href="{{ url_for('admin.branches') }}" class="btn btn-light btn-sm rounded-circle text-muted shadow-none p-2">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        {% if branches and branches|length > 0 %}
+                            {% for branch in branches[:3] %}
+                            <tr>
+                                <td class="py-3 px-3 fw-bold text-dark">{{ branch.branch_name }}</td>
+                                <td class="py-3 px-3"><span class="badge bg-light text-secondary border px-2.5 py-1 rounded-2 fw-semibold">{{ branch.branch_code }}</span></td>
+                                <td class="py-3 px-3 text-muted">{{ branch.phone or '-' }}</td>
+                                <td class="py-3 px-3">
+                                    {% if branch.status == 'Active' %}
+                                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-1.5 rounded-pill fw-semibold">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-1.5 rounded-pill fw-semibold">{{ branch.status or 'Inactive' }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 px-3 text-end">
+                                    <a href="{{ url_for('admin.branch_details', branch_id=branch.branch_id) }}" class="btn btn-light btn-sm rounded-circle text-muted shadow-none p-2">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    <i class="fa-solid fa-building-circle-exclamation me-2 fs-5"></i>
+                                    No branches available. <a href="{{ url_for('admin.branches') }}" class="text-primary fw-semibold">Add a Branch</a>
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
