@@ -1,4 +1,5 @@
 {% extends "student/base.html" %}
+{% block profile_banner %}{% endblock %}
 {% block content %}
 <style>
     .profile-hero-card {
@@ -11,14 +12,15 @@
 
     .sprout-avatar-container {
         position: relative;
-        width: 100px;
-        height: 100px;
+        width: 68px;
+        height: 68px;
+        min-width: 68px;
         background: #e0f2fe;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 4px solid #ffffff;
+        border: 3px solid #ffffff;
         box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
 
@@ -29,7 +31,8 @@
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         border-radius: 12px;
-        padding: 8px 16px;
+        padding: 10px 18px;
+        white-space: nowrap;
     }
 
     .daily-goal-ring {
@@ -187,70 +190,46 @@
 
     <!-- Top Profile & Stats Hero Bar (Matching Image Header) -->
     <div class="profile-hero-card">
-        <div class="row align-items-center g-4">
+        <div class="row align-items-center g-3">
             
-            <!-- Left: Avatar & Sprout Progress -->
-            <div class="col-lg-5 col-md-12 d-flex align-items-center gap-3">
+            <!-- Left: Avatar & Student Info -->
+            <div class="col-lg-4 col-md-12 d-flex align-items-center gap-3">
                 <div class="sprout-avatar-container">
-                    <i class="fa-solid fa-seedling fs-1 text-success"></i>
+                    <i class="fa-solid fa-seedling fs-2 text-success"></i>
                 </div>
                 <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <span class="badge bg-primary px-2.5 py-1 rounded-2 font-monospace">Typing Sprout (2/5)</span>
-                        <span class="text-muted small font-monospace">4,600 xp to go</span>
-                    </div>
-                    <h4 class="fw-bold text-dark mb-0">{{ student.student_name }}</h4>
+                    <h4 class="fw-bold text-dark mb-1 fs-4">{{ student.student_name }}</h4>
                     <span class="text-muted small">Reg No: <strong>{{ student.reg_no or '151625' }}</strong> • Branch ID: {{ student.branch_id or '1' }}</span>
                 </div>
             </div>
 
-            <!-- Center & Right: Speed, Accuracy & Daily Goal -->
-            <div class="col-lg-7 col-md-12 d-flex flex-wrap align-items-center justify-content-lg-end gap-3">
+            <!-- Right: Speed, Accuracy & Typing Time (1 Row) -->
+            <div class="col-lg-8 col-md-12 d-flex align-items-center justify-content-lg-end gap-3 flex-nowrap">
                 <div class="stat-pill">
-                    <i class="fa-solid fa-bolt fs-4 text-warning"></i>
+                    <i class="fa-solid fa-bolt fs-5 text-warning"></i>
                     <div>
-                        <div class="text-muted fs-7 text-uppercase fw-semibold">Avg. Speed</div>
-                        <div class="fw-bold text-dark fs-5">{{ student.english_wpm or 24 }} <small class="fs-7 text-muted">WPM</small></div>
-                    </div>
-                </div>
-
-                <div class="stat-pill">
-                    <i class="fa-solid fa-bullseye fs-4 text-danger"></i>
-                    <div>
-                        <div class="text-muted fs-7 text-uppercase fw-semibold">Avg. Acc.</div>
-                        <div class="fw-bold text-dark fs-5">98%</div>
+                        <div class="text-muted fs-7 text-uppercase fw-semibold" style="letter-spacing: 0.3px;">Avg. Speed</div>
+                        <div class="fw-bold text-dark fs-6">{{ student.english_wpm or 24 }} <small class="fs-7 text-muted">WPM</small></div>
                     </div>
                 </div>
 
                 <div class="stat-pill">
-                    <i class="fa-regular fa-clock fs-4 text-success"></i>
+                    <i class="fa-solid fa-bullseye fs-5 text-danger"></i>
                     <div>
-                        <div class="text-muted fs-7 text-uppercase fw-semibold">Typing Time</div>
-                        <div class="fw-bold text-dark fs-5">03:41</div>
+                        <div class="text-muted fs-7 text-uppercase fw-semibold" style="letter-spacing: 0.3px;">Avg. Acc.</div>
+                        <div class="fw-bold text-dark fs-6">98%</div>
                     </div>
                 </div>
 
-                <!-- Daily Goal Ring -->
-                <div class="d-flex align-items-center gap-2 bg-light p-2 rounded-4 border">
-                    <div class="daily-goal-ring">
-                        <div class="daily-goal-inner">
-                            <span class="text-uppercase fw-bold text-warning" style="font-size: 0.6rem; letter-spacing: 0.5px;">DAILY GOAL</span>
-                            <span class="fw-bold text-dark fs-7">03:41</span>
-                            <span class="text-muted" style="font-size: 0.65rem;">/15:00</span>
-                        </div>
+                <div class="stat-pill">
+                    <i class="fa-regular fa-clock fs-5 text-success"></i>
+                    <div>
+                        <div class="text-muted fs-7 text-uppercase fw-semibold" style="letter-spacing: 0.3px;">Typing Time</div>
+                        <div class="fw-bold text-dark fs-6">03:41</div>
                     </div>
                 </div>
             </div>
 
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top text-muted small">
-            <div>
-                <span class="fw-bold text-dark">GIT - Trainer Harshith Kumar's Class</span> | <a href="#" class="text-primary text-decoration-none">Class Scoreboard</a>
-            </div>
-            <div>
-                <i class="fa-solid fa-fire text-secondary me-1"></i> You have no active streaks
-            </div>
         </div>
     </div>
 

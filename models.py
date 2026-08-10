@@ -97,3 +97,11 @@ class StudentProgress(db.Model):
     time_taken = db.Column(db.Integer)
     completed_on = db.Column(db.DateTime)
     status = db.Column(db.String(20))
+
+class TypingGame(db.Model):
+    __tablename__ = "typing_games"
+    game_id = db.Column(db.Integer, primary_key=True)
+    game_name = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(100), default="Speed & Accuracy")
+    difficulty = db.Column(db.String(50), default="Medium")
+    status = db.Column(db.String(20), default="Active")

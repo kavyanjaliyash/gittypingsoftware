@@ -90,11 +90,18 @@
     .keyboard-key.key-spacebar { width: 320px; font-size: 0.85rem; text-transform: lowercase; }
 
     /* Highlighted Active Key */
+    @keyframes keyPulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7); }
+        70% { transform: scale(1.06); box-shadow: 0 0 0 12px rgba(2, 132, 199, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+    }
+
     .keyboard-key.key-active {
         background: #0284c7 !important;
         color: #ffffff !important;
         border-color: #0284c7 !important;
-        box-shadow: 0 3px 0 #0369a1 !important;
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.5) !important;
+        animation: keyPulse 1.4s infinite ease-in-out;
         transform: translateY(2px);
     }
 
@@ -245,8 +252,24 @@
         <div id="typing-text-box" class="mb-4 shadow-inner">
         </div>
 
+        <!-- Finger Position Assistant Banner -->
+        <div id="finger-guide-banner" class="d-flex align-items-center justify-content-between p-3 mb-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; font-size: 1.1rem; flex-shrink: 0;">
+                    <i class="fa-solid fa-hand-pointer"></i>
+                </div>
+                <div>
+                    <span class="text-muted small fw-bold text-uppercase d-block" style="letter-spacing: 0.5px;">Finger Position Guide</span>
+                    <h6 id="finger-guide-text" class="fw-bold text-primary mb-0 fs-6">Press key to begin practice...</h6>
+                </div>
+            </div>
+            <div class="d-none d-md-flex align-items-center gap-2">
+                <span class="badge bg-primary bg-opacity-20 text-primary px-3 py-1.5 rounded-pill font-monospace"><i class="fa-solid fa-lightbulb me-1"></i> Interactive Finger Guide</span>
+            </div>
+        </div>
+
         <!-- On-Screen Virtual Keyboard with Live Key Highlighting -->
-        <div id="virtual-keyboard" class="virtual-keyboard mb-4 shadow-sm">
+        <div id="virtual-keyboard" class="virtual-keyboard mb-3 shadow-sm">
             <!-- Row 1: Numbers & Symbols -->
             <div class="keyboard-row">
                 <div class="keyboard-key" data-key="`">~<br>`</div>
@@ -319,6 +342,24 @@
             <!-- Row 5: Spacebar -->
             <div class="keyboard-row">
                 <div class="keyboard-key key-spacebar" data-key="Space">space</div>
+            </div>
+        </div>
+
+        <!-- Hands & Finger Guide Legend Bar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between p-3 mb-4 bg-light rounded-3 border text-muted small">
+            <div class="d-flex align-items-center gap-3 fw-bold">
+                <span><i class="fa-solid fa-hand-back-fist text-primary me-1"></i> Left Hand:</span>
+                <span style="color: #ec4899;"><i class="fa-solid fa-circle fs-8 me-1"></i>Pinky (A, Q, Z)</span>
+                <span style="color: #a855f7;"><i class="fa-solid fa-circle fs-8 me-1"></i>Ring (S, W, X)</span>
+                <span style="color: #3b82f6;"><i class="fa-solid fa-circle fs-8 me-1"></i>Middle (D, E, C)</span>
+                <span style="color: #22c55e;"><i class="fa-solid fa-circle fs-8 me-1"></i>Index (F, R, V, G, T, B)</span>
+            </div>
+            <div class="d-flex align-items-center gap-3 fw-bold mt-2 mt-md-0">
+                <span><i class="fa-solid fa-hand-back-fist text-primary me-1"></i> Right Hand:</span>
+                <span style="color: #22c55e;"><i class="fa-solid fa-circle fs-8 me-1"></i>Index (J, U, M, H, Y, N)</span>
+                <span style="color: #3b82f6;"><i class="fa-solid fa-circle fs-8 me-1"></i>Middle (K, I, ,, 8)</span>
+                <span style="color: #a855f7;"><i class="fa-solid fa-circle fs-8 me-1"></i>Ring (L, O, ., 9)</span>
+                <span style="color: #ec4899;"><i class="fa-solid fa-circle fs-8 me-1"></i>Pinky (;, P, /)</span>
             </div>
         </div>
 
@@ -523,6 +564,26 @@
         try {
             document.querySelectorAll(`[data-key="${CSS.escape(lookupKey.toLowerCase())}"]`).forEach(k => k.classList.add("key-active"));
         } catch (e) {}
+
+        // Dynamic Finger Guide Text Update
+        const fingerMap = {
+            'a':'Left Pinky Finger', 'q':'Left Pinky Finger', 'z':'Left Pinky Finger', '1':'Left Pinky Finger', '`':'Left Pinky Finger',
+            's':'Left Ring Finger', 'w':'Left Ring Finger', 'x':'Left Ring Finger', '2':'Left Ring Finger',
+            'd':'Left Middle Finger', 'e':'Left Middle Finger', 'c':'Left Middle Finger', '3':'Left Middle Finger',
+            'f':'Left Index Finger', 'r':'Left Index Finger', 'v':'Left Index Finger', 'g':'Left Index Finger', 't':'Left Index Finger', 'b':'Left Index Finger', '4':'Left Index Finger', '5':'Left Index Finger',
+            'j':'Right Index Finger', 'u':'Right Index Finger', 'm':'Right Index Finger', 'h':'Right Index Finger', 'y':'Right Index Finger', 'n':'Right Index Finger', '6':'Right Index Finger', '7':'Right Index Finger',
+            'k':'Right Middle Finger', 'i':'Right Middle Finger', ',':'Right Middle Finger', '8':'Right Middle Finger',
+            'l':'Right Ring Finger', 'o':'Right Ring Finger', '.':'Right Ring Finger', '9':'Right Ring Finger',
+            ';':'Right Pinky Finger', 'p':'Right Pinky Finger', '/':'Right Pinky Finger', '\'':'Right Pinky Finger', '[':'Right Pinky Finger', ']':'Right Pinky Finger', '0':'Right Pinky Finger', '-':'Right Pinky Finger', '=':'Right Pinky Finger',
+            ' ':'Left or Right Thumb'
+        };
+
+        const targetKeyUpper = remainingStr === ' ' ? 'SPACE' : remainingStr[0].toUpperCase();
+        const fingerName = fingerMap[remainingStr[0].toLowerCase()] || 'Index Finger';
+        const guideEl = document.getElementById("finger-guide-text");
+        if (guideEl) {
+            guideEl.innerHTML = `Press key <span class="badge bg-primary fs-6 px-2.5 py-1 font-monospace">${targetKeyUpper}</span> using <u>${fingerName}</u>`;
+        }
     }
 
     function loadScreen(idx) {
@@ -680,6 +741,15 @@
             let correctCount = 0;
             let mistakeCount = 0;
 
+            // Check if current typed segment is a partial prefix of the target segment (e.g. typed 'ಅ' for 'ಅಂ' or 'ಅಃ')
+            let isInProgressCombination = false;
+            if (typedSegments.length > 0 && typedSegments.length <= targetSegments.length) {
+                const currentIdx = typedSegments.length - 1;
+                if (typedSegments[currentIdx] !== targetSegments[currentIdx] && targetSegments[currentIdx].startsWith(typedSegments[currentIdx])) {
+                    isInProgressCombination = true;
+                }
+            }
+
             for (let i = 0; i < spans.length; i++) {
                 if (i < typedSegments.length) {
                     if (typedSegments[i] === targetSegments[i]) {
@@ -690,7 +760,7 @@
                         spans[i].style.boxShadow = "none";
                         correctCount++;
                     } else if (i === typedSegments.length - 1 && targetSegments[i].startsWith(typedSegments[i])) {
-                        // Active block in-progress multi-key combination -> Active Blue Neutral
+                        // Active block in-progress multi-key combination -> Active Solid Blue
                         spans[i].style.color = "#ffffff";
                         spans[i].style.backgroundColor = "#0284c7";
                         spans[i].style.borderColor = "#0284c7";
@@ -703,8 +773,8 @@
                         spans[i].style.boxShadow = "none";
                         mistakeCount++;
                     }
-                } else if (i === typedSegments.length) {
-                    // Current Active Block to be typed -> Solid Blue (Like Image 2)
+                } else if (i === typedSegments.length && !isInProgressCombination) {
+                    // Current Active Block to be typed -> Solid Blue (ONLY if previous block is not in-progress!)
                     spans[i].style.color = "#ffffff";
                     spans[i].style.backgroundColor = "#0284c7";
                     spans[i].style.borderColor = "#0284c7";
@@ -736,8 +806,9 @@
             const accuracy = totalAttempted > 0 ? Math.max(0, Math.round((correctCount / totalAttempted) * 100)) : 100;
             accuracyEl.innerText = accuracy;
 
-            // Complete screen once all target segments have been typed
-            const isFinished = typedSegments.length >= targetSegments.length;
+            // Complete screen ONLY once all target segments have been typed and the last segment matches completely
+            const isFinished = (typedSegments.length > targetSegments.length) || 
+                (typedSegments.length === targetSegments.length && typedSegments[typedSegments.length - 1] === targetSegments[targetSegments.length - 1]);
 
             handleKeystrokeActivity(isFinished);
 
@@ -774,7 +845,11 @@
             const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
             const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
             const typedSegments = Array.from(segmenter.segment(typedText)).map(s => s.segment);
-            return typedSegments.length >= targetSegments.length;
+            if (typedSegments.length < targetSegments.length) return false;
+            if (typedSegments.length === targetSegments.length) {
+                return typedSegments[targetSegments.length - 1] === targetSegments[targetSegments.length - 1];
+            }
+            return true;
         }
 
         retryBtn.addEventListener("click", () => {

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - {{ student.registration_no }} - Global IT Education</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary-blue: #0284c7;
+            --primary-dark: #0369a1;
+            --sidebar-bg: #0f172a;
+        }
+
+        body {
+            background-color: #f8fafc;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            color: #0f172a;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        /* Side Menubar Layout */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-brand img {
+            max-height: 52px;
+            width: auto;
+        }
+
+        .sidebar-menu {
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .menu-item.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-logout {
+            width: 100%;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .btn-logout:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 24px 36px;
+            min-height: 100vh;
+        }
+
+        .analytics-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+
+        .avatar-seedling {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: #0284c7;
+        }
+
+        /* Nav Sub-Tabs */
+        .sub-nav-tabs {
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+        .sub-nav-link {
+            padding: 10px 4px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #64748b;
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            cursor: pointer;
+        }
+        .sub-nav-link.active {
+            color: #0284c7;
+            border-bottom-color: #0284c7;
+        }
+
+        /* Progress Grid Boxes */
+        .progress-box {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            background: #ffffff;
+            color: #94a3b8;
+            margin-right: 4px;
+            margin-bottom: 6px;
+        }
+        .progress-box.completed {
+            background: #0284c7;
+            border-color: #0284c7;
+            color: #ffffff;
+        }
+
+        .cal-day {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            border-radius: 50%;
+            color: #475569;
+            margin: 2px;
+        }
+        .cal-day.active-day {
+            background: #0284c7;
+            color: #ffffff;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Side Menubar Navigation -->
+    <aside class="sidebar">
+        <div>
+            <div class="sidebar-brand text-center py-4">
+                <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Global IT Logo" onerror="this.style.display='none';">
+            </div>
+
+            <nav class="sidebar-menu">
+                {% if is_faculty %}
+                <a class="menu-item" href="{{ url_for('faculty.dashboard', tab='dashboard') }}">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a class="menu-item" href="{{ url_for('faculty.dashboard', tab='faculty') }}">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span>Profile</span>
+                </a>
+
+                <a class="menu-item active" href="{{ url_for('faculty.dashboard', tab='students') }}">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students</span>
+                </a>
+
+                <a class="menu-item" href="{{ url_for('faculty.dashboard', tab='report') }}">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>Report</span>
+                </a>
+
+                <a class="menu-item" href="{{ url_for('faculty.dashboard', tab='lms') }}">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                    <span>LMS</span>
+                </a>
+                {% else %}
+                <a class="menu-item" href="{{ url_for('branch.dashboard', tab='dashboard') }}">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a class="menu-item" href="{{ url_for('branch.dashboard', tab='faculty') }}">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>Faculty</span>
+                </a>
+
+                <a class="menu-item active" href="{{ url_for('branch.dashboard', tab='students') }}">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students</span>
+                </a>
+
+                <a class="menu-item" href="{{ url_for('branch.dashboard', tab='report') }}">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>Report</span>
+                </a>
+
+                <a class="menu-item" href="{{ url_for('branch.dashboard', tab='lms') }}">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                    <span>LMS</span>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+        <!-- Back Button & Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a href="{% if is_faculty %}{{ url_for('faculty.dashboard', tab='students') }}{% else %}{{ url_for('branch.dashboard', tab='students') }}{% endif %}" class="btn btn-light btn-sm border rounded-3 fw-semibold text-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Student Dashboard
+            </a>
+            
+            <div class="user-profile-badge text-end px-2 py-1 rounded-3">
+                <div class="fw-bold text-dark mb-0 fs-6">{{ session.get('username', branch.branch_name if branch else 'hoskote14') }}</div>
+                <small class="text-muted fs-7">{% if is_faculty %}Faculty Trainer <i class="fa-solid fa-user-tie ms-1 text-success"></i>{% else %}Branch Admin <i class="fa-solid fa-user-gear ms-1 text-primary"></i>{% endif %}</small>
+            </div>
+        </div>
+
+        <!-- Student Profile Hero Card -->
+        <div class="analytics-card mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-seedling">
+                        🌱
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-dark mb-0 font-monospace fs-1">{{ student.registration_no }}</h2>
+                        <div class="text-muted fw-semibold small mt-1">
+                            <i class="fa-solid fa-building me-1 text-primary"></i> {{ branch.branch_name if branch else 'Branch Office' }}
+                            {% if student.student_name %}
+                            <span class="ms-2 badge bg-light text-dark border">{{ student.student_name }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Settings Dropdown Menu (Edit, Reset, Delete) -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary btn-sm rounded-3 fw-bold px-3 dropdown-toggle shadow-none" type="button" id="studentSettingsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-gear me-1"></i> Student Settings
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-2" aria-labelledby="studentSettingsDropdown">
+                        <li>
+                            <button type="button" class="dropdown-item py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#editStudentModal">
+                                <i class="fa-solid fa-pen-to-square text-primary me-2"></i> Edit Details
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                                <i class="fa-solid fa-key text-info me-2"></i> Reset Password
+                            </button>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <button type="button" class="dropdown-item py-2 fw-semibold text-danger" data-bs-toggle="modal" data-bs-target="#deleteStudentModal">
+                                <i class="fa-solid fa-trash-can me-2"></i> Delete Student
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Sub Navigation Tabs -->
+            <div class="sub-nav-tabs mt-4">
+                <span class="sub-nav-link {% if active_subtab == 'overview' or not active_subtab %}active{% endif %}" id="tab-btn-overview" onclick="switchSubTab('overview', this)">Overview</span>
+                <span class="sub-nav-link {% if active_subtab == 'lessons' %}active{% endif %}" id="tab-btn-lessons" onclick="switchSubTab('lessons', this)">Lesson Progress</span>
+                <span class="sub-nav-link {% if active_subtab == 'games' %}active{% endif %}" id="tab-btn-games" onclick="switchSubTab('games', this)">Games</span>
+                <span class="sub-nav-link {% if active_subtab == 'achievements' %}active{% endif %}" id="tab-btn-achievements" onclick="switchSubTab('achievements', this)">Achievements</span>
+            </div>
+
+            <!-- SUB TAB 1: OVERVIEW -->
+            <div id="subtab-pane-overview" class="subtab-content {% if active_subtab != 'overview' and active_subtab %}d-none{% endif %}">
+                <!-- Top 3 Grid Cards -->
+                <div class="row g-4 mt-1">
+                    <!-- Card 1: Student Details -->
+                    <div class="col-md-4">
+                        <div class="border rounded-4 p-3 bg-light bg-opacity-50">
+                            <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-user-graduate me-2 text-primary"></i>Student Details</h6>
+                            <div class="d-flex justify-content-between py-1 border-bottom border-light">
+                                <span class="text-muted small">Username:</span>
+                                <strong class="text-dark font-monospace small">{{ student.user.username if student.user else student.registration_no }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between py-1 border-bottom border-light">
+                                <span class="text-muted small">Created:</span>
+                                <strong class="text-dark small">August 6th 2026</strong>
+                            </div>
+                            <div class="d-flex justify-content-between py-1 border-bottom border-light">
+                                <span class="text-muted small">Logs in Via:</span>
+                                <strong class="text-dark small">Username & Password</strong>
+                            </div>
+                            <div class="d-flex justify-content-between py-1 border-bottom border-light">
+                                <span class="text-muted small">Last Login:</span>
+                                <strong class="text-dark small">Today</strong>
+                            </div>
+                            <div class="d-flex justify-content-between py-1 border-bottom border-light">
+                                <span class="text-muted small">Curriculum:</span>
+                                <strong class="text-dark small">Touch Typing (US English & Nudi)</strong>
+                            </div>
+                            <div class="d-flex justify-content-between py-1">
+                                <span class="text-muted small">License:</span>
+                                <span class="badge bg-success bg-opacity-10 text-success fw-bold">Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Activity Tracker -->
+                    <div class="col-md-4">
+                        <div class="border rounded-4 p-3 bg-light bg-opacity-50 text-center">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="fw-bold text-dark mb-0"><i class="fa-regular fa-calendar-check me-2 text-success"></i>Activity Tracker</h6>
+                                <small class="text-muted font-monospace">&lt; Aug 2026 &gt;</small>
+                            </div>
+                            <div class="d-flex justify-content-center gap-2 mb-2" style="font-size: 0.7rem;">
+                                <span><i class="fa-solid fa-circle text-success fs-9"></i> 15 mins+</span>
+                                <span><i class="fa-solid fa-circle text-warning fs-9"></i> 0-15 mins</span>
+                                <span><i class="fa-solid fa-circle text-muted fs-9"></i> Inactive</span>
+                            </div>
+
+                            <div class="d-flex flex-wrap justify-content-center">
+                                {% for day in range(1, 32) %}
+                                <div class="cal-day {% if day in [6, 7] %}active-day{% endif %}">{{ day }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Recent Activity / Daily Goal -->
+                    <div class="col-md-4">
+                        <div class="border rounded-4 p-3 bg-light bg-opacity-50 text-center h-100 d-flex flex-column justify-content-between">
+                            <h6 class="fw-bold text-dark mb-2 text-start"><i class="fa-solid fa-clock-rotate-left me-2 text-warning"></i>Recent Activity</h6>
+                            <div class="my-auto py-2">
+                                <div class="fs-1 text-primary opacity-50 mb-1"><i class="fa-solid fa-stopwatch"></i></div>
+                                <p class="text-muted small mb-0">Recent typing practice screens recorded for {{ student.registration_no }}.</p>
+                            </div>
+                            <div class="border-top pt-2 text-muted fw-bold small">
+                                Daily Goal: <span class="text-primary font-monospace">15 mins</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Student Performance Metrics Grid (Matching Reference Image 100%) -->
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-stopwatch-20 me-2 text-primary"></i>{{ student.registration_no }}'s Performance</h5>
+                            <p class="text-muted small mb-0">Here's how {{ student.registration_no }} performed recently</p>
+                        </div>
+                        <span class="text-muted small border rounded-3 px-3 py-1.5 bg-white"><i class="fa-regular fa-calendar me-1"></i> Date: Last 7 Days</span>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- Card 1: Overall Time -->
+                        <div class="col-md-3">
+                            <div class="border rounded-4 p-4 bg-white shadow-sm">
+                                <span class="text-muted small fw-semibold">Overall Time</span>
+                                <h3 class="fw-bold text-dark mt-2 mb-3">{{ overall_time_str }}</h3>
+                                <div class="border-top pt-2 text-muted small">
+                                    Class Avg: <span class="fw-bold">37 mins 35 secs</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Lessons Completed -->
+                        <div class="col-md-3">
+                            <div class="border rounded-4 p-4 bg-white shadow-sm">
+                                <span class="text-muted small fw-semibold">Lessons Completed</span>
+                                <h3 class="fw-bold text-dark mt-2 mb-3">{{ lessons_count }} <small class="fs-6 text-muted">Screens</small></h3>
+                                <div class="border-top pt-2 text-muted small">
+                                    Class Avg: <span class="fw-bold">24 Screens</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Avg Speed -->
+                        <div class="col-md-3">
+                            <div class="border rounded-4 p-4 bg-white shadow-sm">
+                                <span class="text-muted small fw-semibold">Avg Speed</span>
+                                <h3 class="fw-bold text-primary mt-2 mb-3">{{ avg_wpm }} <small class="fs-6 text-muted">WPM</small></h3>
+                                <div class="border-top pt-2 text-muted small">
+                                    Class Avg: <span class="fw-bold">12 WPM</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Avg Accuracy -->
+                        <div class="col-md-3">
+                            <div class="border rounded-4 p-4 bg-white shadow-sm">
+                                <span class="text-muted small fw-semibold">Avg Accuracy</span>
+                                <h3 class="fw-bold text-success mt-2 mb-3">{{ avg_accuracy }}%</h3>
+                                <div class="border-top pt-2 text-muted small">
+                                    Class Avg: <span class="fw-bold">93%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SUB TAB 2: LESSON PROGRESS -->
+            <div id="subtab-pane-lessons" class="subtab-content {% if active_subtab != 'lessons' %}d-none{% endif %}">
+                <div class="mb-4">
+                    <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-book-bookmark text-primary me-2"></i>Enrolled Courses & Lesson Progress</h5>
+                    <p class="text-muted small mb-0">List of courses enrolled by {{ student.student_name or student.registration_no }} and screen completions.</p>
+                </div>
+
+                {% for c in courses %}
+                {% set stats = course_stats.get(c.course_id, {}) %}
+                {% set pct = stats.get('pct', 0) %}
+                <div class="border rounded-4 p-4 bg-white shadow-sm mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-graduation-cap me-2 text-primary"></i>{{ c.course_name }}</h5>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="badge bg-primary bg-opacity-10 text-primary font-monospace px-3 py-1.5 rounded-pill">{{ c.lessons|length }} Lessons</span>
+                            {% if pct == 100 %}
+                            <span class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-1.5 rounded-pill"><i class="fa-solid fa-circle-check me-1"></i> 100% Completed</span>
+                            {% else %}
+                            <span class="badge bg-secondary bg-opacity-10 text-dark fw-bold px-3 py-1.5 rounded-pill">{{ pct }}% Progress</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="progress mb-4" style="height: 12px; border-radius: 10px;">
+                        <div class="progress-bar {% if pct == 100 %}bg-success{% else %}bg-primary{% endif %} progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ pct }}%;" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-muted fs-7">
+                                <tr>
+                                    <th>Lesson</th>
+                                    <th>Title</th>
+                                    <th>Completed Screens</th>
+                                    <th>Typing Speed</th>
+                                    <th>Accuracy</th>
+                                    <th>Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for l in c.lessons %}
+                                <tr>
+                                    <td class="font-monospace fw-bold text-primary">Lesson {{ l.display_order }}</td>
+                                    <td class="fw-bold text-dark">{{ l.lesson_title }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ l.screens|length }} Screens</span></td>
+                                    <td><strong class="text-success">{{ avg_wpm }} WPM</strong></td>
+                                    <td><strong class="text-info">{{ avg_accuracy }}%</strong></td>
+                                    <td>
+                                        <span class="text-warning">⭐⭐⭐</span>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-3 text-muted">No lessons configured.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- SUB TAB 3: GAMES (Coming Soon Landing Page) -->
+            <div id="subtab-pane-games" class="subtab-content {% if active_subtab != 'games' %}d-none{% endif %} text-center py-5">
+                <div class="border rounded-4 p-5 bg-white shadow-sm max-w-xl mx-auto">
+                    <div class="fs-1 text-warning mb-3"><i class="fa-solid fa-gamepad fa-2x"></i></div>
+                    <h3 class="fw-bold text-dark mb-2">Typing Games - Coming Soon!</h3>
+                    <p class="text-muted mb-4">Exciting interactive typing games, speed races, and balloon challenges are currently under development and will be available soon for {{ student.registration_no }}.</p>
+                    <span class="badge bg-warning bg-opacity-15 text-warning fw-bold px-4 py-2 rounded-pill fs-6">Under Active Development</span>
+                </div>
+            </div>
+
+            <!-- SUB TAB 4: ACHIEVEMENTS (Certificates Visible) -->
+            <div id="subtab-pane-achievements" class="subtab-content {% if active_subtab != 'achievements' %}d-none{% endif %}">
+                <div class="mb-4">
+                    <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-award text-warning me-2"></i>Student Achievements & Certificates</h5>
+                    <p class="text-muted small mb-0">Official certificates of completion earned by {{ student.student_name or student.registration_no }}.</p>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Certificate Card 1: English Typing -->
+                    <div class="col-md-6">
+                        <div class="border rounded-4 p-4 bg-white shadow-sm d-flex flex-column justify-content-between h-100">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="rounded-circle bg-warning bg-opacity-15 text-warning d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; font-size: 1.6rem;">
+                                    🏅
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-0">Global IT Education English Typing</h5>
+                                    <small class="text-muted">Certificate of Completion</small>
+                                </div>
+                            </div>
+                            <p class="text-secondary small mb-4">Issued by Global IT Education under CEO Naveena S L for mastering English Touch Typing curriculum.</p>
+                            <a href="{{ url_for('student.print_certificate', course_id=1, student_id=student.student_id) }}" target="_blank" class="btn btn-primary fw-semibold rounded-3 w-100 border-0" style="background-color: #0284c7 !important;">
+                                <i class="fa-solid fa-certificate me-2"></i> View & Print Certificate
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Certificate Card 2: Kannada Typing -->
+                    <div class="col-md-6">
+                        <div class="border rounded-4 p-4 bg-white shadow-sm d-flex flex-column justify-content-between h-100">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="rounded-circle bg-success bg-opacity-15 text-success d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; font-size: 1.6rem;">
+                                    🏆
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-0">Global IT Education Kannada Typing</h5>
+                                    <small class="text-muted">Certificate of Completion</small>
+                                </div>
+                            </div>
+                            <p class="text-secondary small mb-4">Issued by Global IT Education under CEO Naveena S L for mastering Kannada Nudi Typing curriculum.</p>
+                            <a href="{{ url_for('student.print_certificate', course_id=2, student_id=student.student_id) }}" target="_blank" class="btn btn-success fw-semibold rounded-3 w-100 border-0" style="background-color: #059669 !important;">
+                                <i class="fa-solid fa-certificate me-2"></i> View & Print Certificate
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modals for Student Settings: Edit, Password Reset, Delete -->
+    {% set sid = student.student_id %}
+
+    <!-- Edit Student Modal Popup -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                    <h5 class="fw-bold text-dark"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Edit Student Details</h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ url_for('branch.update_student', student_id=sid) }}" method="POST">
+                    <div class="modal-body p-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-secondary">First Name</label>
+                                <input type="text" class="form-control rounded-3" name="first_name" value="{{ student.student_name.split(' ')[0] if student.student_name else '' }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-secondary">Last Name</label>
+                                <input type="text" class="form-control rounded-3" name="last_name" value="{{ student.student_name.split(' ')[1:] | join(' ') if student.student_name else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-secondary">Registration Number</label>
+                                <input type="text" class="form-control rounded-3" name="registration_no" value="{{ student.registration_no }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-secondary">Email ID</label>
+                                <input type="email" class="form-control rounded-3" name="email" value="{{ student.email or '' }}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-secondary">Date of Birth</label>
+                                <input type="date" class="form-control rounded-3" name="dob" value="{{ student.dob.strftime('%Y-%m-%d') if student.dob else '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-secondary">Mobile Number</label>
+                                <input type="text" class="form-control rounded-3" name="mobile" value="{{ student.mobile or '' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-secondary">Status</label>
+                                <select class="form-select rounded-3" name="status">
+                                    <option value="Active" {% if student.status == 'Active' %}selected{% endif %}>Active</option>
+                                    <option value="Inactive" {% if student.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 px-4 pb-4">
+                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold" style="background-color: #0284c7 !important;">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal Popup -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                    <h5 class="fw-bold text-dark"><i class="fa-solid fa-key text-info me-2"></i>Reset Student Password</h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ url_for('branch.reset_student_password', student_id=sid) }}" method="POST">
+                    <div class="modal-body p-4">
+                        <p class="text-muted small mb-3">Reset login password for student <strong>{{ student.student_name or student.registration_no }}</strong>.</p>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-secondary">New Password</label>
+                            <input type="text" class="form-control rounded-3 fw-bold" name="password" value="{{ student.registration_no }}" required placeholder="Enter new password">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 px-4 pb-4">
+                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-info text-white rounded-3 px-4 fw-semibold">Update Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Student Modal Popup -->
+    <div class="modal fade" id="deleteStudentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                    <h5 class="fw-bold text-danger"><i class="fa-solid fa-trash-can me-2"></i>Delete Student</h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ url_for('branch.delete_student', student_id=sid) }}" method="POST">
+                    <div class="modal-body p-4">
+                        <p class="mb-0">Are you sure you want to delete student <strong>{{ student.student_name or student.registration_no }}</strong>? This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer border-0 px-4 pb-4">
+                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger rounded-3 px-4 fw-semibold">Delete Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchSubTab(subtabId, element) {
+            document.querySelectorAll('.sub-nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            document.querySelectorAll('.subtab-content').forEach(content => {
+                content.classList.add('d-none');
+            });
+
+            const targetPane = document.getElementById(`subtab-pane-${subtabId}`);
+            if (targetPane) {
+                targetPane.classList.remove('d-none');
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from database import db
-from models import User, Branch, Faculty, Student, Course, Lesson, Screen
+from models import User, Branch, Faculty, Student, Course, Lesson, Screen, TypingGame
 from datetime import datetime
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -288,15 +288,28 @@ def delete_student(student_id):
 @admin_bp.route("/lms-content", methods=["GET", "POST"])
 def lms_content():
     if request.method == "POST":
-        course = Course(
-            course_name=request.form["course_name"],
-            status=request.form["status"]
-        )
-        db.session.add(course)
-        db.session.commit()
-        return redirect(url_for("admin.lms_content"))
+        if "game_name" in request.form:
+            game = TypingGame(
+                game_name=request.form["game_name"],
+                category=request.form.get("category", "Speed & Accuracy"),
+                difficulty=request.form.get("difficulty", "Medium"),
+                status=request.form.get("status", "Active")
+            )
+            db.session.add(game)
+            db.session.commit()
+            return redirect(url_for("admin.lms_content"))
+        else:
+            course = Course(
+                course_name=request.form["course_name"],
+                status=request.form["status"]
+            )
+            db.session.add(course)
+            db.session.commit()
+            return redirect(url_for("admin.lms_content"))
+
     courses = Course.query.all()
-    return render_template("admin/lms_content.html", courses=courses)
+    games = TypingGame.query.all()
+    return render_template("admin/lms_content.html", courses=courses, games=games)
 
 @admin_bp.route("/course/update/<int:course_id>", methods=["POST"])
 def update_course(course_id):
@@ -310,6 +323,23 @@ def update_course(course_id):
 def delete_course(course_id):
     course = Course.query.get_or_404(course_id)
     db.session.delete(course)
+    db.session.commit()
+    return redirect(url_for("admin.lms_content"))
+
+@admin_bp.route("/game/update/<int:game_id>", methods=["POST"])
+def update_game(game_id):
+    game = TypingGame.query.get_or_404(game_id)
+    game.game_name = request.form["game_name"]
+    game.category = request.form.get("category", game.category)
+    game.difficulty = request.form.get("difficulty", game.difficulty)
+    game.status = request.form["status"]
+    db.session.commit()
+    return redirect(url_for("admin.lms_content"))
+
+@admin_bp.route("/game/delete/<int:game_id>")
+def delete_game(game_id):
+    game = TypingGame.query.get_or_404(game_id)
+    db.session.delete(game)
     db.session.commit()
     return redirect(url_for("admin.lms_content"))
 

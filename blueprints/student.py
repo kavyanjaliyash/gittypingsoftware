@@ -24,12 +24,13 @@ def dashboard():
 
     course_stats = {}
     for c in courses:
-        total_lessons = len(c.lessons)
-        completed_count = sum(1 for l in c.lessons if l.lesson_id in completed_lesson_ids)
-        pct = round((completed_count / total_lessons) * 100) if total_lessons > 0 else 0
-        is_completed = (completed_count == total_lessons) and (total_lessons > 0)
+        active_lessons = [l for l in c.lessons if len(l.screens) > 0]
+        total_lessons = len(active_lessons) if active_lessons else len(c.lessons)
+        completed_count = sum(1 for l in (active_lessons or c.lessons) if l.lesson_id in completed_lesson_ids)
+        pct = round((completed_count / total_lessons) * 100) if total_lessons > 0 else 100
+        is_completed = (pct == 100)
         course_stats[c.course_id] = {
-            'total_lessons': total_lessons,
+            'total_lessons': len(c.lessons),
             'completed_count': completed_count,
             'pct': pct,
             'is_completed': is_completed
@@ -45,37 +46,38 @@ def dashboard():
     )
 
 @student_bp.route('/certificate/<int:course_id>')
-def print_certificate(course_id):
-    if 'user_id' not in session or session.get('role') != 'student':
+@student_bp.route('/certificate')
+def print_certificate(course_id=1):
+    if 'user_id' not in session:
         return redirect(url_for('auth.login'))
 
-    student = Student.query.filter_by(user_id=session['user_id']).first()
-    course = Course.query.get_or_404(course_id)
+    user_role = session.get('role', '')
+    student_id_arg = request.args.get('student_id')
 
-    lessons = Lesson.query.filter_by(course_id=course_id, status='Active').all()
-    lesson_ids = [l.lesson_id for l in lessons]
+    if student_id_arg:
+        student = Student.query.get(student_id_arg)
+    else:
+        student = Student.query.filter_by(user_id=session['user_id']).first()
 
-    completed_progress = StudentProgress.query.filter(
-        StudentProgress.student_id == student.student_id,
-        StudentProgress.lesson_id.in_(lesson_ids),
-        StudentProgress.status == 'Completed'
-    ).all() if lesson_ids else []
+    if not student:
+        student = Student.query.first()
 
-    wpms = [p.wpm for p in completed_progress if p.wpm]
-    avg_wpm = round(sum(wpms) / len(wpms)) if wpms else (student.english_wpm if 'Kannada' not in course.course_name else student.kannada_wpm)
-
-    accuracies = [p.accuracy for p in completed_progress if p.accuracy]
-    avg_accuracy = round(sum(accuracies) / len(accuracies)) if accuracies else 98
-
+    course = Course.query.get(course_id) or Course.query.first()
     completion_date = datetime.now().strftime("%B %d, %Y")
+
+    if user_role in ['branch', 'branch_admin', 'branch admin'] or user_role != 'student':
+        back_url = url_for('branch.student_details', student_id=student.student_id, subtab='achievements')
+    else:
+        back_url = url_for('student.dashboard', subtab='achievements')
 
     return render_template(
         'student/certificate.html',
         student=student,
         course=course,
-        avg_wpm=avg_wpm or 20,
-        avg_accuracy=avg_accuracy,
-        completion_date=completion_date
+        avg_wpm=student.english_wpm or 20,
+        avg_accuracy=98,
+        completion_date=completion_date,
+        back_url=back_url
     )
 
 @student_bp.route("/courses")

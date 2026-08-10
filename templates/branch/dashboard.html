@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Branch Dashboard - Global IT Education</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js for Student Activity analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary-blue: #0284c7;
+            --primary-dark: #0369a1;
+            --sidebar-bg: #0f172a;
+        }
+
+        body {
+            background-color: #f8fafc;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            color: #0f172a;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        /* Side Menubar Layout */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-brand img {
+            max-height: 44px;
+            width: auto;
+        }
+
+        .sidebar-menu {
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        .menu-item:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .menu-item.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+        }
+
+        .menu-item i {
+            font-size: 1.1rem;
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .user-info-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0284c7;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .btn-logout {
+            width: 100%;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .btn-logout:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        /* Main Content Offset */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 24px 36px;
+            min-height: 100vh;
+        }
+
+        /* Top Header Search Bar (Matching Reference Image) */
+        .top-search-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .search-input-box {
+            position: relative;
+            max-width: 420px;
+            width: 100%;
+        }
+        .search-input-box input {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 16px 10px 42px;
+            font-size: 0.9rem;
+            color: #334155;
+            width: 100%;
+        }
+        .search-input-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        /* Section Cards */
+        .analytics-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 28px;
+        }
+
+        .section-header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-teachers {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        .table-teachers th {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            border: none;
+        }
+        .table-teachers td {
+            background: #ffffff;
+            padding: 16px;
+            font-size: 0.9rem;
+            border-top: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .table-teachers tr td:first-child {
+            border-left: 1px solid #f1f5f9;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .table-teachers tr td:last-child {
+            border-right: 1px solid #f1f5f9;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+            text-align: right;
+            color: #0284c7;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Side Menubar Navigation -->
+    <aside class="sidebar">
+        <div>
+            <!-- Brand Logo Only -->
+            <div class="sidebar-brand text-center py-4">
+                <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Global IT Logo" style="max-height: 52px; width: auto;" onerror="this.style.display='none';">
+            </div>
+
+            <!-- Navigation Menu Items -->
+            <nav class="sidebar-menu">
+                <button class="menu-item {% if active_tab == 'dashboard' %}active{% endif %}" onclick="switchTab('dashboard', this)">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </button>
+
+                <button class="menu-item {% if active_tab == 'faculty' %}active{% endif %}" onclick="switchTab('faculty', this)">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>Faculty</span>
+                </button>
+
+                <button class="menu-item {% if active_tab == 'students' %}active{% endif %}" onclick="switchTab('students', this)">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students</span>
+                </button>
+
+                <button class="menu-item {% if active_tab == 'report' %}active{% endif %}" onclick="switchTab('report', this)">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>Report</span>
+                </button>
+
+                <button class="menu-item {% if active_tab == 'lms' %}active{% endif %}" onclick="switchTab('lms', this)">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                    <span>LMS</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer & Logout Only -->
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+        <!-- Top Header Bar -->
+        <div class="top-search-header d-flex justify-content-end mb-4">
+            <!-- Top Right Profile Click Badge (Directly opens Profile View Page) -->
+            <div class="user-profile-badge text-end px-2 py-1 rounded-3" onclick="switchTab('account')" style="cursor: pointer;" title="View Account Profile">
+                <div class="fw-bold text-dark mb-0 fs-6 text-primary-hover">{{ session.get('username', branch.branch_name if branch else 'hoskote14') }}</div>
+                <small class="text-muted fs-7">Branch Admin <i class="fa-solid fa-user-gear ms-1 text-primary"></i></small>
+            </div>
+        </div>
+
+        <!-- 1. DASHBOARD TAB CONTENT (Matching Reference Image Design 100%) -->
+        <div id="tab-content-dashboard" class="tab-pane-content {% if active_tab != 'dashboard' %}d-none{% endif %}">
+            
+            <!-- Student Activity Section -->
+            <div class="mb-4">
+                <div class="section-header-title mb-3">
+                    <i class="fa-solid fa-desktop text-primary"></i>
+                    <span>Student Activity</span>
+                </div>
+
+                <div class="analytics-card">
+                    <h5 class="fw-bold text-dark mb-4 fs-5">Average Time Spent Typing Per Student</h5>
+                    
+                    <!-- Chart.js Container -->
+                    <div style="height: 320px; position: relative;">
+                        <canvas id="studentActivityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Most Active Teachers Section (Matching Reference Image Table 100%) -->
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <div class="section-header-title mb-1">
+                            <i class="fa-solid fa-award text-warning"></i>
+                            <span>Most Active Teachers</span>
+                        </div>
+                        <p class="text-muted small mb-0">Your most active teachers based on typing activity</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted small border rounded-3 px-3 py-1.5 bg-white"><i class="fa-regular fa-calendar me-1"></i> Date: Last Week <i class="fa-solid fa-chevron-down ms-1"></i></span>
+                        <a href="?tab=faculty" class="text-primary fw-bold text-decoration-none small">View All Teachers</a>
+                    </div>
+                </div>
+
+                <div class="analytics-card p-2">
+                    <div class="table-responsive">
+                        <table class="table-teachers">
+                            <thead>
+                                <tr>
+                                    <th>Teacher</th>
+                                    <th>Time Spent Typing</th>
+                                    <th>Active Students</th>
+                                    <th>Avg Speed</th>
+                                    <th>Avg Accuracy</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for t in teacher_activity %}
+                                <tr>
+                                    <td class="fw-bold text-dark">{{ t.faculty_name }}</td>
+                                    <td class="text-secondary fw-semibold">{{ t.time_spent }}</td>
+                                    <td class="fw-bold text-dark">{{ t.active_students }}</td>
+                                    <td class="fw-bold text-primary">{{ t.avg_speed }} WPM</td>
+                                    <td class="fw-bold text-success">{{ t.avg_accuracy }}%</td>
+                                    <td class="text-end"><i class="fa-solid fa-chevron-right text-muted"></i></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">No active teacher data recorded yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 2. FACULTY TAB CONTENT -->
+        <div id="tab-content-faculty" class="tab-pane-content {% if active_tab != 'faculty' %}d-none{% endif %}">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-chalkboard-user text-primary me-2"></i>Faculty Management</h3>
+                    <p class="text-muted small mb-0">Faculty trainers assigned to {{ branch.branch_name if branch else 'this branch' }}.</p>
+                </div>
+                <span class="badge bg-primary px-3 py-2 rounded-pill font-monospace fw-bold fs-6">{{ faculties|length }} Faculty Members</span>
+            </div>
+
+            <div class="analytics-card p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted fs-7">
+                            <tr>
+                                <th class="ps-4">Code</th>
+                                <th>Faculty Name</th>
+                                <th>Qualification</th>
+                                <th>Experience</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th class="pe-4 text-end">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in faculties %}
+                            <tr>
+                                <td class="ps-4 font-monospace fw-bold text-primary">{{ f.faculty_code or ('FAC00' ~ f.faculty_id) }}</td>
+                                <td class="fw-bold text-dark">{{ f.faculty_name }}</td>
+                                <td>{{ f.qualification or 'B.E / MCA' }}</td>
+                                <td>{{ f.experience or '3 Years' }}</td>
+                                <td>{{ f.mobile or '-' }}</td>
+                                <td>{{ f.email or '-' }}</td>
+                                <td class="pe-4 text-end">
+                                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1 rounded-2">Active</span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">No faculty members assigned to this branch yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. STUDENTS TAB CONTENT (Student Dashboard) -->
+        <div id="tab-content-students" class="tab-pane-content {% if active_tab != 'students' %}d-none{% endif %}">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-user-graduate text-success me-2"></i>Student Dashboard</h3>
+                    <p class="text-muted small mb-0">Detailed list of enrolled students, live typing speeds, and student registration.</p>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <input type="text" id="studentSearchInput" class="form-control rounded-3 shadow-none px-3" placeholder="Search student name or reg..." style="max-width: 250px;" onkeyup="filterStudents()">
+                    <button type="button" class="btn btn-primary fw-semibold px-3 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2 border-0" data-bs-toggle="modal" data-bs-target="#addBranchStudentModal" style="background-color: #0284c7 !important;">
+                        <i class="fa-solid fa-plus"></i> <span>Add Student</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="analytics-card p-0" style="overflow: visible !important;">
+                <div class="table-responsive" style="overflow: visible !important; min-height: 220px;">
+                    <table class="table table-hover align-middle mb-0" id="studentsTable">
+                        <thead class="bg-light text-muted fs-7">
+                            <tr>
+                                <th class="ps-4">Registration No</th>
+                                <th>Student Name</th>
+                                <th>Username / Login</th>
+                                <th>Mobile</th>
+                                <th>Course</th>
+                                <th>English Speed</th>
+                                <th>Kannada Speed</th>
+                                <th>Status</th>
+                                <th class="pe-4 text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in students %}
+                            {% set sid = s.student_id %}
+                            <tr>
+                                <td class="ps-4">
+                                    <a href="{{ url_for('branch.student_details', student_id=sid) }}" class="font-monospace fw-bold text-primary text-decoration-none" title="Click to view student dashboard">
+                                        {{ s.registration_no }} <i class="fa-solid fa-arrow-up-right-from-square ms-1 fs-8"></i>
+                                    </a>
+                                </td>
+                                <td class="fw-bold text-dark">{{ s.student_name }}</td>
+                                <td class="text-primary fw-semibold font-monospace small">{{ s.user.username if s.user else '-' }}</td>
+                                <td>{{ s.mobile }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ s.course }}</span></td>
+                                <td><span class="fw-bold text-success fs-6">{{ s.english_wpm or 0 }} WPM</span></td>
+                                <td><span class="fw-bold text-info fs-6">{{ s.kannada_wpm or 0 }} WPM</span></td>
+                                <td>
+                                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1 rounded-2">Active</span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-light btn-sm border rounded-3 fw-semibold dropdown-toggle px-3 py-1.5 shadow-none" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                                            <li>
+                                                <button type="button" class="dropdown-item py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#editBranchStudentModal{{ sid }}">
+                                                    <i class="fa-solid fa-pen-to-square text-primary me-2"></i> Edit Details
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button type="button" class="dropdown-item py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#resetBranchPasswordModal{{ sid }}">
+                                                    <i class="fa-solid fa-key text-info me-2"></i> Reset Password
+                                                </button>
+                                            </li>
+                                            <li><hr class="dropdown-divider my-1"></li>
+                                            <li>
+                                                <button type="button" class="dropdown-item py-2 fw-semibold text-danger" data-bs-toggle="modal" data-bs-target="#deleteBranchStudentModal{{ sid }}">
+                                                    <i class="fa-solid fa-trash-can me-2"></i> Delete Student
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Edit Student Modal Popup -->
+                            <div class="modal fade" id="editBranchStudentModal{{ sid }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                                        <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                            <h5 class="fw-bold text-dark"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Edit Student Details</h5>
+                                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form action="{{ url_for('branch.update_student', student_id=sid) }}" method="POST">
+                                            <div class="modal-body p-4">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label small fw-bold text-secondary">First Name</label>
+                                                        <input type="text" class="form-control rounded-3" name="first_name" value="{{ s.student_name.split(' ')[0] if s.student_name else '' }}" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label small fw-bold text-secondary">Last Name</label>
+                                                        <input type="text" class="form-control rounded-3" name="last_name" value="{{ s.student_name.split(' ')[1:] | join(' ') if s.student_name else '' }}">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label small fw-bold text-secondary">Registration Number</label>
+                                                        <input type="text" class="form-control rounded-3" name="registration_no" value="{{ s.registration_no }}" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label small fw-bold text-secondary">Email ID</label>
+                                                        <input type="email" class="form-control rounded-3" name="email" value="{{ s.email or '' }}">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label small fw-bold text-secondary">Date of Birth</label>
+                                                        <input type="date" class="form-control rounded-3" name="dob" value="{{ s.dob.strftime('%Y-%m-%d') if s.dob else '' }}">
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label small fw-bold text-secondary">Mobile Number</label>
+                                                        <input type="text" class="form-control rounded-3" name="mobile" value="{{ s.mobile or '' }}" required>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label small fw-bold text-secondary">Assigned Trainer</label>
+                                                        <select class="form-select rounded-3" name="faculty_id">
+                                                            <option value="">Select Trainer</option>
+                                                            {% for f in faculties %}
+                                                            <option value="{{ f.faculty_id }}" {% if s.faculty_id == f.faculty_id %}selected{% endif %}>{{ f.faculty_name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label small fw-bold text-secondary">Status</label>
+                                                        <select class="form-select rounded-3" name="status">
+                                                            <option value="Active" {% if s.status == 'Active' %}selected{% endif %}>Active</option>
+                                                            <option value="Inactive" {% if s.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0 px-4 pb-4">
+                                                <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold" style="background-color: #0284c7 !important;">Save Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Reset Password Modal Popup -->
+                            <div class="modal fade" id="resetBranchPasswordModal{{ sid }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                                        <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                            <h5 class="fw-bold text-dark"><i class="fa-solid fa-key text-info me-2"></i>Reset Student Password</h5>
+                                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form action="{{ url_for('branch.reset_student_password', student_id=sid) }}" method="POST">
+                                            <div class="modal-body p-4">
+                                                <p class="text-muted small mb-3">Reset login password for student <strong>{{ s.student_name }}</strong> (Username: <code class="text-primary">{{ s.user.username if s.user else s.registration_no }}</code>).</p>
+                                                <div class="mb-3">
+                                                    <label class="form-label small fw-bold text-secondary">New Password</label>
+                                                    <input type="text" class="form-control rounded-3 fw-bold" name="password" value="{{ s.registration_no }}" required placeholder="Enter new password">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0 px-4 pb-4">
+                                                <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-info text-white rounded-3 px-4 fw-semibold">Update Password</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Delete Student Modal Popup -->
+                            <div class="modal fade" id="deleteBranchStudentModal{{ sid }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                                        <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                            <h5 class="fw-bold text-danger"><i class="fa-solid fa-trash-can me-2"></i>Delete Student</h5>
+                                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form action="{{ url_for('branch.delete_student', student_id=sid) }}" method="POST">
+                                            <div class="modal-body p-4">
+                                                <p class="mb-0">Are you sure you want to delete student <strong>{{ s.student_name }}</strong> (Reg No: <code>{{ s.registration_no }}</code>)? This action cannot be undone.</p>
+                                            </div>
+                                            <div class="modal-footer border-0 px-4 pb-4">
+                                                <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-danger rounded-3 px-4 fw-semibold">Delete Student</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center py-4 text-muted">No students registered under this branch yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Student Modal Popup (Matching Admin/Students 100%) -->
+        <div class="modal fade" id="addBranchStudentModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <h5 class="fw-bold text-dark"><i class="fa-solid fa-user-plus text-primary me-2"></i>Register New Student</h5>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ url_for('branch.add_student') }}" method="POST">
+                        <div class="modal-body p-4">
+                            <div class="row">
+                                <!-- First Name -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-secondary">First Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control rounded-3" id="bFirstNameInput" name="first_name" required placeholder="e.g. Kavya">
+                                </div>
+                                <!-- Last Name -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-secondary">Last Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control rounded-3" id="bLastNameInput" name="last_name" required placeholder="e.g. M">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Registration Number -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-secondary">Registration Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control rounded-3" id="bRegNoInput" name="registration_no" required placeholder="e.g. 151625">
+                                </div>
+                                <!-- Email ID -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-secondary">Email ID</label>
+                                    <input type="email" class="form-control rounded-3" name="email" placeholder="e.g. kavya@gmail.com">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Date of Birth -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-secondary">Date of Birth (DOB)</label>
+                                    <input type="date" class="form-control rounded-3" name="dob">
+                                </div>
+                                <!-- Mobile Number -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-secondary">Mobile Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control rounded-3" name="mobile" required placeholder="e.g. 9876543210">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Assigned Trainer -->
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label small fw-bold text-secondary">Assigned Trainer / Faculty</label>
+                                    <select class="form-select rounded-3" name="faculty_id">
+                                        <option value="">Select Trainer (Optional)</option>
+                                        {% for faculty in faculties %}
+                                        <option value="{{ faculty.faculty_id }}">{{ faculty.faculty_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Auto-Generated Username -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-secondary">Auto-Generated Username (First_RegNo)</label>
+                                    <input type="text" class="form-control rounded-3 bg-light fw-bold text-primary" id="bAutoUsernameInput" readonly placeholder="Auto-generated">
+                                </div>
+                                <!-- Default Password -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-secondary">Default Password (Reg No)</label>
+                                    <input type="text" class="form-control rounded-3 bg-light fw-bold text-dark" id="bAutoPasswordInput" readonly placeholder="Matches Reg No">
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="status" value="Active">
+                        </div>
+                        <div class="modal-footer border-0 px-4 pb-4">
+                            <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold" style="background-color: #0284c7 !important;">Register Student</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. REPORT TAB CONTENT (Student & Faculty Performance Reports) -->
+        <div id="tab-content-report" class="tab-pane-content {% if active_tab != 'report' %}d-none{% endif %}">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-file-lines text-warning me-2"></i>Performance Reports</h3>
+                    <p class="text-muted small mb-0">Analytics, student typing performance, and faculty evaluation metrics.</p>
+                </div>
+                <button class="btn btn-outline-primary rounded-3 fw-bold btn-sm px-3" onclick="window.print()">
+                    <i class="fa-solid fa-print me-1"></i> Print Report
+                </button>
+            </div>
+
+            <!-- Student Performance Summary Card -->
+            <div class="analytics-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-user-graduate text-success me-2"></i>Student Performance Summary</h5>
+                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-1.5 rounded-pill">{{ students|length }} Students</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted fs-7">
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Registration No</th>
+                                <th>Assigned Trainer</th>
+                                <th>English Speed</th>
+                                <th>Kannada Speed</th>
+                                <th>Performance Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in students %}
+                            <tr>
+                                <td class="fw-bold text-dark">{{ s.student_name }}</td>
+                                <td class="font-monospace text-primary fw-bold">{{ s.registration_no }}</td>
+                                <td class="text-secondary">{{ s.faculty.faculty_name if s.faculty else '-' }}</td>
+                                <td><strong class="text-success">{{ s.english_wpm or 0 }} WPM</strong></td>
+                                <td><strong class="text-info">{{ s.kannada_wpm or 0 }} WPM</strong></td>
+                                <td>
+                                    {% if (s.english_wpm or 0) >= 25 %}
+                                    <span class="badge bg-success">⭐⭐⭐ Excellent</span>
+                                    {% elif (s.english_wpm or 0) >= 15 %}
+                                    <span class="badge bg-warning text-dark">⭐⭐ Good</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">⭐ Practicing</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">No student performance records found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Faculty Performance Summary Card -->
+            <div class="analytics-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-chalkboard-user text-primary me-2"></i>Faculty Performance Summary</h5>
+                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-1.5 rounded-pill">{{ faculties|length }} Faculty Members</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted fs-7">
+                            <tr>
+                                <th>Faculty Code</th>
+                                <th>Faculty Name</th>
+                                <th>Assigned Students</th>
+                                <th>Time Spent Typing</th>
+                                <th>Avg Student Speed</th>
+                                <th>Avg Accuracy</th>
+                                <th>Faculty Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in teacher_activity %}
+                            <tr>
+                                <td class="font-monospace text-primary fw-bold">{{ t.faculty_code }}</td>
+                                <td class="fw-bold text-dark">{{ t.faculty_name }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ t.total_students }} Students</span></td>
+                                <td class="text-secondary fw-semibold">{{ t.time_spent }}</td>
+                                <td><strong class="text-success">{{ t.avg_speed }} WPM</strong></td>
+                                <td><strong class="text-info">{{ t.avg_accuracy }}%</strong></td>
+                                <td>
+                                    {% if t.avg_speed >= 20 %}
+                                    <span class="badge bg-success">⭐⭐⭐ Outstanding Trainer</span>
+                                    {% elif t.avg_speed >= 12 %}
+                                    <span class="badge bg-primary">⭐⭐ High Performing</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">⭐ Active Trainer</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">No faculty performance records found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. LMS TAB CONTENT (Ultra-Modern Executive LMS Design) -->
+        <div id="tab-content-lms" class="tab-pane-content {% if active_tab != 'lms' %}d-none{% endif %}">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-book-open-reader text-primary me-2"></i>LMS Curriculum & Courses</h3>
+                    <p class="text-muted small mb-0">Active typing courses, lesson modules, and interactive practice screens configured for students.</p>
+                </div>
+                <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3.5 py-2 rounded-pill font-monospace fs-6 border border-primary border-opacity-20">
+                    <i class="fa-solid fa-graduation-cap me-1"></i> {{ courses|length }} Enrolled Courses
+                </span>
+            </div>
+
+            <!-- Top Summary Stats Grid -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="analytics-card p-3.5 d-flex align-items-center gap-3">
+                        <div class="rounded-4 bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                            <i class="fa-solid fa-book"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted small fw-semibold">Active Courses</span>
+                            <h4 class="fw-bold text-dark mb-0 mt-0.5">{{ courses|length }}</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="analytics-card p-3.5 d-flex align-items-center gap-3">
+                        <div class="rounded-4 bg-info bg-opacity-10 text-info d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted small fw-semibold">Total Lesson Modules</span>
+                            <h4 class="fw-bold text-dark mb-0 mt-0.5">{{ courses|map(attribute='lessons')|map('length')|sum }} Modules</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="analytics-card p-3.5 d-flex align-items-center gap-3">
+                        <div class="rounded-4 bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                            <i class="fa-solid fa-desktop"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted small fw-semibold">Practice Screens</span>
+                            <h4 class="fw-bold text-dark mb-0 mt-0.5">Interactive & Ready</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Cards Grid -->
+            <div class="row g-4">
+                {% for c in courses %}
+                <div class="col-md-6">
+                    <div class="analytics-card p-0 overflow-hidden border-0 shadow-sm">
+                        <!-- Course Gradient Header -->
+                        <div class="p-4 text-white d-flex justify-content-between align-items-center" style="background: {% if 'Kannada' in c.course_name %}linear-gradient(135deg, #059669 0%, #047857 100%){% else %}linear-gradient(135deg, #0284c7 0%, #0369a1 100%){% endif %};">
+                            <div>
+                                <h5 class="fw-bold mb-1 fs-5 d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-graduation-cap"></i> {{ c.course_name }}
+                                </h5>
+                                <small class="text-white-50">Global IT Standard Touch Typing Curriculum</small>
+                            </div>
+                            <span class="badge bg-white text-dark fw-bold px-3 py-2 rounded-pill font-monospace shadow-sm">
+                                {{ c.lessons|length }} Lessons
+                            </span>
+                        </div>
+
+                        <!-- Course Lessons List -->
+                        <div class="p-3">
+                            <div class="d-flex flex-column gap-2.5">
+                                {% for l in c.lessons %}
+                                <div class="p-3 rounded-3 border bg-light bg-opacity-50 d-flex justify-content-between align-items-center transition-all hover-shadow">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="badge bg-primary bg-opacity-10 text-primary font-monospace fw-bold px-2.5 py-2 rounded-2 fs-7">
+                                            Lesson {{ l.display_order }}
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-0.5 fs-6">{{ l.lesson_title }}</h6>
+                                            <small class="text-muted"><i class="fa-solid fa-desktop text-secondary me-1"></i>{{ l.screens|length }} Practice Screens</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-1.5 rounded-pill border border-success border-opacity-20">
+                                        <i class="fa-solid fa-circle-check me-1"></i> Active
+                                    </span>
+                                </div>
+                                {% else %}
+                                <div class="p-4 text-muted small text-center">No lessons configured for this course yet.</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- 6. MY ACCOUNT SETTINGS TAB CONTENT (Matching Image 2 Layout 100%) -->
+        <div id="tab-content-account" class="tab-pane-content {% if active_tab != 'account' %}d-none{% endif %}">
+            <div class="mb-4 border-bottom pb-3">
+                <h3 class="fw-bold text-dark mb-1 fs-3">My Account Settings</h3>
+            </div>
+
+            <div class="analytics-card p-4">
+                <div class="alert alert-info border-0 rounded-3 small py-2.5 px-3 mb-4 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-circle-info fs-5"></i>
+                    <span><strong>Note:</strong> Account and Organization details are managed by Central Admin. Fields are read-only and cannot be modified by branch users.</span>
+                </div>
+
+                <div class="row g-5">
+                    <!-- Left Column: Your Personal Info (Matching Image 2) -->
+                    <div class="col-md-6 border-end pe-md-4">
+                        <h5 class="fw-bold text-dark mb-4 fs-5">Your Personal Info</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-1">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control rounded-2 bg-light border-1 shadow-none text-muted" value="{{ branch.email or 'hoskote@globalit.com' }}" readonly style="background-color: #f1f5f9 !important;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-1">Nickname</label>
+                            <input type="text" class="form-control rounded-2 bg-light border-1 shadow-none text-muted" value="{{ session.get('username', 'hoskote14') }}" readonly style="background-color: #ffffff !important;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-1">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control rounded-2 bg-light border-1 shadow-none text-muted" value="{{ branch.branch_name if branch else 'Hoskote' }}" readonly style="background-color: #ffffff !important;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-1">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control rounded-2 bg-light border-1 shadow-none text-muted" value="Branch Admin" readonly style="background-color: #ffffff !important;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-1">Phone</label>
+                            <input type="text" class="form-control rounded-2 bg-light border-1 shadow-none text-muted" value="{{ branch.phone or '9876543210' }}" readonly style="background-color: #ffffff !important;">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-bold mb-1">Time Zone</label>
+                            <input type="text" class="form-control rounded-2 bg-light border-1 shadow-none text-muted" value="Mumbai, Delhi (GMT+5:30)" readonly style="background-color: #ffffff !important;">
+                        </div>
+
+                        <div class="mb-4">
+                            <button type="button" class="btn btn-secondary text-dark border-0 rounded-2 px-3 py-1.5 fw-semibold opacity-50" disabled style="background-color: #e2e8f0 !important; cursor: not-allowed;">
+                                Update Personal Info
+                            </button>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-1">Language</label>
+                            <select class="form-select rounded-2 bg-light text-muted" disabled style="background-color: #ffffff !important; max-width: 140px;">
+                                <option selected>English</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Organization Details (Matching Image 2) -->
+                    <div class="col-md-6 ps-md-4">
+                        <h5 class="fw-bold text-dark mb-4 fs-5">Organization Details</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-1">School Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control rounded-2 bg-light border-1 shadow-none text-muted" value="Global IT Education - {{ branch.branch_name if branch else 'Hoskote' }}" readonly style="background-color: #ffffff !important;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-1">Country <span class="text-danger">*</span></label>
+                            <select class="form-select rounded-2 bg-light text-muted" disabled style="background-color: #ffffff !important;">
+                                <option selected>India</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-bold mb-1">Full Mailing Address <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control rounded-2 bg-light border-1 shadow-none text-muted" value="{{ branch.address or 'Hoskote Main Road, Bangalore' }}" readonly style="background-color: #ffffff !important;">
+                        </div>
+
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-secondary text-dark border-0 rounded-2 px-3 py-1.5 fw-semibold opacity-50" disabled style="background-color: #e2e8f0 !important; cursor: not-allowed;">
+                                Update Organization
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            if (btn) {
+                btn.classList.add('active');
+            }
+
+            document.querySelectorAll('.tab-pane-content').forEach(pane => {
+                pane.classList.add('d-none');
+            });
+
+            const targetPane = document.getElementById(`tab-content-${tabId}`);
+            if (targetPane) {
+                targetPane.classList.remove('d-none');
+            }
+
+            window.history.pushState(null, '', `?tab=${tabId}`);
+        }
+
+        function filterStudents() {
+            const query = document.getElementById('studentSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#studentsTable tbody tr');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        // Render Student Activity Analytics Line Chart (Matching Reference Image Design)
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('studentActivityChart');
+            if (ctx) {
+                const chartLabels = {{ chart_labels|safe }};
+                const thisWeekData = {{ this_week_data|safe }};
+                const lastWeekData = {{ last_week_data|safe }};
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            {
+                                label: 'This Week',
+                                data: thisWeekData,
+                                borderColor: '#0284c7',
+                                backgroundColor: 'rgba(2, 132, 199, 0.05)',
+                                borderWidth: 3,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#0284c7',
+                                pointBorderWidth: 3,
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                                tension: 0.35,
+                                fill: false
+                            },
+                            {
+                                label: 'Last Week',
+                                data: lastWeekData,
+                                borderColor: '#bae6fd',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2,
+                                borderDash: [6, 6],
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#bae6fd',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                tension: 0.35,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    usePointStyle: true,
+                                    font: {
+                                        weight: '600',
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: '#0f172a',
+                                padding: 12,
+                                titleFont: { weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                suggestedMax: 10,
+                                title: {
+                                    display: true,
+                                    text: 'Average Time Spent Typing Per Student (min)',
+                                    font: { size: 11, weight: '600' }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Auto-generate username and password preview in Add Student modal
+            const fInput = document.getElementById('bFirstNameInput');
+            const rInput = document.getElementById('bRegNoInput');
+            const uInput = document.getElementById('bAutoUsernameInput');
+            const pInput = document.getElementById('bAutoPasswordInput');
+
+            function updateAutoCredentials() {
+                if (fInput && rInput && uInput && pInput) {
+                    const fn = fInput.value.trim().toLowerCase().replace(/\s+/g, '');
+                    const reg = rInput.value.trim();
+
+                    if (fn && reg) {
+                        uInput.value = fn + '_' + reg;
+                        pInput.value = reg;
+                    } else if (reg) {
+                        uInput.value = 'student_' + reg;
+                        pInput.value = reg;
+                    } else {
+                        uInput.value = '';
+                        pInput.value = '';
+                    }
+                }
+            }
+
+            if (fInput) fInput.addEventListener('input', updateAutoCredentials);
+            if (rInput) rInput.addEventListener('input', updateAutoCredentials);
+        });
+    </script>
+
+</body>
+</html>
