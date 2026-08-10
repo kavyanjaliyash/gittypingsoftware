@@ -24,6 +24,17 @@ app.register_blueprint(faculty_bp)
 with app.app_context():
     db.create_all()
 
+    # Automatic migration: ensure screen_type column exists in lesson_screens table
+    try:
+        from sqlalchemy import text
+        with db.engine.connect() as conn:
+            cols = [row[1] for row in conn.execute(text("PRAGMA table_info(lesson_screens)")).fetchall()]
+            if 'screen_type' not in cols:
+                conn.execute(text("ALTER TABLE lesson_screens ADD COLUMN screen_type VARCHAR(50) DEFAULT 'block'"))
+                conn.commit()
+    except Exception as e:
+        print(f"Migration notice: {e}")
+
     if User.query.count() == 0:
         admin = User(
             role="Admin",

@@ -1,0 +1,507 @@
+/* ==========================================================================
+   TYPING SCREEN STYLES: BLOCK, WATERFALL & JUMP PLATFORMER
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. BLOCK STYLE (Standard Tiles)
+   -------------------------------------------------------------------------- */
+.block-typing-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-x: auto;
+    background-color: #f8fafc;
+    border: 3px solid #cbd5e1 !important;
+    border-radius: 16px;
+    padding: 25px 20px;
+    min-height: 160px;
+    width: 100%;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+.block-typing-area::-webkit-scrollbar {
+    height: 8px;
+}
+.block-typing-area::-webkit-scrollbar-thumb {
+    background: #0284c7;
+    border-radius: 4px;
+}
+
+.block-typing-area span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 75px;
+    height: 85px;
+    margin-right: 12px;
+    border: 3px solid #cbd5e1;
+    border-radius: 12px;
+    background-color: #ffffff;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 2.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.15s ease;
+}
+
+.block-typing-area span.active-char {
+    color: #ffffff !important;
+    background-color: #0284c7 !important;
+    border-color: #0284c7 !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+.block-typing-area span.correct-char {
+    color: #059669 !important;
+    background-color: #d1e7dd !important;
+    border-color: #10b981 !important;
+    box-shadow: none !important;
+}
+
+.block-typing-area span.incorrect-char {
+    color: #ffffff !important;
+    background-color: #ef4444 !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4) !important;
+    animation: blockShake 0.25s ease-in-out;
+}
+
+@keyframes blockShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
+
+/* --------------------------------------------------------------------------
+   2. WATERFALL STYLE (Vertical Cascading Lanes & Downward Moving Tracks)
+   -------------------------------------------------------------------------- */
+.waterfall-container {
+    position: relative;
+    width: 100%;
+    min-height: 290px;
+    height: 290px;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+    user-select: none;
+    padding: 12px 16px;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Vertical Guide Beam Connecting Active Key to Keyboard */
+.waterfall-column-beam {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: rgba(2, 132, 199, 0.09);
+    border-left: 1.5px dashed rgba(2, 132, 199, 0.35);
+    border-right: 1.5px dashed rgba(2, 132, 199, 0.35);
+    pointer-events: none;
+    z-index: 1;
+    transition: left 0.18s cubic-bezier(0.2, 0.8, 0.3, 1), width 0.18s ease;
+}
+
+/* Stage Holding the Horizontal Track Strips */
+.waterfall-tracks-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column-reverse; /* Bottom row is index 0 */
+    gap: 10px;
+    justify-content: flex-start;
+    z-index: 2;
+    transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+/* Horizontal Track Strip */
+.waterfall-track-row {
+    position: relative;
+    width: 100%;
+    height: 52px;
+    min-height: 52px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+/* Active Bottom Track Strip */
+.waterfall-track-row.active-track {
+    background: #e0f2fe !important;
+    border: 1px solid #bae6fd !important;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+}
+
+/* Individual Waterfall Letter Tile */
+.waterfall-tile {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 44px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #334155;
+    transform: translateX(-50%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    transition: left 0.18s cubic-bezier(0.2, 0.8, 0.3, 1), transform 0.18s ease, background 0.18s ease;
+}
+
+/* Active Bottom Key Tile (Solid Blue) */
+.waterfall-tile.active-tile {
+    background: #0284c7 !important;
+    border-color: #0284c7 !important;
+    color: #ffffff !important;
+    width: 54px;
+    height: 46px;
+    font-size: 1.95rem;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.45) !important;
+    z-index: 5;
+    animation: activeTileBounce 1.4s infinite ease-in-out;
+}
+
+.waterfall-tile.error-tile {
+    background: #ef4444 !important;
+    border-color: #dc2626 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.5) !important;
+    animation: blockShake 0.25s ease-in-out !important;
+}
+
+.waterfall-tile.dropped-tile {
+    transform: translateX(-50%) translateY(30px) scale(0.8);
+    opacity: 0;
+    transition: all 0.2s ease-out;
+}
+
+@keyframes activeTileBounce {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.06); }
+}
+
+/* Slide Down Track Keyframe Animation */
+.waterfall-slide-down {
+    animation: waterfallRowDrop 0.18s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@keyframes waterfallRowDrop {
+    0% { transform: translateY(-52px); }
+    100% { transform: translateY(0); }
+}
+
+
+/* --------------------------------------------------------------------------
+   3. VIRTUAL KEYBOARD HIGHLIGHTS & MISTAKE FEEDBACK
+   -------------------------------------------------------------------------- */
+.keyboard-key.key-mistake {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6) !important;
+    animation: blockShake 0.25s ease-in-out;
+}
+
+/* Live Keystroke Feedback Stream Display */
+.typed-feedback-box {
+    min-height: 58px;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+    cursor: text;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.typed-feedback-box:focus-within {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+}
+
+.feedback-char-correct {
+    color: #059669;
+}
+
+.feedback-char-mistake {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #ef4444;
+    border-radius: 6px;
+    padding: 0 6px;
+    animation: blockShake 0.25s ease-in-out;
+}
+
+.feedback-cursor {
+    display: inline-block;
+    width: 2.5px;
+    height: 24px;
+    background: #0284c7;
+    animation: cursorBlink 1s infinite;
+}
+
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+
+/* --------------------------------------------------------------------------
+   4. JUMP STYLE (Platformer Game Theme)
+   -------------------------------------------------------------------------- */
+.jump-game-container {
+    position: relative;
+    width: 100%;
+    height: 480px;
+    min-height: 480px;
+    background: linear-gradient(180deg, #38bdf8 0%, #7dd3fc 45%, #bae6fd 80%, #99f6e4 100%);
+    border: 3px solid #0284c7;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15);
+    user-select: none;
+}
+
+/* Parallax Cloud Animations */
+.jump-cloud {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 50px;
+    opacity: 0.9;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+    pointer-events: none;
+}
+.jump-cloud::before, .jump-cloud::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+}
+.jump-cloud-1 {
+    width: 140px;
+    height: 45px;
+    top: 40px;
+    left: 10%;
+    animation: cloudDrift1 32s linear infinite;
+}
+.jump-cloud-1::before {
+    width: 55px;
+    height: 55px;
+    top: -24px;
+    left: 20px;
+}
+.jump-cloud-1::after {
+    width: 45px;
+    height: 45px;
+    top: -16px;
+    right: 25px;
+}
+
+.jump-cloud-2 {
+    width: 170px;
+    height: 50px;
+    top: 90px;
+    right: 15%;
+    animation: cloudDrift2 42s linear infinite;
+}
+.jump-cloud-2::before {
+    width: 65px;
+    height: 65px;
+    top: -28px;
+    left: 30px;
+}
+.jump-cloud-2::after {
+    width: 50px;
+    height: 50px;
+    top: -18px;
+    right: 35px;
+}
+
+@keyframes cloudDrift1 {
+    0% { transform: translateX(-150px); }
+    100% { transform: translateX(1100px); }
+}
+@keyframes cloudDrift2 {
+    0% { transform: translateX(200px); }
+    100% { transform: translateX(-1000px); }
+}
+
+/* Side Forest Foliage */
+.jump-forest-tree {
+    position: absolute;
+    left: -20px;
+    top: 0;
+    height: 100%;
+    width: 140px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Sound Toggle Button */
+.jump-sound-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 46px;
+    height: 46px;
+    background: #f59e0b;
+    border: 3px solid #d97706;
+    border-radius: 12px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    z-index: 30;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+.jump-sound-btn:hover {
+    transform: scale(1.08);
+    background: #fbbf24;
+}
+.jump-sound-btn.sound-muted {
+    background: #94a3b8;
+    border-color: #64748b;
+}
+
+/* Stage Area Containing Platforms & Character */
+.jump-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+/* Wooden Branch Platform */
+.jump-platform {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.platform-wood-branch {
+    position: relative;
+    width: 220px;
+    height: 24px;
+    background: linear-gradient(180deg, #a16207 0%, #78350f 100%);
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+    border: 2px solid #542508;
+}
+
+/* Branch Pine Needles / Foliage under log */
+.platform-wood-branch::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    bottom: -18px;
+    width: 60px;
+    height: 18px;
+    background: repeating-linear-gradient(45deg, #15803d 0, #15803d 4px, transparent 4px, transparent 8px);
+    border-radius: 4px;
+}
+.platform-wood-branch::after {
+    content: '';
+    position: absolute;
+    right: 15px;
+    bottom: -18px;
+    width: 65px;
+    height: 18px;
+    background: repeating-linear-gradient(-45deg, #15803d 0, #15803d 4px, transparent 4px, transparent 8px);
+    border-radius: 4px;
+}
+
+/* Text Prompts Sitting on the Branch */
+.platform-text-box {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #0f172a;
+    text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9), 0 -1px 0 #ffffff;
+}
+
+/* Platform Letter Tile */
+.platform-char {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 52px;
+    padding: 0 4px;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.platform-char.char-active {
+    background: #16a34a !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.4);
+    text-shadow: none !important;
+    transform: translateY(-2px);
+}
+
+.platform-char.char-done {
+    color: #15803d !important;
+}
+
+.platform-char.char-error {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.5) !important;
+    animation: blockShake 0.25s ease-in-out;
+}
+
+/* Cute Robot Character Avatar (Matching Image 2) */
+.jump-character {
+    position: absolute;
+    width: 60px;
+    height: 80px;
+    z-index: 20;
+    transition: left 0.35s cubic-bezier(0.34, 1.25, 0.64, 1), top 0.35s cubic-bezier(0.34, 1.25, 0.64, 1);
+    pointer-events: none;
+}
+
+/* Robot Jump Bounce Keyframes */
+.jump-animating {
+    animation: robotHop 0.45s cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+
+@keyframes robotHop {
+    0% { transform: scale(1, 0.8) translateY(0); }
+    35% { transform: scale(0.85, 1.2) translateY(-40px); }
+    70% { transform: scale(1.1, 0.9) translateY(-10px); }
+    100% { transform: scale(1, 1) translateY(0); }
+}

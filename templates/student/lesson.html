@@ -4,6 +4,12 @@
 <!-- Link to your separate Nudi mapping script -->
 <script src="{{ url_for('static', filename='js/nudi-mapper.js') }}"></script>
 
+<!-- Link to Typing Styles CSS & Modular Style Renderers -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/typing-styles.css') }}">
+<script src="{{ url_for('static', filename='js/typing-styles/block-style.js') }}"></script>
+<script src="{{ url_for('static', filename='js/typing-styles/waterfall-style.js') }}"></script>
+<script src="{{ url_for('static', filename='js/typing-styles/jump-style.js') }}"></script>
+
 <style>
     /* Force main container to stretch full screen width */
     .portal-container {
@@ -50,59 +56,111 @@
         transition: all 0.1s ease;
     }
 
-    /* Virtual On-Screen Keyboard Styles */
+    /* Virtual On-Screen Keyboard Styles (TypingClub / Apple Style) */
     .virtual-keyboard {
-        background: #cbd5e1;
+        background: #d8dde3;
+        border: 1px solid #c8ced6;
         border-radius: 16px;
-        padding: 16px;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        padding: 10px 14px 14px 14px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
         user-select: none;
+        max-width: 860px;
+        margin: 0 auto;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    .keyboard-top-bar {
+        font-size: 0.78rem;
+        color: #475569;
+    }
+    .keyboard-settings-label {
+        cursor: pointer;
+        opacity: 0.85;
+        transition: opacity 0.15s ease;
+    }
+    .keyboard-settings-label:hover {
+        opacity: 1;
+        color: #0284c7 !important;
     }
     .keyboard-row {
         display: flex;
         justify-content: center;
-        gap: 6px;
-        margin-bottom: 6px;
+        gap: 5px;
+        margin-bottom: 5px;
     }
     .keyboard-row:last-child {
         margin-bottom: 0;
     }
     .keyboard-key {
         background: #ffffff;
-        border: 1px solid #94a3b8;
-        border-radius: 8px;
+        border: 1px solid #cfd5dc;
+        border-radius: 6px;
         min-width: 44px;
-        height: 48px;
+        height: 46px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
-        font-size: 0.92rem;
-        color: #334155;
-        box-shadow: 0 3px 0 #94a3b8;
-        transition: all 0.15s ease;
-        line-height: 1.1;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #1e293b;
+        box-shadow: 0 2.5px 0 #b3b9c2, 0 3px 5px rgba(0, 0, 0, 0.05);
+        transition: all 0.12s ease;
+        line-height: 1.05;
         text-align: center;
+        padding: 2px 4px;
+        position: relative;
     }
-    .keyboard-key.key-wide { min-width: 70px; font-size: 0.8rem; text-transform: lowercase; }
-    .keyboard-key.key-extra-wide { min-width: 90px; font-size: 0.8rem; }
-    .keyboard-key.key-spacebar { width: 320px; font-size: 0.85rem; text-transform: lowercase; }
+    .keyboard-key .key-top {
+        font-size: 0.72rem;
+        color: #64748b;
+        margin-bottom: -1px;
+    }
+    .keyboard-key .key-bottom {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .keyboard-key.key-fn {
+        background: #eef2f6;
+        color: #475569;
+        font-size: 0.74rem;
+        font-weight: 600;
+    }
+    .keyboard-key.key-delete { min-width: 68px; }
+    .keyboard-key.key-tab { min-width: 62px; }
+    .keyboard-key.key-backslash { min-width: 50px; }
+    .keyboard-key.key-caps { min-width: 74px; }
+    .keyboard-key.key-enter { min-width: 76px; }
+    .keyboard-key.key-shift-left { min-width: 90px; }
+    .keyboard-key.key-shift-right { min-width: 90px; }
+    .keyboard-key.key-mod { min-width: 48px; font-size: 0.74rem; }
+    .keyboard-key.key-spacebar { width: 330px; font-size: 0.8rem; color: #64748b; font-weight: 500; }
 
     /* Highlighted Active Key */
-    @keyframes keyPulse {
-        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7); }
-        70% { transform: scale(1.06); box-shadow: 0 0 0 12px rgba(2, 132, 199, 0); }
-        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
-    }
-
     .keyboard-key.key-active {
         background: #0284c7 !important;
         color: #ffffff !important;
         border-color: #0284c7 !important;
-        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.5) !important;
-        animation: keyPulse 1.4s infinite ease-in-out;
-        transform: translateY(2px);
+        box-shadow: 0 2.5px 0 #0369a1, 0 4px 14px rgba(2, 132, 199, 0.5) !important;
+        transform: translateY(1.5px);
+    }
+    .keyboard-key.key-active .key-top,
+    .keyboard-key.key-active .key-bottom {
+        color: #ffffff !important;
+    }
+
+    /* Mistake Key */
+    .keyboard-key.key-mistake {
+        background: #ef4444 !important;
+        color: #ffffff !important;
+        border-color: #dc2626 !important;
+        box-shadow: 0 2.5px 0 #b91c1c, 0 4px 14px rgba(239, 68, 68, 0.5) !important;
+        animation: blockShake 0.25s ease-in-out;
+        transform: translateY(1.5px);
+    }
+    .keyboard-key.key-mistake .key-top,
+    .keyboard-key.key-mistake .key-bottom {
+        color: #ffffff !important;
     }
 
     /* Pause Toast Popup (Positioned on Bottom Right) */
@@ -268,84 +326,99 @@
             </div>
         </div>
 
-        <!-- On-Screen Virtual Keyboard with Live Key Highlighting -->
-        <div id="virtual-keyboard" class="virtual-keyboard mb-3 shadow-sm">
-            <!-- Row 1: Numbers & Symbols -->
-            <div class="keyboard-row">
-                <div class="keyboard-key" data-key="`">~<br>`</div>
-                <div class="keyboard-key" data-key="1">!<br>1</div>
-                <div class="keyboard-key" data-key="2">@<br>2</div>
-                <div class="keyboard-key" data-key="3">#<br>3</div>
-                <div class="keyboard-key" data-key="4">$<br>4</div>
-                <div class="keyboard-key" data-key="5">%<br>5</div>
-                <div class="keyboard-key" data-key="6">^<br>6</div>
-                <div class="keyboard-key" data-key="7">&amp;<br>7</div>
-                <div class="keyboard-key" data-key="8">*<br>8</div>
-                <div class="keyboard-key" data-key="9">(<br>9</div>
-                <div class="keyboard-key" data-key="0">)<br>0</div>
-                <div class="keyboard-key" data-key="-">_<br>-</div>
-                <div class="keyboard-key" data-key="=">+<br>=</div>
-                <div class="keyboard-key key-wide" data-key="Backspace">delete ⌫</div>
-            </div>
+        <!-- On-Screen Virtual Keyboard (Apple / TypingClub Style) -->
+        <div class="virtual-keyboard-container position-relative mb-3">
+            <div id="virtual-keyboard" class="virtual-keyboard shadow-sm position-relative">
+                <!-- Keyboard Top Header Bar -->
+                <div class="keyboard-top-bar d-flex justify-content-end align-items-center mb-2 px-1">
+                    <span class="keyboard-settings-label text-secondary small fw-bold">
+                        <i class="fa-solid fa-gear me-1"></i> <u>Keyboard Settings</u> <i class="fa-regular fa-keyboard ms-1"></i>
+                    </span>
+                </div>
 
-            <!-- Row 2: QWERTY -->
-            <div class="keyboard-row">
-                <div class="keyboard-key key-wide" data-key="Tab">tab ⇥</div>
-                <div class="keyboard-key" data-key="q">Q</div>
-                <div class="keyboard-key" data-key="w">W</div>
-                <div class="keyboard-key" data-key="e">E</div>
-                <div class="keyboard-key" data-key="r">R</div>
-                <div class="keyboard-key" data-key="t">T</div>
-                <div class="keyboard-key" data-key="y">Y</div>
-                <div class="keyboard-key" data-key="u">U</div>
-                <div class="keyboard-key" data-key="i">I</div>
-                <div class="keyboard-key" data-key="o">O</div>
-                <div class="keyboard-key" data-key="p">P</div>
-                <div class="keyboard-key" data-key="[">{<br>[</div>
-                <div class="keyboard-key" data-key="]">}<br>]</div>
-                <div class="keyboard-key" data-key="\">|<br>\</div>
-            </div>
+                <!-- Row 1: Numbers & Symbols -->
+                <div class="keyboard-row">
+                    <div class="keyboard-key" data-key="`"><span class="key-top">~</span><span class="key-bottom">`</span></div>
+                    <div class="keyboard-key" data-key="1"><span class="key-top">!</span><span class="key-bottom">1</span></div>
+                    <div class="keyboard-key" data-key="2"><span class="key-top">@</span><span class="key-bottom">2</span></div>
+                    <div class="keyboard-key" data-key="3"><span class="key-top">#</span><span class="key-bottom">3</span></div>
+                    <div class="keyboard-key" data-key="4"><span class="key-top">$</span><span class="key-bottom">4</span></div>
+                    <div class="keyboard-key" data-key="5"><span class="key-top">%</span><span class="key-bottom">5</span></div>
+                    <div class="keyboard-key" data-key="6"><span class="key-top">^</span><span class="key-bottom">6</span></div>
+                    <div class="keyboard-key" data-key="7"><span class="key-top">&amp;</span><span class="key-bottom">7</span></div>
+                    <div class="keyboard-key" data-key="8"><span class="key-top">*</span><span class="key-bottom">8</span></div>
+                    <div class="keyboard-key" data-key="9"><span class="key-top">(</span><span class="key-bottom">9</span></div>
+                    <div class="keyboard-key" data-key="0"><span class="key-top">)</span><span class="key-bottom">0</span></div>
+                    <div class="keyboard-key" data-key="-"><span class="key-top">_</span><span class="key-bottom">-</span></div>
+                    <div class="keyboard-key" data-key="="><span class="key-top">+</span><span class="key-bottom">=</span></div>
+                    <div class="keyboard-key key-delete key-fn" data-key="Backspace">delete ⌫</div>
+                </div>
 
-            <!-- Row 3: Home Row -->
-            <div class="keyboard-row">
-                <div class="keyboard-key key-extra-wide" data-key="CapsLock">caps lock ⇪</div>
-                <div class="keyboard-key" data-key="a">A</div>
-                <div class="keyboard-key" data-key="s">S</div>
-                <div class="keyboard-key" data-key="d">D</div>
-                <div class="keyboard-key" data-key="f">F</div>
-                <div class="keyboard-key" data-key="g">G</div>
-                <div class="keyboard-key" data-key="h">H</div>
-                <div class="keyboard-key" data-key="j">J</div>
-                <div class="keyboard-key" data-key="k">K</div>
-                <div class="keyboard-key" data-key="l">L</div>
-                <div class="keyboard-key" data-key=";">:<br>;</div>
-                <div class="keyboard-key" data-key="'">"<br>'</div>
-                <div class="keyboard-key key-extra-wide" data-key="Enter">enter ↵</div>
-            </div>
+                <!-- Row 2: QWERTY -->
+                <div class="keyboard-row">
+                    <div class="keyboard-key key-tab key-fn" data-key="Tab">tab ⇥</div>
+                    <div class="keyboard-key" data-key="q">Q</div>
+                    <div class="keyboard-key" data-key="w">W</div>
+                    <div class="keyboard-key" data-key="e">E</div>
+                    <div class="keyboard-key" data-key="r">R</div>
+                    <div class="keyboard-key" data-key="t">T</div>
+                    <div class="keyboard-key" data-key="y">Y</div>
+                    <div class="keyboard-key" data-key="u">U</div>
+                    <div class="keyboard-key" data-key="i">I</div>
+                    <div class="keyboard-key" data-key="o">O</div>
+                    <div class="keyboard-key" data-key="p">P</div>
+                    <div class="keyboard-key" data-key="["><span class="key-top">{</span><span class="key-bottom">[</span></div>
+                    <div class="keyboard-key" data-key="]"><span class="key-top">}</span><span class="key-bottom">]</span></div>
+                    <div class="keyboard-key key-backslash" data-key="\"><span class="key-top">|</span><span class="key-bottom">\</span></div>
+                </div>
 
-            <!-- Row 4: Bottom Row -->
-            <div class="keyboard-row">
-                <div class="keyboard-key key-extra-wide" data-key="Shift">shift ⇧</div>
-                <div class="keyboard-key" data-key="z">Z</div>
-                <div class="keyboard-key" data-key="x">X</div>
-                <div class="keyboard-key" data-key="c">C</div>
-                <div class="keyboard-key" data-key="v">V</div>
-                <div class="keyboard-key" data-key="b">B</div>
-                <div class="keyboard-key" data-key="n">N</div>
-                <div class="keyboard-key" data-key="m">M</div>
-                <div class="keyboard-key" data-key=",">&lt;<br>,</div>
-                <div class="keyboard-key" data-key=".">&gt;<br>.</div>
-                <div class="keyboard-key" data-key="/">?<br>/</div>
-                <div class="keyboard-key key-extra-wide" data-key="Shift">shift ⇧</div>
-            </div>
+                <!-- Row 3: Home Row -->
+                <div class="keyboard-row">
+                    <div class="keyboard-key key-caps key-fn" data-key="CapsLock">caps lock ⇪</div>
+                    <div class="keyboard-key" data-key="a">A</div>
+                    <div class="keyboard-key" data-key="s">S</div>
+                    <div class="keyboard-key" data-key="d">D</div>
+                    <div class="keyboard-key" data-key="f">F</div>
+                    <div class="keyboard-key" data-key="g">G</div>
+                    <div class="keyboard-key" data-key="h">H</div>
+                    <div class="keyboard-key" data-key="j">J</div>
+                    <div class="keyboard-key" data-key="k">K</div>
+                    <div class="keyboard-key" data-key="l">L</div>
+                    <div class="keyboard-key" data-key=";"><span class="key-top">:</span><span class="key-bottom">;</span></div>
+                    <div class="keyboard-key" data-key="'"><span class="key-top">"</span><span class="key-bottom">'</span></div>
+                    <div class="keyboard-key key-enter key-fn" data-key="Enter">enter ↵</div>
+                </div>
 
-            <!-- Row 5: Spacebar -->
-            <div class="keyboard-row">
-                <div class="keyboard-key key-spacebar" data-key="Space">space</div>
+                <!-- Row 4: Bottom Row -->
+                <div class="keyboard-row">
+                    <div class="keyboard-key key-shift-left key-fn" data-key="Shift">shift ⇧</div>
+                    <div class="keyboard-key" data-key="z">Z</div>
+                    <div class="keyboard-key" data-key="x">X</div>
+                    <div class="keyboard-key" data-key="c">C</div>
+                    <div class="keyboard-key" data-key="v">V</div>
+                    <div class="keyboard-key" data-key="b">B</div>
+                    <div class="keyboard-key" data-key="n">N</div>
+                    <div class="keyboard-key" data-key="m">M</div>
+                    <div class="keyboard-key" data-key=","><span class="key-top">&lt;</span><span class="key-bottom">,</span></div>
+                    <div class="keyboard-key" data-key="."><span class="key-top">&gt;</span><span class="key-bottom">.</span></div>
+                    <div class="keyboard-key" data-key="/"><span class="key-top">?</span><span class="key-bottom">/</span></div>
+                    <div class="keyboard-key key-shift-right key-fn" data-key="Shift">⇧ shift</div>
+                </div>
+
+                <!-- Row 5: Modifier & Spacebar Row -->
+                <div class="keyboard-row">
+                    <div class="keyboard-key key-mod key-fn">ctrl</div>
+                    <div class="keyboard-key key-mod key-fn">alt</div>
+                    <div class="keyboard-key key-mod key-fn">cmd</div>
+                    <div class="keyboard-key key-spacebar" data-key="Space">space</div>
+                    <div class="keyboard-key key-mod key-fn">cmd</div>
+                    <div class="keyboard-key key-mod key-fn">alt</div>
+                    <div class="keyboard-key key-mod key-fn">ctrl</div>
+                </div>
             </div>
         </div>
 
-        <!-- Hands & Finger Guide Legend Bar -->
+        <!-- Finger Guide Legend Bar -->
         <div class="d-flex flex-wrap align-items-center justify-content-between p-3 mb-4 bg-light rounded-3 border text-muted small">
             <div class="d-flex align-items-center gap-3 fw-bold">
                 <span><i class="fa-solid fa-hand-back-fist text-primary me-1"></i> Left Hand:</span>
@@ -363,8 +436,12 @@
             </div>
         </div>
 
-        <!-- Input Area to capture keystrokes -->
-        <textarea id="typing-input" class="form-control mb-4 p-3 fs-5 rounded-3 border-2 shadow-none" rows="2" placeholder="Click here and start typing the text above..."></textarea>
+        <!-- Interactive Typing Feedback Display & Hidden Input Receiver -->
+        <div id="typed-feedback-box" class="typed-feedback-box mb-4 position-relative" onclick="document.getElementById('typing-input').focus();">
+            <div id="typed-chars-container" class="d-inline-flex flex-wrap align-items-center gap-1"></div>
+            <span class="feedback-cursor"></span>
+            <input type="text" id="typing-input" class="position-absolute" style="opacity: 0; width: 1px; height: 1px; pointer-events: auto; left: 10px; top: 10px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
 
         <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 border">
             <div class="d-flex gap-4 align-items-center">
@@ -396,6 +473,7 @@
         {
             id: {{ s.screen_id }},
             title: "{{ s.screen_title }}",
+            type: "{{ s.screen_type or 'block' }}",
             content: {{ s.screen_content | tojson | safe }}
         },
         {% endfor %}
@@ -403,6 +481,7 @@
 
     const lessonId = {{ lesson.lesson_id }};
     let currentScreenIdx = 0;
+    let currentRenderer = null;
     let timerInterval = null;
     let inactivityTimeout = null;
     let isTimerRunning = false;
@@ -498,28 +577,14 @@
         });
     }
 
-    function updateKeyboardHighlighting(targetSegments, typedSegments) {
-        document.querySelectorAll(".keyboard-key").forEach(k => k.classList.remove("key-active"));
-        if (!targetSegments) return;
+    function updateKeyboardHighlighting(targetSegments, activeIdx) {
+        document.querySelectorAll(".keyboard-key").forEach(k => {
+            k.classList.remove("key-active");
+            k.classList.remove("key-mistake");
+        });
+        if (!targetSegments || activeIdx >= targetSegments.length) return;
 
-        let activeIdx = typedSegments.length;
-        let remainingStr = "";
-
-        // Check if user is in the middle of typing a multi-character grapheme (e.g. 'ಅಂ' -> typed 'ಅ')
-        if (activeIdx > 0 && activeIdx - 1 < targetSegments.length) {
-            const prevTyped = typedSegments[activeIdx - 1];
-            const prevTarget = targetSegments[activeIdx - 1];
-            if (prevTyped !== prevTarget && prevTarget.startsWith(prevTyped)) {
-                activeIdx = activeIdx - 1;
-                remainingStr = prevTarget.substring(prevTyped.length);
-            }
-        }
-
-        if (activeIdx >= targetSegments.length) return;
-
-        if (!remainingStr) {
-            remainingStr = targetSegments[activeIdx];
-        }
+        let remainingStr = targetSegments[activeIdx];
 
         if (remainingStr === '\n') {
             document.querySelectorAll('[data-key="Enter"]').forEach(k => k.classList.add("key-active"));
@@ -586,8 +651,17 @@
         }
     }
 
+    let currentProgressIdx = 0;
+    let screenMistakes = 0;
+    let screenCorrect = 0;
+    let partialGrapheme = "";
+
     function loadScreen(idx) {
         currentScreenIdx = idx;
+        currentProgressIdx = 0;
+        screenMistakes = 0;
+        screenCorrect = 0;
+        partialGrapheme = "";
         updateProgressBar(idx);
 
         const topCounter = document.getElementById("top-screen-counter");
@@ -598,52 +672,36 @@
         const screen = screens[idx];
         titleEl.innerText = screen.title;
         
-        textBoxEl.innerHTML = "";
-        
-        // Normalize newlines (\r\n -> \n) and split into lines so wrapping ONLY occurs when \n exists
+        // Clear typed characters stream
+        const typedContainer = document.getElementById("typed-chars-container");
+        if (typedContainer) typedContainer.innerHTML = "";
+
+        // Destroy previous renderer if any
+        if (currentRenderer && typeof currentRenderer.destroy === 'function') {
+            currentRenderer.destroy();
+        }
+
+        // Instantiate chosen template renderer (Block, Waterfall, or Jump)
+        const screenType = (screen.type || 'block').toLowerCase();
+        if (screenType === 'waterfall' && typeof WaterfallStyleRenderer !== 'undefined') {
+            currentRenderer = new WaterfallStyleRenderer(textBoxEl);
+        } else if (screenType === 'jump' && typeof JumpStyleRenderer !== 'undefined') {
+            currentRenderer = new JumpStyleRenderer(textBoxEl);
+        } else {
+            currentRenderer = new BlockStyleRenderer(textBoxEl);
+        }
+
+        // Initialize chosen renderer with content
+        currentRenderer.init(screen.content);
+
         const normalizedContent = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        const lines = normalizedContent.split('\n');
         const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-
-        lines.forEach((lineText, lineIdx) => {
-            const rowEl = document.createElement("div");
-            rowEl.className = "d-flex flex-nowrap align-items-center w-100 py-1";
-            rowEl.style.overflowX = "auto";
-
-            const lineSegments = Array.from(segmenter.segment(lineText)).map(s => s.segment);
-            lineSegments.forEach(seg => {
-                const span = document.createElement("span");
-                span.innerText = seg;
-                rowEl.appendChild(span);
-            });
-
-            // Append Enter symbol block if there is a newline after this line
-            if (lineIdx < lines.length - 1) {
-                const enterSpan = document.createElement("span");
-                enterSpan.innerText = '↵';
-                enterSpan.title = "Press Enter Key";
-                enterSpan.style.color = "#0284c7";
-                rowEl.appendChild(enterSpan);
-            }
-
-            textBoxEl.appendChild(rowEl);
-        });
-
         const targetSegs = Array.from(segmenter.segment(normalizedContent)).map(s => s.segment);
-        updateKeyboardHighlighting(targetSegs, []);
+        updateKeyboardHighlighting(targetSegs, 0);
 
         inputEl.value = "";
         inputEl.disabled = false;
         inputEl.focus();
-        
-        // Highlight 1st block in solid blue immediately upon load
-        const initialSpans = textBoxEl.querySelectorAll("span");
-        if (initialSpans.length > 0) {
-            initialSpans[0].style.color = "#ffffff";
-            initialSpans[0].style.backgroundColor = "#0284c7";
-            initialSpans[0].style.borderColor = "#0284c7";
-            initialSpans[0].style.boxShadow = "0 4px 12px rgba(2, 132, 199, 0.35)";
-        }
 
         // Disable next button until typed correctly
         nextBtn.disabled = true;
@@ -666,6 +724,14 @@
         const toast = document.getElementById("pause-toast");
         if (toast) toast.classList.remove("show");
     }
+
+    // Keep input field focused automatically whenever student clicks inside practice area
+    document.addEventListener("click", (e) => {
+        if (!nextBtn.disabled && currentProgressIdx >= (screens[currentScreenIdx] ? screens[currentScreenIdx].content.length : 0)) return;
+        if (inputEl && !inputEl.disabled) {
+            inputEl.focus();
+        }
+    });
 
     // Nudi Modal & Verification Logic
     const nudiTestInput = document.getElementById("nudi-test-input");
@@ -726,90 +792,99 @@
     if (screens.length > 0) {
         loadScreen(0);
 
-        inputEl.addEventListener("input", () => {
+        function handleKeystrokeInput(typedChar) {
+            if (!typedChar) return;
             const screen = screens[currentScreenIdx];
             const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            const typedText = inputEl.value.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            const spans = textBoxEl.querySelectorAll("span");
-
             const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
             const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
-            const typedSegments = Array.from(segmenter.segment(typedText)).map(s => s.segment);
 
-            updateKeyboardHighlighting(targetSegments, typedSegments);
+            if (currentProgressIdx >= targetSegments.length) return;
 
-            let correctCount = 0;
-            let mistakeCount = 0;
+            const expectedTarget = targetSegments[currentProgressIdx];
+            const testTyped = partialGrapheme + typedChar;
+            const typedContainer = document.getElementById("typed-chars-container");
 
-            // Check if current typed segment is a partial prefix of the target segment (e.g. typed 'ಅ' for 'ಅಂ' or 'ಅಃ')
-            let isInProgressCombination = false;
-            if (typedSegments.length > 0 && typedSegments.length <= targetSegments.length) {
-                const currentIdx = typedSegments.length - 1;
-                if (typedSegments[currentIdx] !== targetSegments[currentIdx] && targetSegments[currentIdx].startsWith(typedSegments[currentIdx])) {
-                    isInProgressCombination = true;
+            if (testTyped === expectedTarget) {
+                // 1. CORRECT KEY TYPED!
+                screenCorrect++;
+                currentProgressIdx++;
+                partialGrapheme = "";
+
+                // Append green char to feedback box
+                if (typedContainer) {
+                    const span = document.createElement("span");
+                    span.className = "feedback-char-correct";
+                    span.innerText = testTyped === ' ' ? '␣' : (testTyped === '\n' ? '↵' : testTyped);
+                    typedContainer.appendChild(span);
+                }
+
+                if (currentRenderer && typeof currentRenderer.onCorrect === 'function') {
+                    currentRenderer.onCorrect(currentProgressIdx);
+                }
+
+                updateKeyboardHighlighting(targetSegments, currentProgressIdx);
+            } else if (expectedTarget.startsWith(testTyped)) {
+                // In-progress partial grapheme (e.g. Kannada compound letters)
+                partialGrapheme = testTyped;
+            } else {
+                // 2. WRONG KEY / MISTAKE IDENTIFIED!
+                screenMistakes++;
+                partialGrapheme = "";
+
+                // Flash active tile RED & shake
+                if (currentRenderer && typeof currentRenderer.onMistake === 'function') {
+                    currentRenderer.onMistake(currentProgressIdx);
+                }
+
+                // Highlight the WRONGLY pressed key in bright RED on the virtual keyboard
+                let mistakeKeyLookup = typedChar.toLowerCase();
+                if (typedChar === ' ') mistakeKeyLookup = 'Space';
+                if (typedChar === '\n') mistakeKeyLookup = 'Enter';
+                try {
+                    const wrongKeyEl = document.querySelector(`[data-key="${CSS.escape(mistakeKeyLookup)}"]`);
+                    if (wrongKeyEl) {
+                        wrongKeyEl.classList.remove("key-mistake");
+                        void wrongKeyEl.offsetWidth;
+                        wrongKeyEl.classList.add("key-mistake");
+                        setTimeout(() => {
+                            if (wrongKeyEl) wrongKeyEl.classList.remove("key-mistake");
+                        }, 400);
+                    }
+                } catch (e) {}
+
+                // Append red mistake pill in feedback box
+                if (typedContainer) {
+                    const errSpan = document.createElement("span");
+                    errSpan.className = "feedback-char-mistake";
+                    errSpan.innerText = `${typedChar === ' ' ? 'SPACE' : typedChar} ✗`;
+                    typedContainer.appendChild(errSpan);
+                    setTimeout(() => {
+                        if (errSpan) errSpan.remove();
+                    }, 800);
+                }
+
+                // Update Finger Guide with mistake warning
+                const guideEl = document.getElementById("finger-guide-text");
+                if (guideEl) {
+                    const targetKeyUpper = expectedTarget === ' ' ? 'SPACE' : expectedTarget[0].toUpperCase();
+                    guideEl.innerHTML = `<span class="text-danger fw-bold"><i class="fa-solid fa-circle-xmark me-1"></i> Wrong key '${typedChar.toUpperCase()}'!</span> Press <span class="badge bg-primary fs-6 px-2 py-1 font-monospace">${targetKeyUpper}</span>`;
                 }
             }
 
-            for (let i = 0; i < spans.length; i++) {
-                if (i < typedSegments.length) {
-                    if (typedSegments[i] === targetSegments[i]) {
-                        // Correct block -> Green
-                        spans[i].style.color = "#059669";
-                        spans[i].style.backgroundColor = "#d1e7dd";
-                        spans[i].style.borderColor = "#10b981";
-                        spans[i].style.boxShadow = "none";
-                        correctCount++;
-                    } else if (i === typedSegments.length - 1 && targetSegments[i].startsWith(typedSegments[i])) {
-                        // Active block in-progress multi-key combination -> Active Solid Blue
-                        spans[i].style.color = "#ffffff";
-                        spans[i].style.backgroundColor = "#0284c7";
-                        spans[i].style.borderColor = "#0284c7";
-                        spans[i].style.boxShadow = "0 4px 12px rgba(2, 132, 199, 0.35)";
-                    } else {
-                        // Confirmed mistake -> Red
-                        spans[i].style.color = "#dc2626";
-                        spans[i].style.backgroundColor = "#fee2e2";
-                        spans[i].style.borderColor = "#ef4444";
-                        spans[i].style.boxShadow = "none";
-                        mistakeCount++;
-                    }
-                } else if (i === typedSegments.length && !isInProgressCombination) {
-                    // Current Active Block to be typed -> Solid Blue (ONLY if previous block is not in-progress!)
-                    spans[i].style.color = "#ffffff";
-                    spans[i].style.backgroundColor = "#0284c7";
-                    spans[i].style.borderColor = "#0284c7";
-                    spans[i].style.boxShadow = "0 4px 12px rgba(2, 132, 199, 0.35)";
-                } else {
-                    // Untyped future blocks -> Neutral White
-                    if (targetSegments[i] === '\n') {
-                        spans[i].style.color = "#0284c7";
-                    } else {
-                        spans[i].style.color = "#1e293b";
-                    }
-                    spans[i].style.backgroundColor = "#ffffff";
-                    spans[i].style.borderColor = "#cbd5e1";
-                    spans[i].style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05)";
-                }
-            }
-
-            // Auto scroll active block into view
-            if (typedSegments.length < spans.length) {
-                spans[typedSegments.length].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-            }
-
+            // Real-time WPM Calculation
             const minutes = secondsElapsed > 0 ? secondsElapsed / 60 : 1 / 60;
-            const wordsTyped = typedSegments.length / 5;
+            const wordsTyped = screenCorrect / 5;
             const wpm = secondsElapsed >= 2 ? Math.round(wordsTyped / minutes) : 0;
             wpmEl.innerText = wpm >= 0 ? wpm : 0;
 
-            const totalAttempted = correctCount + mistakeCount;
-            const accuracy = totalAttempted > 0 ? Math.max(0, Math.round((correctCount / totalAttempted) * 100)) : 100;
+            // Real-time Accuracy Calculation: (Correct / (Correct + Mistakes)) * 100
+            const totalAttempts = screenCorrect + screenMistakes;
+            const accuracy = totalAttempts > 0 ? Math.max(0, Math.round((screenCorrect / totalAttempts) * 100)) : 100;
             accuracyEl.innerText = accuracy;
 
-            // Complete screen ONLY once all target segments have been typed and the last segment matches completely
-            const isFinished = (typedSegments.length > targetSegments.length) || 
-                (typedSegments.length === targetSegments.length && typedSegments[typedSegments.length - 1] === targetSegments[targetSegments.length - 1]);
-
+            // Check if screen finished
+            const isFinished = currentProgressIdx >= targetSegments.length;
             handleKeystrokeActivity(isFinished);
 
             if (isFinished) {
@@ -818,39 +893,48 @@
                 nextBtn.classList.remove("disabled");
                 nextBtn.style.opacity = "1";
                 nextBtn.style.cursor = "pointer";
-            } else {
-                nextBtn.disabled = true;
-                nextBtn.classList.add("disabled");
-                nextBtn.style.opacity = "0.6";
-                nextBtn.style.cursor = "not-allowed";
             }
+        }
+
+        // Input event listener for all text inputs & IMEs
+        inputEl.addEventListener("input", (e) => {
+            const val = inputEl.value;
+            if (!val || val.length === 0) return;
+
+            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+            const graphemes = Array.from(segmenter.segment(val)).map(s => s.segment);
+            
+            // Process each typed grapheme
+            graphemes.forEach(g => {
+                handleKeystrokeInput(g);
+            });
+
+            inputEl.value = "";
         });
 
-        // Block Backspace and Delete keys to prevent editing typed mistakes
+        // Keydown listener for Enter, Space, and Backspace prevention
         inputEl.addEventListener("keydown", (e) => {
-            if (!isFinishedScreen()) {
+            if (currentProgressIdx < (screens[currentScreenIdx] ? screens[currentScreenIdx].content.length : 0)) {
                 handleKeystrokeActivity(false);
             }
+
             if (e.key === "Backspace" || e.key === "Delete") {
                 e.preventDefault();
                 return false;
             }
-        });
 
-        function isFinishedScreen() {
-            const screen = screens[currentScreenIdx];
-            if (!screen) return true;
-            const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            const typedText = inputEl.value.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-            const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
-            const typedSegments = Array.from(segmenter.segment(typedText)).map(s => s.segment);
-            if (typedSegments.length < targetSegments.length) return false;
-            if (typedSegments.length === targetSegments.length) {
-                return typedSegments[targetSegments.length - 1] === targetSegments[targetSegments.length - 1];
+            if (e.key === "Enter") {
+                e.preventDefault();
+                handleKeystrokeInput('\n');
+                return false;
             }
-            return true;
-        }
+
+            if (e.key === " " || e.code === "Space") {
+                e.preventDefault();
+                handleKeystrokeInput(' ');
+                return false;
+            }
+        });
 
         retryBtn.addEventListener("click", () => {
             loadScreen(currentScreenIdx);
@@ -860,21 +944,9 @@
             if (nextBtn.disabled) return;
 
             // Accumulate performance metrics for this screen
-            const typedText = inputEl.value.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            const screen = screens[currentScreenIdx];
-            const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-            const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
-            const typedSegments = Array.from(segmenter.segment(typedText)).map(s => s.segment);
-            
-            const wordsTyped = typedSegments.length / 5;
-            let mistakeCount = 0;
-            for (let i = 0; i < typedSegments.length; i++) {
-                if (typedSegments[i] !== targetSegments[i]) mistakeCount++;
-            }
-
+            const wordsTyped = screenCorrect / 5;
             cumulativeWords += wordsTyped;
-            cumulativeMistakes += mistakeCount;
+            cumulativeMistakes += screenMistakes;
             cumulativeSeconds += secondsElapsed;
 
             if (currentScreenIdx < screens.length - 1) {

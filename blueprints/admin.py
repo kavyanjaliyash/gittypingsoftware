@@ -389,10 +389,12 @@ def manage_screens(lesson_id):
 @admin_bp.route("/lesson/<int:lesson_id>/screen/add", methods=["POST"])
 def add_screen(lesson_id):
     display_order = Screen.query.filter_by(lesson_id=lesson_id).count() + 1
+    screen_type = request.form.get("screen_type", "block")
     screen = Screen(
         lesson_id=lesson_id,
         screen_title=request.form["screen_title"],
         screen_content=request.form["screen_content"],
+        screen_type=screen_type,
         display_order=display_order,
         status=request.form["status"]
     )
@@ -405,6 +407,7 @@ def update_screen(screen_id):
     screen = Screen.query.get_or_404(screen_id)
     screen.screen_title = request.form["screen_title"]
     screen.screen_content = request.form["screen_content"]
+    screen.screen_type = request.form.get("screen_type", screen.screen_type or "block")
     screen.status = request.form["status"]
     db.session.commit()
     return redirect(url_for("admin.manage_screens", lesson_id=screen.lesson_id))

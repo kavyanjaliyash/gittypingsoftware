@@ -81,6 +81,7 @@ class Screen(db.Model):
     lesson_id = db.Column(db.Integer, db.ForeignKey("lessons.lesson_id"), nullable=False)
     screen_title = db.Column(db.String(200), nullable=False)
     screen_content = db.Column(db.Text, nullable=False)
+    screen_type = db.Column(db.String(50), default="block") # 'block', 'waterfall', 'jump'
     display_order = db.Column(db.Integer, default=1)
     status = db.Column(db.String(20), default="Active")
     

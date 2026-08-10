@@ -29,6 +29,7 @@
                         <tr>
                             <th class="py-3 px-4">Order</th>
                             <th class="py-3 px-4">Screen Title</th>
+                            <th class="py-3 px-4">Template Style</th>
                             <th class="py-3 px-4">Typing Content Snippet</th>
                             <th class="py-3 px-4">Status</th>
                             <th class="py-3 px-4 text-end">Actions</th>
@@ -39,7 +40,22 @@
                         <tr>
                             <td class="py-3 px-4 fw-semibold text-primary">#{{ s.display_order }}</td>
                             <td class="py-3 px-4 fw-bold text-dark">{{ s.screen_title }}</td>
-                            <td class="py-3 px-4 text-muted"><code class="bg-light px-2 py-1 rounded text-dark border">{{ s.screen_content[:60] }}...</code></td>
+                            <td class="py-3 px-4">
+                                {% if s.screen_type == 'waterfall' %}
+                                    <span class="badge bg-info bg-opacity-15 text-info-emphasis px-3 py-1.5 rounded-pill fw-semibold border border-info border-opacity-25">
+                                        <i class="fa-solid fa-water me-1"></i> Waterfall
+                                    </span>
+                                {% elif s.screen_type == 'jump' %}
+                                    <span class="badge bg-success bg-opacity-15 text-success px-3 py-1.5 rounded-pill fw-semibold border border-success border-opacity-25">
+                                        <i class="fa-solid fa-person-running me-1"></i> Jump Style
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1.5 rounded-pill fw-semibold border border-primary border-opacity-25">
+                                        <i class="fa-solid fa-square me-1"></i> Block Style
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-muted"><code class="bg-light px-2 py-1 rounded text-dark border">{{ s.screen_content[:50] }}...</code></td>
                             <td class="py-3 px-4">
                                 <span class="badge {% if s.status == 'Active' %}bg-success bg-opacity-10 text-success{% else %}bg-secondary bg-opacity-10 text-secondary{% endif %} px-3 py-1.5 rounded-pill fw-semibold">
                                     {{ s.status }}
@@ -71,9 +87,15 @@
                                                 <label class="form-label small fw-bold text-secondary">Screen Title</label>
                                                 <input type="text" name="screen_title" class="form-control rounded-3" value="{{ s.screen_title }}" required>
                                             </div>
+
+                                            <!-- Screen Template Chooser Component -->
+                                            {% with picker_id='edit_' ~ s.screen_id, current_val=s.screen_type or 'block' %}
+                                                {% include "admin/screen_template_picker.html" %}
+                                            {% endwith %}
+
                                             <div class="mb-3">
                                                 <label class="form-label small fw-bold text-secondary">Typing Content / Text Passage</label>
-                                                <textarea name="screen_content" class="form-control rounded-3" rows="5" required>{{ s.screen_content }}</textarea>
+                                                <textarea name="screen_content" class="form-control rounded-3 font-monospace" rows="5" required>{{ s.screen_content }}</textarea>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label small fw-bold text-secondary">Status</label>
@@ -93,7 +115,7 @@
                         </div>
                         {% else %}
                         <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">No typing screens found for this lesson. Click "Add New Typing Screen" to create one.</td>
+                            <td colspan="6" class="text-center py-4 text-muted">No typing screens found for this lesson. Click "Add New Typing Screen" to create one.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -117,9 +139,15 @@
                         <label class="form-label small fw-bold text-secondary">Screen Title</label>
                         <input type="text" name="screen_title" class="form-control rounded-3" required placeholder="e.g. Exercise 1 - Home Row Practice">
                     </div>
+
+                    <!-- Screen Template Chooser Component -->
+                    {% with picker_id='add', current_val='block' %}
+                        {% include "admin/screen_template_picker.html" %}
+                    {% endwith %}
+
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-secondary">Typing Content / Text Passage</label>
-                        <textarea name="screen_content" class="form-control rounded-3" rows="5" placeholder="Type or paste the exercise passage here..." required></textarea>
+                        <textarea name="screen_content" class="form-control rounded-3 font-monospace" rows="5" placeholder="Type or paste the exercise passage here..." required></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-secondary">Status</label>
@@ -137,4 +165,24 @@
         </div>
     </div>
 </div>
+
+<script>
+    function updateTemplateSelection(pickerId, selectedType) {
+        const types = ['block', 'waterfall', 'jump'];
+        types.forEach(t => {
+            const card = document.getElementById(`card_${pickerId}_${t}`);
+            const radio = document.getElementById(`radio_${pickerId}_${t}`);
+            if (card) {
+                if (t === selectedType) {
+                    card.style.borderColor = "#0284c7";
+                    card.style.background = "#f0f9ff";
+                    if (radio) radio.checked = true;
+                } else {
+                    card.style.borderColor = "#e2e8f0";
+                    card.style.background = "#ffffff";
+                }
+            }
+        });
+    }
+</script>
 {% endblock %}
