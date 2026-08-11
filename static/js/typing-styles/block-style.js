@@ -49,9 +49,45 @@ class BlockStyleRenderer {
         }
     }
 
+    onKeyTyped(typedChar, expectedChar, idx, isCorrect) {
+        if (idx < this.spans.length && this.spans[idx]) {
+            const span = this.spans[idx];
+            span.classList.remove("active-char");
+            if (isCorrect) {
+                span.className = "correct-char";
+            } else {
+                span.className = "incorrect-char";
+            }
+        }
+
+        const nextIdx = idx + 1;
+        if (nextIdx < this.spans.length && this.spans[nextIdx]) {
+            this.spans[nextIdx].className = "active-char";
+            this.spans[nextIdx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+    }
+
+    onBackspace(newIdx) {
+        if (newIdx < 0 || newIdx >= this.spans.length) return;
+
+        // Reset spans from the end down to newIdx
+        for (let i = this.spans.length - 1; i > newIdx; i--) {
+            if (this.spans[i]) {
+                this.spans[i].className = "";
+            }
+        }
+
+        // Set target span as active
+        if (this.spans[newIdx]) {
+            this.spans[newIdx].className = "active-char";
+            this.spans[newIdx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+    }
+
     onMistake(currentIdx) {
         if (currentIdx < this.spans.length && this.spans[currentIdx]) {
             const span = this.spans[currentIdx];
+            span.classList.remove("active-char");
             span.classList.remove("incorrect-char");
             void span.offsetWidth;
             span.className = "incorrect-char";
@@ -64,20 +100,7 @@ class BlockStyleRenderer {
     }
 
     onCorrect(newIdx) {
-        for (let i = 0; i < this.spans.length; i++) {
-            if (i < newIdx) {
-                this.spans[i].className = "correct-char";
-            } else if (i === newIdx) {
-                this.spans[i].className = "active-char";
-            } else {
-                this.spans[i].className = "";
-            }
-        }
-
-        // Auto-scroll active block into view smoothly
-        if (newIdx < this.spans.length && this.spans[newIdx]) {
-            this.spans[newIdx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }
+        this.onKeyTyped("", "", newIdx - 1, true);
     }
 
     destroy() {

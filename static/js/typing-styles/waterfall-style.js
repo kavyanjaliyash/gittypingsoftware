@@ -127,22 +127,11 @@ class WaterfallStyleRenderer {
         }
     }
 
-    onMistake() {
-        const activeTile = this.tracksWrapper.querySelector(".active-tile");
-        if (activeTile) {
-            activeTile.classList.remove("error-tile");
-            void activeTile.offsetWidth;
-            activeTile.classList.add("error-tile");
-            setTimeout(() => {
-                if (activeTile) activeTile.classList.remove("error-tile");
-            }, 400);
-        }
-    }
-
-    onCorrect(newIdx) {
-        this.currentIdx = newIdx;
-        if (newIdx < this.targetSegments.length) {
-            this.renderTracks(newIdx, true);
+    onKeyTyped(typedChar, expectedChar, idx, isCorrect) {
+        const nextIdx = idx + 1;
+        this.currentIdx = nextIdx;
+        if (nextIdx < this.targetSegments.length) {
+            this.renderTracks(nextIdx, true);
         } else {
             // Exercise Completed
             this.tracksWrapper.innerHTML = "";
@@ -152,6 +141,20 @@ class WaterfallStyleRenderer {
             this.tracksWrapper.appendChild(finishRow);
             this.columnBeam.style.display = "none";
         }
+    }
+
+    onBackspace(newIdx) {
+        if (newIdx < 0) return;
+        this.currentIdx = newIdx;
+        this.renderTracks(newIdx, false);
+    }
+
+    onMistake() {
+        this.onKeyTyped("", "", this.currentIdx, false);
+    }
+
+    onCorrect(newIdx) {
+        this.onKeyTyped("", "", newIdx - 1, true);
     }
 
     destroy() {

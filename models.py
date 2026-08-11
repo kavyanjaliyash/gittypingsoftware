@@ -63,6 +63,7 @@ class Course(db.Model):
     course_id = db.Column(db.Integer, primary_key=True)
     course_name = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(20), default="Active")
+    lessons = db.relationship("Lesson", backref="course", order_by="Lesson.display_order")
 
 class Lesson(db.Model):
     __tablename__ = "lessons"
@@ -70,10 +71,9 @@ class Lesson(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey("courses.course_id"), nullable=False)
     lesson_title = db.Column(db.String(200), nullable=False)
     lesson_description = db.Column(db.Text)
+    chapter = db.Column(db.String(100), default="Beginner") # 'Beginner', 'Intermediate', 'Advanced'
     display_order = db.Column(db.Integer, default=1)
     status = db.Column(db.String(20), default="Active")
-    
-    course = db.relationship("Course", backref="lessons")
 
 class Screen(db.Model):
     __tablename__ = "lesson_screens"

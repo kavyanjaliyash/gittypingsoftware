@@ -49,6 +49,10 @@
                                     <span class="badge bg-success bg-opacity-15 text-success px-3 py-1.5 rounded-pill fw-semibold border border-success border-opacity-25">
                                         <i class="fa-solid fa-person-running me-1"></i> Jump Style
                                     </span>
+                                {% elif s.screen_type == 'paragraph' %}
+                                    <span class="badge px-3 py-1.5 rounded-pill fw-semibold text-white" style="background: #8b5cf6;">
+                                        <i class="fa-solid fa-paragraph me-1"></i> Paragraph Style
+                                    </span>
                                 {% else %}
                                     <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1.5 rounded-pill fw-semibold border border-primary border-opacity-25">
                                         <i class="fa-solid fa-square me-1"></i> Block Style
@@ -168,7 +172,7 @@
 
 <script>
     function updateTemplateSelection(pickerId, selectedType) {
-        const types = ['block', 'waterfall', 'jump'];
+        const types = ['block', 'waterfall', 'jump', 'paragraph'];
         types.forEach(t => {
             const card = document.getElementById(`card_${pickerId}_${t}`);
             const radio = document.getElementById(`radio_${pickerId}_${t}`);

@@ -352,10 +352,12 @@ def manage_lessons(course_id):
 @admin_bp.route("/course/<int:course_id>/lesson/add", methods=["POST"])
 def add_lesson(course_id):
     display_order = Lesson.query.filter_by(course_id=course_id).count() + 1
+    chapter = request.form.get("chapter", "Beginner")
     lesson = Lesson(
         course_id=course_id,
         lesson_title=request.form["lesson_title"],
         lesson_description=request.form["lesson_description"],
+        chapter=chapter,
         display_order=display_order,
         status=request.form["status"]
     )
@@ -368,6 +370,7 @@ def update_lesson(lesson_id):
     lesson = Lesson.query.get_or_404(lesson_id)
     lesson.lesson_title = request.form["lesson_title"]
     lesson.lesson_description = request.form["lesson_description"]
+    lesson.chapter = request.form.get("chapter", lesson.chapter or "Beginner")
     lesson.status = request.form["status"]
     db.session.commit()
     return redirect(url_for("admin.manage_lessons", course_id=lesson.course_id))

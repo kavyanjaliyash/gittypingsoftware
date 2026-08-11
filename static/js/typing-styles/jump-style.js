@@ -87,7 +87,7 @@ class JumpStyleRenderer {
         this.stageEl.className = "jump-stage";
         this.container.appendChild(this.stageEl);
 
-        // 5. Chunk text passage into platform segments (words or 3-4 char groups)
+        // 5. Chunk text passage cleanly into platform segments (words or 3-4 char groups)
         const normalizedContent = screenContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
         const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
         const allGraphemes = Array.from(segmenter.segment(normalizedContent)).map(s => s.segment);
@@ -95,38 +95,41 @@ class JumpStyleRenderer {
         const chunks = [];
         let curChunk = [];
         for (let i = 0; i < allGraphemes.length; i++) {
-            curChunk.push({ char: allGraphemes[i], globalIdx: i });
-            if (allGraphemes[i] === ' ' || allGraphemes[i] === '\n' || curChunk.length >= 4 || i === allGraphemes.length - 1) {
-                chunks.push(curChunk);
-                curChunk = [];
+            const char = allGraphemes[i];
+            curChunk.push({ char: char, globalIdx: i });
+            
+            // Break chunk at space, newline, or when reaching 4 characters
+            if (char === ' ' || char === '\n' || curChunk.length >= 4 || i === allGraphemes.length - 1) {
+                // If next character is just a trailing newline or space and chunk isn't full, group it
+                if (i + 1 < allGraphemes.length && (allGraphemes[i + 1] === '\n' || allGraphemes[i + 1] === ' ') && curChunk.length < 5) {
+                    // continue to grab next whitespace
+                } else {
+                    chunks.push(curChunk);
+                    curChunk = [];
+                }
             }
         }
         if (curChunk.length > 0) chunks.push(curChunk);
 
-        // Generate platforms
-        const platformPositions = [
-            { left: '60%', top: '350px' }, // Start bottom right
-            { left: '26%', top: '230px' }, // Platform 2 middle left
-            { left: '62%', top: '120px' }, // Platform 3 top right
-            { left: '28%', top: '20px' },  // Platform 4 high left
-            { left: '55%', top: '-80px' }, // Ascending...
-        ];
+        // Generate platforms in a guaranteed non-overlapping zig-zag ladder
+        const baseTop = 270;
+        const stepY = 160;
 
         chunks.forEach((chunk, pIdx) => {
             const platEl = document.createElement("div");
             platEl.className = "jump-platform";
             
-            // Layout platforms in staggered ladder pattern
-            const basePos = platformPositions[pIdx % platformPositions.length];
-            const cycleOffset = Math.floor(pIdx / platformPositions.length) * -450;
-            const topVal = parseInt(basePos.top) + cycleOffset;
+            // Alternating Left (18%) and Right (56%) columns, spaced 160px apart vertically
+            const leftVal = (pIdx % 2 === 0) ? '18%' : '56%';
+            const topVal = baseTop - (pIdx * stepY);
             
-            platEl.style.left = basePos.left;
+            platEl.style.left = leftVal;
             platEl.style.top = `${topVal}px`;
             platEl.dataset.top = topVal;
-            platEl.dataset.left = basePos.left;
+            platEl.dataset.left = leftVal;
+            platEl.dataset.pIdx = pIdx;
 
-            // Text on platform
+            // Text on platform (crisp white cards)
             const textBox = document.createElement("div");
             textBox.className = "platform-text-box";
             chunk.forEach(item => {
@@ -149,7 +152,8 @@ class JumpStyleRenderer {
                 element: platEl,
                 chunk: chunk,
                 startIndex: chunk[0].globalIdx,
-                endIndex: chunk[chunk.length - 1].globalIdx
+                endIndex: chunk[chunk.length - 1].globalIdx,
+                top: topVal
             });
         });
 
@@ -192,27 +196,90 @@ class JumpStyleRenderer {
         const plat = this.platforms[platformIdx];
         const platEl = plat.element;
 
-        const left = platEl.offsetLeft + 140;
-        const top = platEl.offsetTop - 45;
+        // Position robot on the right side of the platform
+        const left = platEl.offsetLeft + platEl.offsetWidth + 8;
+        const top = platEl.offsetTop - 48;
 
         this.characterEl.style.left = `${left}px`;
         this.characterEl.style.top = `${top}px`;
+
+        // Pan stage smoothly so active platform is always clearly centered in view (Y ~ 220px)
+        const cameraOffset = 220 - plat.top;
+        this.stageEl.style.transform = `translateY(${cameraOffset}px)`;
 
         if (animate) {
             this.characterEl.classList.remove("jump-animating");
             void this.characterEl.offsetWidth; // trigger reflow
             this.characterEl.classList.add("jump-animating");
             this.playJumpSound();
+        }
+    }
 
-            // Pan stage to keep active platform in clear view
-            const stageOffset = Math.max(0, 300 - platEl.offsetTop);
-            this.stageEl.style.transform = `translateY(${stageOffset}px)`;
+    onKeyTyped(typedChar, expectedChar, idx, isCorrect) {
+        if (idx < this.charElements.length && this.charElements[idx]) {
+            const span = this.charElements[idx];
+            span.classList.remove("char-active");
+            if (isCorrect) {
+                span.className = "platform-char char-done";
+            } else {
+                span.className = "platform-char char-error";
+            }
+        }
+
+        const nextIdx = idx + 1;
+        if (nextIdx < this.charElements.length && this.charElements[nextIdx]) {
+            this.charElements[nextIdx].className = "platform-char char-active";
+        }
+
+        // Determine which platform is currently active
+        let targetPlatformIdx = 0;
+        for (let p = 0; p < this.platforms.length; p++) {
+            if (nextIdx >= this.platforms[p].startIndex && nextIdx <= this.platforms[p].endIndex) {
+                targetPlatformIdx = p;
+                break;
+            }
+            if (nextIdx > this.platforms[p].endIndex) {
+                targetPlatformIdx = Math.min(this.platforms.length - 1, p + 1);
+            }
+        }
+
+        if (targetPlatformIdx !== this.currentPlatformIdx) {
+            this.currentPlatformIdx = targetPlatformIdx;
+            this.moveCharacterToPlatform(this.currentPlatformIdx, true);
+        }
+    }
+
+    onBackspace(newIdx) {
+        if (newIdx < 0) return;
+
+        for (let i = this.charElements.length - 1; i > newIdx; i--) {
+            if (this.charElements[i]) {
+                this.charElements[i].className = "platform-char";
+            }
+        }
+
+        if (this.charElements[newIdx]) {
+            this.charElements[newIdx].className = "platform-char char-active";
+        }
+
+        let targetPlatformIdx = 0;
+        for (let p = 0; p < this.platforms.length; p++) {
+            if (newIdx >= this.platforms[p].startIndex && newIdx <= this.platforms[p].endIndex) {
+                targetPlatformIdx = p;
+                break;
+            }
+        }
+
+        if (targetPlatformIdx !== this.currentPlatformIdx) {
+            this.currentPlatformIdx = targetPlatformIdx;
+            this.moveCharacterToPlatform(this.currentPlatformIdx, true);
         }
     }
 
     onMistake(currentIdx) {
         if (currentIdx < this.charElements.length && this.charElements[currentIdx]) {
             const span = this.charElements[currentIdx];
+            span.classList.remove("char-active");
             span.classList.remove("char-error");
             void span.offsetWidth;
             span.className = "platform-char char-error";
@@ -225,35 +292,7 @@ class JumpStyleRenderer {
     }
 
     onCorrect(newIdx) {
-        for (let i = 0; i < this.charElements.length; i++) {
-            const span = this.charElements[i];
-            const gIdx = parseInt(span.dataset.globalIdx);
-
-            if (gIdx < newIdx) {
-                span.className = "platform-char char-done";
-            } else if (gIdx === newIdx) {
-                span.className = "platform-char char-active";
-            } else {
-                span.className = "platform-char";
-            }
-        }
-
-        // Determine which platform is currently active
-        let targetPlatformIdx = 0;
-        for (let p = 0; p < this.platforms.length; p++) {
-            if (newIdx >= this.platforms[p].startIndex && newIdx <= this.platforms[p].endIndex) {
-                targetPlatformIdx = p;
-                break;
-            }
-            if (newIdx > this.platforms[p].endIndex) {
-                targetPlatformIdx = Math.min(this.platforms.length - 1, p + 1);
-            }
-        }
-
-        if (targetPlatformIdx !== this.currentPlatformIdx) {
-            this.currentPlatformIdx = targetPlatformIdx;
-            this.moveCharacterToPlatform(this.currentPlatformIdx, true);
-        }
+        this.onKeyTyped("", "", newIdx - 1, true);
     }
 
     destroy() {

@@ -24,7 +24,7 @@ app.register_blueprint(faculty_bp)
 with app.app_context():
     db.create_all()
 
-    # Automatic migration: ensure screen_type column exists in lesson_screens table
+    # Automatic migration: ensure screen_type and chapter columns exist
     try:
         from sqlalchemy import text
         with db.engine.connect() as conn:
@@ -32,6 +32,13 @@ with app.app_context():
             if 'screen_type' not in cols:
                 conn.execute(text("ALTER TABLE lesson_screens ADD COLUMN screen_type VARCHAR(50) DEFAULT 'block'"))
                 conn.commit()
+            
+            lesson_cols = [row[1] for row in conn.execute(text("PRAGMA table_info(lessons)")).fetchall()]
+            if 'chapter' not in lesson_cols:
+                conn.execute(text("ALTER TABLE lessons ADD COLUMN chapter VARCHAR(100) DEFAULT 'Beginner'"))
+                conn.commit()
+            conn.execute(text("UPDATE lessons SET chapter='Beginner' WHERE chapter IS NULL OR chapter=''"))
+            conn.commit()
     except Exception as e:
         print(f"Migration notice: {e}")
 

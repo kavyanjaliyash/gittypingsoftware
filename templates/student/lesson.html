@@ -1,4 +1,30 @@
 {% extends "student/base.html" %}
+
+{% block profile_banner %}
+<!-- Clean, High-Legibility Student Header -->
+<div class="profile-banner py-2.5 px-4 d-flex align-items-center justify-content-between shadow-sm" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+    <div class="d-flex align-items-center gap-3">
+        <div class="profile-avatar" style="width: 42px; height: 42px; font-size: 1.15rem; flex-shrink: 0; box-shadow: 0 3px 8px rgba(0,0,0,0.15);">
+            {{ student.student_name[0] | upper if student.student_name else 'S' }}
+        </div>
+        <div>
+            <h5 class="mb-0 fw-bold text-white fs-5 leading-tight">{{ student.student_name }}</h5>
+            <span class="text-white-50 small"><i class="fa-solid fa-id-card me-1"></i>Reg No: <strong class="text-white">{{ student.registration_no }}</strong> &bull; Branch ID: <strong class="text-white">{{ student.branch_id }}</strong></span>
+        </div>
+    </div>
+    <div class="d-flex gap-2.5">
+        <div class="stats-card-mini py-1.5 px-3 rounded-3 d-flex align-items-center gap-2" style="min-width: auto; background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.3);">
+            <small class="text-white-50 fw-semibold fs-7"><i class="fa-solid fa-bolt text-warning me-1"></i>English:</small>
+            <span class="fs-5 fw-bold text-white">{{ student.english_wpm or 0 }} <span class="fs-7 text-white-50 fw-normal">WPM</span></span>
+        </div>
+        <div class="stats-card-mini py-1.5 px-3 rounded-3 d-flex align-items-center gap-2" style="min-width: auto; background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.3);">
+            <small class="text-white-50 fw-semibold fs-7"><i class="fa-solid fa-keyboard text-info me-1"></i>Kannada:</small>
+            <span class="fs-5 fw-bold text-white">{{ student.kannada_wpm or 0 }} <span class="fs-7 text-white-50 fw-normal">WPM</span></span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 
 <!-- Link to your separate Nudi mapping script -->
@@ -9,83 +35,50 @@
 <script src="{{ url_for('static', filename='js/typing-styles/block-style.js') }}"></script>
 <script src="{{ url_for('static', filename='js/typing-styles/waterfall-style.js') }}"></script>
 <script src="{{ url_for('static', filename='js/typing-styles/jump-style.js') }}"></script>
+<script src="{{ url_for('static', filename='js/typing-styles/paragraph-style.js') }}"></script>
 
 <style>
-    /* Force main container to stretch full screen width */
+    /* Centered uniform stage for typing screen, finger guide, and keyboard */
     .portal-container {
-        max-width: 98% !important;
-        padding: 0 10px !important;
+        max-width: 100% !important;
+        margin: 10px auto !important;
+        padding: 0 16px !important;
+    }
+
+    .lesson-container {
+        max-width: 1140px;
+        width: 100%;
+        margin: 0 auto;
     }
 
     #typing-text-box {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        overflow-x: auto;
-        background-color: #f8fafc;
-        border: 3px solid #cbd5e1 !important;
-        border-radius: 16px;
-        padding: 25px 20px;
-        min-height: 160px;
         width: 100%;
+        max-width: 1140px;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 0 0.5rem 0 !important;
+        box-shadow: none !important;
     }
 
-    #typing-text-box::-webkit-scrollbar {
-        height: 8px;
-    }
-    #typing-text-box::-webkit-scrollbar-thumb {
-        background: #0284c7;
-        border-radius: 4px;
-    }
-
-    /* Block size and font size */
-    #typing-text-box span {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 75px;
-        height: 85px;
-        margin-right: 12px;
-        border: 3px solid #cbd5e1;
-        border-radius: 12px;
-        background-color: #ffffff;
-        font-size: 2.8rem;
-        font-weight: 700;
-        flex-shrink: 0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        transition: all 0.1s ease;
-    }
-
-    /* Virtual On-Screen Keyboard Styles (TypingClub / Apple Style) */
+    /* Virtual On-Screen Keyboard Styles (Apple / TypingClub Style - High Legibility) */
     .virtual-keyboard {
         background: #d8dde3;
         border: 1px solid #c8ced6;
         border-radius: 16px;
-        padding: 10px 14px 14px 14px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        padding: 12px 16px 14px 16px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
         user-select: none;
-        max-width: 860px;
+        max-width: 1140px;
+        width: 100%;
         margin: 0 auto;
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    }
-    .keyboard-top-bar {
-        font-size: 0.78rem;
-        color: #475569;
-    }
-    .keyboard-settings-label {
-        cursor: pointer;
-        opacity: 0.85;
-        transition: opacity 0.15s ease;
-    }
-    .keyboard-settings-label:hover {
-        opacity: 1;
-        color: #0284c7 !important;
     }
     .keyboard-row {
         display: flex;
         justify-content: center;
-        gap: 5px;
-        margin-bottom: 5px;
+        gap: 6px;
+        margin-bottom: 6px;
     }
     .keyboard-row:last-child {
         margin-bottom: 0;
@@ -93,55 +86,55 @@
     .keyboard-key {
         background: #ffffff;
         border: 1px solid #cfd5dc;
-        border-radius: 6px;
-        min-width: 44px;
-        height: 46px;
+        border-radius: 8px;
+        min-width: 56px;
+        height: 48px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         font-weight: 600;
-        font-size: 0.95rem;
+        font-size: 1.18rem;
         color: #1e293b;
-        box-shadow: 0 2.5px 0 #b3b9c2, 0 3px 5px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2.5px 0 #b3b9c2, 0 2px 5px rgba(0, 0, 0, 0.05);
         transition: all 0.12s ease;
         line-height: 1.05;
         text-align: center;
-        padding: 2px 4px;
+        padding: 2px 5px;
         position: relative;
     }
     .keyboard-key .key-top {
-        font-size: 0.72rem;
+        font-size: 0.78rem;
         color: #64748b;
         margin-bottom: -1px;
     }
     .keyboard-key .key-bottom {
-        font-size: 0.85rem;
+        font-size: 1.05rem;
         font-weight: 700;
         color: #1e293b;
     }
     .keyboard-key.key-fn {
         background: #eef2f6;
         color: #475569;
-        font-size: 0.74rem;
+        font-size: 0.85rem;
         font-weight: 600;
     }
-    .keyboard-key.key-delete { min-width: 68px; }
-    .keyboard-key.key-tab { min-width: 62px; }
-    .keyboard-key.key-backslash { min-width: 50px; }
-    .keyboard-key.key-caps { min-width: 74px; }
-    .keyboard-key.key-enter { min-width: 76px; }
-    .keyboard-key.key-shift-left { min-width: 90px; }
-    .keyboard-key.key-shift-right { min-width: 90px; }
-    .keyboard-key.key-mod { min-width: 48px; font-size: 0.74rem; }
-    .keyboard-key.key-spacebar { width: 330px; font-size: 0.8rem; color: #64748b; font-weight: 500; }
+    .keyboard-key.key-delete { min-width: 96px; }
+    .keyboard-key.key-tab { min-width: 86px; }
+    .keyboard-key.key-backslash { min-width: 72px; }
+    .keyboard-key.key-caps { min-width: 102px; }
+    .keyboard-key.key-enter { min-width: 108px; }
+    .keyboard-key.key-shift-left { min-width: 128px; }
+    .keyboard-key.key-shift-right { min-width: 128px; }
+    .keyboard-key.key-mod { min-width: 66px; font-size: 0.85rem; }
+    .keyboard-key.key-spacebar { width: 440px; font-size: 0.9rem; color: #64748b; font-weight: 500; }
 
     /* Highlighted Active Key */
     .keyboard-key.key-active {
         background: #0284c7 !important;
         color: #ffffff !important;
         border-color: #0284c7 !important;
-        box-shadow: 0 2.5px 0 #0369a1, 0 4px 14px rgba(2, 132, 199, 0.5) !important;
+        box-shadow: 0 3px 0 #0369a1, 0 4px 14px rgba(2, 132, 199, 0.5) !important;
         transform: translateY(1.5px);
     }
     .keyboard-key.key-active .key-top,
@@ -154,7 +147,7 @@
         background: #ef4444 !important;
         color: #ffffff !important;
         border-color: #dc2626 !important;
-        box-shadow: 0 2.5px 0 #b91c1c, 0 4px 14px rgba(239, 68, 68, 0.5) !important;
+        box-shadow: 0 3px 0 #b91c1c, 0 4px 14px rgba(239, 68, 68, 0.5) !important;
         animation: blockShake 0.25s ease-in-out;
         transform: translateY(1.5px);
     }
@@ -272,70 +265,48 @@
 {% endif %}
 
 <div class="lesson-container w-100">
-    <!-- Top Header Bar with Back to Dashboard Button (Matching Image 2) -->
-    <div class="d-flex align-items-center justify-content-between text-white px-3.5 py-2.5 rounded-3 mb-4 shadow-sm" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
-        <div class="d-flex align-items-center gap-3">
-            <a href="{{ url_for('student.dashboard') }}" class="btn btn-light text-primary btn-sm rounded-3 fw-bold px-3 py-1.5 shadow-sm d-inline-flex align-items-center gap-2" title="Back to Dashboard">
-                <i class="fa-solid fa-arrow-left fs-6"></i> <span>Back to Dashboard</span>
+    <!-- Top Header Row: Lesson Title + Exit 'X' Button on Right -->
+    <div class="card border-0 shadow-sm px-4 py-2.5 bg-white rounded-4 mb-3 w-100">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2.5">
+                <span class="rounded-3 bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                    <i class="fa-solid fa-keyboard fs-6"></i>
+                </span>
+                <h5 class="mb-0 fw-bold text-dark fs-5">
+                    {{ lesson.lesson_title }}
+                </h5>
+                <span class="text-muted small d-none d-md-inline">&bull; {{ lesson.lesson_description or 'Touch typing speed practice' }}</span>
+            </div>
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-none text-muted" style="width: 34px; height: 34px;" title="Exit to Dashboard">
+                <i class="fa-solid fa-xmark fs-6"></i>
             </a>
-            <h5 class="mb-0 fw-bold fs-6 text-white text-truncate">
-                {{ lesson.lesson_title }} <span id="screen-subtitle" class="text-white-50 ms-2 fs-7 fw-normal"></span>
-            </h5>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-white text-primary rounded-pill px-3 py-1.5 font-monospace fw-bold" id="top-screen-counter">Screen 1 of {{ screens|length }}</span>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm p-4 bg-white rounded-4 mb-4">
-        <h4 class="mb-1 text-primary fw-bold"><i class="fa-solid fa-keyboard me-2"></i>{{ lesson.lesson_title }}</h4>
-        <p class="text-muted small mb-0">{{ lesson.lesson_description or 'Follow the letter prompts below and practice your touch typing speed.' }}</p>
-    </div>
-
-    <!-- Lesson Progress Bar Card -->
-    <div class="card border-0 shadow-sm p-4 bg-white rounded-4 mb-4 w-100">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold text-dark mb-0 fs-5">Lesson Progress</h5>
-            <span id="progress-text" class="text-muted fw-semibold font-monospace">0/0 Screens Completed</span>
-        </div>
-        <div id="progress-bar-container" class="d-flex gap-1.5 w-100 rounded-3 overflow-hidden p-1 bg-light border" style="min-height: 42px;">
         </div>
     </div>
 
     {% if screens %}
     <div class="card border-0 shadow-sm p-4 bg-white rounded-4 w-100">
-        <h6 id="screen-title" class="text-muted text-uppercase fs-7 fw-bold mb-3" style="letter-spacing: 0.5px;"></h6>
+        <h6 id="screen-title" class="text-muted text-uppercase fs-7 fw-bold mb-2.5" style="letter-spacing: 0.5px;"></h6>
         
-        <!-- Typing Display Area with Larger Letter Blocks & Full Width Stretch -->
-        <div id="typing-text-box" class="mb-4 shadow-inner">
+        <!-- Typing Display Area with Matching 1140px Width -->
+        <div id="typing-text-box" class="mb-3 shadow-inner">
         </div>
 
-        <!-- Finger Position Assistant Banner -->
-        <div id="finger-guide-banner" class="d-flex align-items-center justify-content-between p-3 mb-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; font-size: 1.1rem; flex-shrink: 0;">
+        <!-- Finger Position Assistant Banner (Centered & High Legibility) -->
+        <div id="finger-guide-banner" class="d-flex align-items-center justify-content-center text-center p-2.5 mb-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3">
+            <div class="d-flex align-items-center justify-content-center gap-3">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-size: 1rem; flex-shrink: 0;">
                     <i class="fa-solid fa-hand-pointer"></i>
                 </div>
-                <div>
-                    <span class="text-muted small fw-bold text-uppercase d-block" style="letter-spacing: 0.5px;">Finger Position Guide</span>
+                <div class="text-center">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-0.5" style="letter-spacing: 0.5px; font-size: 0.76rem;">Finger Position Guide</span>
                     <h6 id="finger-guide-text" class="fw-bold text-primary mb-0 fs-6">Press key to begin practice...</h6>
                 </div>
             </div>
-            <div class="d-none d-md-flex align-items-center gap-2">
-                <span class="badge bg-primary bg-opacity-20 text-primary px-3 py-1.5 rounded-pill font-monospace"><i class="fa-solid fa-lightbulb me-1"></i> Interactive Finger Guide</span>
-            </div>
         </div>
 
-        <!-- On-Screen Virtual Keyboard (Apple / TypingClub Style) -->
+        <!-- On-Screen Virtual Keyboard (Apple / TypingClub Style - 1140px Width) -->
         <div class="virtual-keyboard-container position-relative mb-3">
             <div id="virtual-keyboard" class="virtual-keyboard shadow-sm position-relative">
-                <!-- Keyboard Top Header Bar -->
-                <div class="keyboard-top-bar d-flex justify-content-end align-items-center mb-2 px-1">
-                    <span class="keyboard-settings-label text-secondary small fw-bold">
-                        <i class="fa-solid fa-gear me-1"></i> <u>Keyboard Settings</u> <i class="fa-regular fa-keyboard ms-1"></i>
-                    </span>
-                </div>
-
                 <!-- Row 1: Numbers & Symbols -->
                 <div class="keyboard-row">
                     <div class="keyboard-key" data-key="`"><span class="key-top">~</span><span class="key-bottom">`</span></div>
@@ -418,30 +389,42 @@
             </div>
         </div>
 
-        <!-- Finger Guide Legend Bar -->
-        <div class="d-flex flex-wrap align-items-center justify-content-between p-3 mb-4 bg-light rounded-3 border text-muted small">
-            <div class="d-flex align-items-center gap-3 fw-bold">
-                <span><i class="fa-solid fa-hand-back-fist text-primary me-1"></i> Left Hand:</span>
-                <span style="color: #ec4899;"><i class="fa-solid fa-circle fs-8 me-1"></i>Pinky (A, Q, Z)</span>
-                <span style="color: #a855f7;"><i class="fa-solid fa-circle fs-8 me-1"></i>Ring (S, W, X)</span>
-                <span style="color: #3b82f6;"><i class="fa-solid fa-circle fs-8 me-1"></i>Middle (D, E, C)</span>
-                <span style="color: #22c55e;"><i class="fa-solid fa-circle fs-8 me-1"></i>Index (F, R, V, G, T, B)</span>
-            </div>
-            <div class="d-flex align-items-center gap-3 fw-bold mt-2 mt-md-0">
-                <span><i class="fa-solid fa-hand-back-fist text-primary me-1"></i> Right Hand:</span>
-                <span style="color: #22c55e;"><i class="fa-solid fa-circle fs-8 me-1"></i>Index (J, U, M, H, Y, N)</span>
-                <span style="color: #3b82f6;"><i class="fa-solid fa-circle fs-8 me-1"></i>Middle (K, I, ,, 8)</span>
-                <span style="color: #a855f7;"><i class="fa-solid fa-circle fs-8 me-1"></i>Ring (L, O, ., 9)</span>
-                <span style="color: #ec4899;"><i class="fa-solid fa-circle fs-8 me-1"></i>Pinky (;, P, /)</span>
+        <!-- Finger Guide Legend Bar (Clean, Spacious & Easy to Read) -->
+        <div class="p-3 mb-3 bg-light rounded-3 border text-muted" style="font-size: 0.84rem;">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-3 fw-bold flex-wrap">
+                    <span class="text-primary"><i class="fa-solid fa-hand-back-fist me-1"></i> Left Hand:</span>
+                    <span style="color: #db2777;"><i class="fa-solid fa-circle fs-8 me-1"></i>Pinky (A, Q, Z)</span>
+                    <span style="color: #9333ea;"><i class="fa-solid fa-circle fs-8 me-1"></i>Ring (S, W, X)</span>
+                    <span style="color: #2563eb;"><i class="fa-solid fa-circle fs-8 me-1"></i>Middle (D, E, C)</span>
+                    <span style="color: #16a34a;"><i class="fa-solid fa-circle fs-8 me-1"></i>Index (F, R, V, G, T, B)</span>
+                </div>
+                <div class="d-flex align-items-center gap-3 fw-bold flex-wrap">
+                    <span class="text-primary"><i class="fa-solid fa-hand-back-fist me-1"></i> Right Hand:</span>
+                    <span style="color: #16a34a;"><i class="fa-solid fa-circle fs-8 me-1"></i>Index (J, U, M, H, Y, N)</span>
+                    <span style="color: #2563eb;"><i class="fa-solid fa-circle fs-8 me-1"></i>Middle (K, I, ,, 8)</span>
+                    <span style="color: #9333ea;"><i class="fa-solid fa-circle fs-8 me-1"></i>Ring (L, O, ., 9)</span>
+                    <span style="color: #db2777;"><i class="fa-solid fa-circle fs-8 me-1"></i>Pinky (;, P, /)</span>
+                </div>
             </div>
         </div>
 
-        <!-- Interactive Typing Feedback Display & Hidden Input Receiver -->
-        <div id="typed-feedback-box" class="typed-feedback-box mb-4 position-relative" onclick="document.getElementById('typing-input').focus();">
-            <div id="typed-chars-container" class="d-inline-flex flex-wrap align-items-center gap-1"></div>
-            <span class="feedback-cursor"></span>
-            <input type="text" id="typing-input" class="position-absolute" style="opacity: 0; width: 1px; height: 1px; pointer-events: auto; left: 10px; top: 10px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <!-- Bottom Screen Progress Bar (Segmented Screens) -->
+        <div class="mb-3 p-3 bg-light rounded-3 border">
+            <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                <span class="text-muted fw-bold font-monospace fs-7"><i class="fa-solid fa-layer-group text-primary me-1"></i> Screen Progress</span>
+                <div class="d-flex align-items-center gap-2">
+                    <span id="progress-text" class="text-muted fw-bold font-monospace fs-7">0/0 Screens Completed</span>
+                    <span class="badge bg-primary text-white rounded-pill px-3 py-1 font-monospace fw-bold fs-7" id="top-screen-counter">Screen 1 of {{ screens|length }}</span>
+                    <span id="screen-subtitle" class="d-none"></span>
+                </div>
+            </div>
+            <div id="progress-bar-container" class="d-flex gap-1.5 w-100 rounded-2 overflow-hidden p-1 bg-white border" style="min-height: 24px;">
+            </div>
         </div>
+
+        <!-- Hidden Global Input Receiver (Typing is directly in style/template) -->
+        <input type="text" id="typing-input" style="opacity: 0; position: fixed; left: -9999px; top: -9999px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 
         <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 border">
             <div class="d-flex gap-4 align-items-center">
@@ -450,7 +433,7 @@
                 <span class="fs-6 text-muted fw-semibold"><i class="fa-solid fa-bullseye text-warning me-1"></i> Accuracy: <strong id="accuracy" class="text-dark fs-5">100</strong>%</span>
             </div>
             <div class="d-flex gap-2">
-                <button id="retry-btn" type="button" class="btn btn-outline-secondary px-3 py-2 fw-semibold rounded-3 shadow-sm d-flex align-items-center gap-1">
+                <button id="retry-btn" type="button" class="btn btn-outline-secondary px-3.5 py-2 fw-semibold rounded-3 shadow-sm d-flex align-items-center gap-1">
                     <i class="fa-solid fa-rotate-right"></i> Retry
                 </button>
                 <button id="next-screen-btn" type="button" class="btn btn-success px-4 py-2 fw-bold rounded-3 shadow-sm d-flex align-items-center gap-1 disabled" disabled>
@@ -558,7 +541,9 @@
 
         screens.forEach((s, i) => {
             const block = document.createElement("div");
-            block.className = "flex-fill d-flex align-items-center justify-content-center fw-bold fs-7 rounded-2 py-2 transition-all";
+            block.className = "flex-fill d-flex align-items-center justify-content-center fw-bold rounded-1 py-0.5 transition-all";
+            block.style.fontSize = "0.74rem";
+            block.style.minHeight = "20px";
             block.innerText = (i + 1);
 
             if (i <= idx) {
@@ -566,7 +551,7 @@
                 block.style.background = "#0284c7";
                 block.style.color = "#ffffff";
                 if (i === idx) {
-                    block.style.boxShadow = "0 2px 6px rgba(2, 132, 199, 0.4)";
+                    block.style.boxShadow = "0 1px 4px rgba(2, 132, 199, 0.4)";
                 }
             } else {
                 // Remaining -> Light Gray (#e2e8f0)
@@ -661,6 +646,7 @@
         currentProgressIdx = 0;
         screenMistakes = 0;
         screenCorrect = 0;
+        charHistory = {};
         partialGrapheme = "";
         updateProgressBar(idx);
 
@@ -671,22 +657,20 @@
 
         const screen = screens[idx];
         titleEl.innerText = screen.title;
-        
-        // Clear typed characters stream
-        const typedContainer = document.getElementById("typed-chars-container");
-        if (typedContainer) typedContainer.innerHTML = "";
 
         // Destroy previous renderer if any
         if (currentRenderer && typeof currentRenderer.destroy === 'function') {
             currentRenderer.destroy();
         }
 
-        // Instantiate chosen template renderer (Block, Waterfall, or Jump)
+        // Instantiate chosen template renderer (Block, Waterfall, Jump, or Paragraph)
         const screenType = (screen.type || 'block').toLowerCase();
         if (screenType === 'waterfall' && typeof WaterfallStyleRenderer !== 'undefined') {
             currentRenderer = new WaterfallStyleRenderer(textBoxEl);
         } else if (screenType === 'jump' && typeof JumpStyleRenderer !== 'undefined') {
             currentRenderer = new JumpStyleRenderer(textBoxEl);
+        } else if (screenType === 'paragraph' && typeof ParagraphStyleRenderer !== 'undefined') {
+            currentRenderer = new ParagraphStyleRenderer(textBoxEl);
         } else {
             currentRenderer = new BlockStyleRenderer(textBoxEl);
         }
@@ -790,7 +774,23 @@
     }
 
     if (screens.length > 0) {
-        loadScreen(0);
+        const studentId = {{ student.student_id if student else 0 }};
+        const storageKey = `student_${studentId}_lesson_${lessonId}_screen`;
+        const serverSavedIdx = {{ saved_screen_idx|default(0) }};
+        const localSavedIdx = localStorage.getItem(storageKey);
+
+        let startScreenIdx = 0;
+        if (localSavedIdx !== null && !isNaN(parseInt(localSavedIdx))) {
+            startScreenIdx = parseInt(localSavedIdx);
+        } else if (serverSavedIdx !== null && !isNaN(parseInt(serverSavedIdx))) {
+            startScreenIdx = parseInt(serverSavedIdx);
+        }
+
+        if (startScreenIdx < 0 || startScreenIdx >= screens.length) {
+            startScreenIdx = 0;
+        }
+
+        loadScreen(startScreenIdx);
 
         function handleKeystrokeInput(typedChar) {
             if (!typedChar) return;
@@ -803,73 +803,95 @@
 
             const expectedTarget = targetSegments[currentProgressIdx];
             const testTyped = partialGrapheme + typedChar;
-            const typedContainer = document.getElementById("typed-chars-container");
 
-            if (testTyped === expectedTarget) {
-                // 1. CORRECT KEY TYPED!
-                screenCorrect++;
+            // Strict handling for Enter key ('\n'): student must press Enter to advance to next line/platform!
+            if (expectedTarget === '\n') {
+                if (testTyped === '\n') {
+                    // Enter pressed correctly!
+                    screenCorrect++;
+                    charHistory[currentProgressIdx] = 'correct';
+                    if (currentRenderer && typeof currentRenderer.onKeyTyped === 'function') {
+                        currentRenderer.onKeyTyped(typedChar, expectedTarget, currentProgressIdx, true);
+                    }
+                    currentProgressIdx++;
+                    partialGrapheme = "";
+                    updateKeyboardHighlighting(targetSegments, currentProgressIdx);
+                } else {
+                    // Pressed a key other than Enter: DO NOT MOVE FORWARD!
+                    screenMistakes++;
+                    partialGrapheme = "";
+
+                    // Shake / flash active Enter block in red
+                    if (currentRenderer && typeof currentRenderer.onMistake === 'function') {
+                        currentRenderer.onMistake(currentProgressIdx);
+                    }
+
+                    // Flash the wrongly pressed key on virtual keyboard
+                    let mistakeKeyLookup = typedChar.toLowerCase();
+                    if (typedChar === ' ') mistakeKeyLookup = 'Space';
+                    if (typedChar === '\n') mistakeKeyLookup = 'Enter';
+                    try {
+                        const wrongKeyEl = document.querySelector(`[data-key="${CSS.escape(mistakeKeyLookup)}"]`);
+                        if (wrongKeyEl) {
+                            wrongKeyEl.classList.remove("key-mistake");
+                            void wrongKeyEl.offsetWidth;
+                            wrongKeyEl.classList.add("key-mistake");
+                            setTimeout(() => {
+                                if (wrongKeyEl) wrongKeyEl.classList.remove("key-mistake");
+                            }, 400);
+                        }
+                    } catch (e) {}
+
+                    // Update Finger Guide warning
+                    const guideEl = document.getElementById("finger-guide-text");
+                    if (guideEl) {
+                        guideEl.innerHTML = `<span class="text-danger fw-bold"><i class="fa-solid fa-circle-xmark me-1"></i> Wrong key!</span> Press <span class="badge bg-primary fs-6 px-2 py-1 font-monospace">ENTER ↵</span> to jump to the next line`;
+                    }
+                }
+            } else {
+                // Regular character (letters, numbers, space, punctuation)
+                if (testTyped === expectedTarget) {
+                    // Correct key typed!
+                    screenCorrect++;
+                    charHistory[currentProgressIdx] = 'correct';
+                    if (currentRenderer && typeof currentRenderer.onKeyTyped === 'function') {
+                        currentRenderer.onKeyTyped(typedChar, expectedTarget, currentProgressIdx, true);
+                    }
+                } else if (expectedTarget.startsWith(testTyped)) {
+                    // In-progress partial compound grapheme
+                    partialGrapheme = testTyped;
+                    return;
+                } else {
+                    // Wrong key typed: Mark as mistake, stays red, and ADVANCE TO NEXT BLOCK!
+                    screenMistakes++;
+                    charHistory[currentProgressIdx] = 'mistake';
+                    if (currentRenderer && typeof currentRenderer.onKeyTyped === 'function') {
+                        currentRenderer.onKeyTyped(typedChar, expectedTarget, currentProgressIdx, false);
+                    }
+
+                    // Flash the wrongly pressed key in bright RED on the virtual keyboard
+                    let mistakeKeyLookup = typedChar.toLowerCase();
+                    if (typedChar === ' ') mistakeKeyLookup = 'Space';
+                    if (typedChar === '\n') mistakeKeyLookup = 'Enter';
+                    try {
+                        const wrongKeyEl = document.querySelector(`[data-key="${CSS.escape(mistakeKeyLookup)}"]`);
+                        if (wrongKeyEl) {
+                            wrongKeyEl.classList.remove("key-mistake");
+                            void wrongKeyEl.offsetWidth;
+                            wrongKeyEl.classList.add("key-mistake");
+                            setTimeout(() => {
+                                if (wrongKeyEl) wrongKeyEl.classList.remove("key-mistake");
+                            }, 400);
+                        }
+                    } catch (e) {}
+                }
+
+                // Advance to next block / letter
                 currentProgressIdx++;
                 partialGrapheme = "";
 
-                // Append green char to feedback box
-                if (typedContainer) {
-                    const span = document.createElement("span");
-                    span.className = "feedback-char-correct";
-                    span.innerText = testTyped === ' ' ? '␣' : (testTyped === '\n' ? '↵' : testTyped);
-                    typedContainer.appendChild(span);
-                }
-
-                if (currentRenderer && typeof currentRenderer.onCorrect === 'function') {
-                    currentRenderer.onCorrect(currentProgressIdx);
-                }
-
+                // Highlight next target key on virtual keyboard & update finger guide
                 updateKeyboardHighlighting(targetSegments, currentProgressIdx);
-            } else if (expectedTarget.startsWith(testTyped)) {
-                // In-progress partial grapheme (e.g. Kannada compound letters)
-                partialGrapheme = testTyped;
-            } else {
-                // 2. WRONG KEY / MISTAKE IDENTIFIED!
-                screenMistakes++;
-                partialGrapheme = "";
-
-                // Flash active tile RED & shake
-                if (currentRenderer && typeof currentRenderer.onMistake === 'function') {
-                    currentRenderer.onMistake(currentProgressIdx);
-                }
-
-                // Highlight the WRONGLY pressed key in bright RED on the virtual keyboard
-                let mistakeKeyLookup = typedChar.toLowerCase();
-                if (typedChar === ' ') mistakeKeyLookup = 'Space';
-                if (typedChar === '\n') mistakeKeyLookup = 'Enter';
-                try {
-                    const wrongKeyEl = document.querySelector(`[data-key="${CSS.escape(mistakeKeyLookup)}"]`);
-                    if (wrongKeyEl) {
-                        wrongKeyEl.classList.remove("key-mistake");
-                        void wrongKeyEl.offsetWidth;
-                        wrongKeyEl.classList.add("key-mistake");
-                        setTimeout(() => {
-                            if (wrongKeyEl) wrongKeyEl.classList.remove("key-mistake");
-                        }, 400);
-                    }
-                } catch (e) {}
-
-                // Append red mistake pill in feedback box
-                if (typedContainer) {
-                    const errSpan = document.createElement("span");
-                    errSpan.className = "feedback-char-mistake";
-                    errSpan.innerText = `${typedChar === ' ' ? 'SPACE' : typedChar} ✗`;
-                    typedContainer.appendChild(errSpan);
-                    setTimeout(() => {
-                        if (errSpan) errSpan.remove();
-                    }, 800);
-                }
-
-                // Update Finger Guide with mistake warning
-                const guideEl = document.getElementById("finger-guide-text");
-                if (guideEl) {
-                    const targetKeyUpper = expectedTarget === ' ' ? 'SPACE' : expectedTarget[0].toUpperCase();
-                    guideEl.innerHTML = `<span class="text-danger fw-bold"><i class="fa-solid fa-circle-xmark me-1"></i> Wrong key '${typedChar.toUpperCase()}'!</span> Press <span class="badge bg-primary fs-6 px-2 py-1 font-monospace">${targetKeyUpper}</span>`;
-                }
             }
 
             // Real-time WPM Calculation
@@ -912,7 +934,7 @@
             inputEl.value = "";
         });
 
-        // Keydown listener for Enter, Space, and Backspace prevention
+        // Keydown listener for Enter, Space, and Backspace/Delete handling
         inputEl.addEventListener("keydown", (e) => {
             if (currentProgressIdx < (screens[currentScreenIdx] ? screens[currentScreenIdx].content.length : 0)) {
                 handleKeystrokeActivity(false);
@@ -920,6 +942,39 @@
 
             if (e.key === "Backspace" || e.key === "Delete") {
                 e.preventDefault();
+                if (currentProgressIdx > 0) {
+                    currentProgressIdx--;
+                    partialGrapheme = "";
+
+                    // Decrement the corresponding stat based on history
+                    if (charHistory[currentProgressIdx] === 'correct') {
+                        screenCorrect = Math.max(0, screenCorrect - 1);
+                    } else if (charHistory[currentProgressIdx] === 'mistake') {
+                        screenMistakes = Math.max(0, screenMistakes - 1);
+                    }
+                    delete charHistory[currentProgressIdx];
+
+                    if (currentRenderer && typeof currentRenderer.onBackspace === 'function') {
+                        currentRenderer.onBackspace(currentProgressIdx);
+                    }
+
+                    const screen = screens[currentScreenIdx];
+                    const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+                    const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
+                    updateKeyboardHighlighting(targetSegments, currentProgressIdx);
+                    handleKeystrokeActivity(false);
+
+                    // Re-calculate real-time stats
+                    const minutes = secondsElapsed > 0 ? secondsElapsed / 60 : 1 / 60;
+                    const wordsTyped = screenCorrect / 5;
+                    const wpm = secondsElapsed >= 2 ? Math.round(wordsTyped / minutes) : 0;
+                    wpmEl.innerText = wpm >= 0 ? wpm : 0;
+
+                    const totalAttempts = screenCorrect + screenMistakes;
+                    const accuracy = totalAttempts > 0 ? Math.max(0, Math.round((screenCorrect / totalAttempts) * 100)) : 100;
+                    accuracyEl.innerText = accuracy;
+                }
                 return false;
             }
 
@@ -949,13 +1004,39 @@
             cumulativeMistakes += screenMistakes;
             cumulativeSeconds += secondsElapsed;
 
-            if (currentScreenIdx < screens.length - 1) {
-                // Move to next screen
-                loadScreen(currentScreenIdx + 1);
+            const totalMinutes = secondsElapsed > 0 ? secondsElapsed / 60 : 1 / 60;
+            const currentScreenWpm = Math.round(wordsTyped / totalMinutes);
+            const totalAttempts = screenCorrect + screenMistakes;
+            const currentScreenAccuracy = totalAttempts > 0 ? Math.round((screenCorrect / totalAttempts) * 100) : 100;
+
+            const nextScreenIdx = currentScreenIdx + 1;
+            const storageKey = `student_${studentId}_lesson_${lessonId}_screen`;
+
+            if (nextScreenIdx < screens.length) {
+                // Save progress to localStorage
+                localStorage.setItem(storageKey, nextScreenIdx);
+
+                // Save to backend asynchronously
+                fetch(`/student/lesson/${lessonId}/save_screen_progress`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        screen_index: currentScreenIdx,
+                        wpm: currentScreenWpm,
+                        accuracy: currentScreenAccuracy,
+                        mistakes: screenMistakes,
+                        seconds: secondsElapsed
+                    })
+                }).catch(err => console.error("Error saving screen progress:", err));
+
+                // Move to next pending screen
+                loadScreen(nextScreenIdx);
             } else {
-                // Last screen completed -> Submit form and save data to DB
-                const totalMinutes = cumulativeSeconds > 0 ? cumulativeSeconds / 60 : 1 / 60;
-                const lessonWpm = Math.round(cumulativeWords / totalMinutes);
+                // Last screen completed -> clear saved screen progress and submit complete form
+                localStorage.removeItem(storageKey);
+
+                const totalLessonMinutes = cumulativeSeconds > 0 ? cumulativeSeconds / 60 : 1 / 60;
+                const lessonWpm = Math.round(cumulativeWords / totalLessonMinutes);
                 
                 const form = document.createElement('form');
                 form.method = 'POST';

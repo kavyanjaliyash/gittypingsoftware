@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request
+from flask import Blueprint, render_template, session, redirect, url_for, request, jsonify
 from database import db
 from models import Student, Course, Lesson, Screen, User, StudentProgress
 from datetime import datetime
@@ -123,12 +123,66 @@ def student_lesson(lesson_id):
     lesson = Lesson.query.get_or_404(lesson_id)
     screens = Screen.query.filter_by(lesson_id=lesson_id).all()
     
+    saved_screen_idx = session.get(f'student_{student.student_id}_lesson_{lesson_id}_screen', 0) if student else 0
+    if saved_screen_idx >= len(screens):
+        saved_screen_idx = max(0, len(screens) - 1)
+    
     return render_template(
         'student/lesson.html', 
         student=student, 
         lesson=lesson, 
-        screens=screens
+        screens=screens,
+        saved_screen_idx=saved_screen_idx
     )
+
+@student_bp.route('/lesson/<int:lesson_id>/save_screen_progress', methods=['POST'])
+def save_screen_progress(lesson_id):
+    if 'user_id' not in session or session.get('role') != 'student':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    
+    student = Student.query.filter_by(user_id=session['user_id']).first()
+    if not student:
+        return jsonify({'success': False, 'error': 'Student not found'}), 404
+        
+    data = request.get_json(silent=True) or request.form
+    screen_index = int(data.get('screen_index', 0))
+    wpm = int(data.get('wpm', 0))
+    accuracy = float(data.get('accuracy', 100.0))
+    mistakes = int(data.get('mistakes', 0))
+    seconds = int(data.get('seconds', 0))
+    
+    next_screen_idx = screen_index + 1
+    session[f'student_{student.student_id}_lesson_{lesson_id}_screen'] = next_screen_idx
+    session.modified = True
+    
+    # Save/update progress record in DB
+    progress = StudentProgress.query.filter_by(
+        student_id=student.student_id, 
+        lesson_id=lesson_id
+    ).first()
+    
+    if not progress:
+        progress = StudentProgress(
+            student_id=student.student_id,
+            lesson_id=lesson_id,
+            wpm=wpm,
+            accuracy=accuracy,
+            mistakes=mistakes,
+            time_taken=seconds,
+            completed_on=datetime.now(),
+            status='In Progress'
+        )
+        db.session.add(progress)
+    elif progress.status != 'Completed':
+        progress.wpm = wpm
+        progress.accuracy = accuracy
+        progress.mistakes = mistakes
+        progress.time_taken = seconds
+        progress.status = 'In Progress'
+        
+    db.session.commit()
+    
+    return jsonify({'success': True, 'next_screen_idx': next_screen_idx})
 
 @student_bp.route('/lesson/<int:lesson_id>/complete', methods=['POST'])
 def complete_lesson(lesson_id):
@@ -143,6 +197,10 @@ def complete_lesson(lesson_id):
     seconds = int(request.form.get('seconds', 0))
 
     if student:
+        # Clear in-progress session key for this lesson
+        session.pop(f'student_{student.student_id}_lesson_{lesson_id}_screen', None)
+        session.modified = True
+
         # Save or update progress record in DB
         progress = StudentProgress.query.filter_by(
             student_id=student.student_id, 

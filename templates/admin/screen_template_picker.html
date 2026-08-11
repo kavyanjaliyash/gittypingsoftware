@@ -2,18 +2,18 @@
   Reusable Screen Template Picker Component
   Parameters:
     - picker_id: unique identifier for radio inputs (e.g. 'add' or 'edit_' ~ s.screen_id)
-    - current_val: currently selected screen_type ('block', 'waterfall', 'jump')
+    - current_val: currently selected screen_type ('block', 'waterfall', 'jump', 'paragraph')
 #}
 {% set current_val = current_val or 'block' %}
 <div class="mb-3">
     <label class="form-label small fw-bold text-secondary d-flex align-items-center justify-content-between mb-2">
         <span><i class="fa-solid fa-palette text-primary me-1"></i> Choose Screen Typing Template / Style</span>
-        <span class="badge bg-light text-primary border fs-8">3 Interactive Modes</span>
+        <span class="badge bg-light text-primary border fs-8">4 Interactive Modes</span>
     </label>
     
     <div class="row g-3">
         <!-- 1. Block Style Card -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-3">
             <label class="card h-100 border-2 rounded-4 p-3 position-relative cursor-pointer transition-all template-card text-start" 
                    id="card_{{ picker_id }}_block" 
                    style="cursor: pointer; border-color: {% if current_val == 'block' %}#0284c7{% else %}#e2e8f0{% endif %}; background: {% if current_val == 'block' %}#f0f9ff{% else %}#ffffff{% endif %};">
@@ -47,7 +47,7 @@
         </div>
 
         <!-- 2. Waterfall Style Card -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-3">
             <label class="card h-100 border-2 rounded-4 p-3 position-relative cursor-pointer transition-all template-card text-start" 
                    id="card_{{ picker_id }}_waterfall" 
                    style="cursor: pointer; border-color: {% if current_val == 'waterfall' %}#0284c7{% else %}#e2e8f0{% endif %}; background: {% if current_val == 'waterfall' %}#f0f9ff{% else %}#ffffff{% endif %};">
@@ -63,7 +63,7 @@
                         <i class="fa-solid fa-water fs-6"></i>
                     </span>
                     <div>
-                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.88rem;">Waterfall Style</h6>
+                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.88rem;">Waterfall</h6>
                         <span class="badge bg-info bg-opacity-15 text-info-emphasis" style="font-size: 0.7rem;">Vertical Drops</span>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
         </div>
 
         <!-- 3. Jump Style Card -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-3">
             <label class="card h-100 border-2 rounded-4 p-3 position-relative cursor-pointer transition-all template-card text-start" 
                    id="card_{{ picker_id }}_jump" 
                    style="cursor: pointer; border-color: {% if current_val == 'jump' %}#0284c7{% else %}#e2e8f0{% endif %}; background: {% if current_val == 'jump' %}#f0f9ff{% else %}#ffffff{% endif %};">
@@ -107,6 +107,41 @@
                     </div>
                 </div>
                 <p class="text-muted mb-0" style="font-size: 0.75rem;">Cute platformer game with wooden branch platforms & jumping robot.</p>
+            </label>
+        </div>
+
+        <!-- 4. Paragraph Style Card -->
+        <div class="col-md-6 col-lg-3">
+            <label class="card h-100 border-2 rounded-4 p-3 position-relative cursor-pointer transition-all template-card text-start" 
+                   id="card_{{ picker_id }}_paragraph" 
+                   style="cursor: pointer; border-color: {% if current_val == 'paragraph' %}#0284c7{% else %}#e2e8f0{% endif %}; background: {% if current_val == 'paragraph' %}#f0f9ff{% else %}#ffffff{% endif %};">
+                <input class="form-check-input position-absolute top-0 end-0 m-3 shadow-none template-radio" 
+                       type="radio" 
+                       name="screen_type" 
+                       id="radio_{{ picker_id }}_paragraph" 
+                       value="paragraph" 
+                       {% if current_val == 'paragraph' %}checked{% endif %}
+                       onchange="updateTemplateSelection('{{ picker_id }}', 'paragraph')">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="rounded-3 text-white d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: #8b5cf6;">
+                        <i class="fa-solid fa-paragraph fs-6"></i>
+                    </span>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.88rem;">Paragraph</h6>
+                        <span class="badge text-white" style="font-size: 0.7rem; background: #8b5cf6;">Flow & Backspace</span>
+                    </div>
+                </div>
+                <!-- Visual Preview Graphic -->
+                <div class="p-2 rounded-3 bg-light border text-center mb-2">
+                    <div class="d-flex flex-column gap-1 text-start px-1 font-monospace" style="font-size: 0.7rem;">
+                        <div>
+                            <span class="bg-success bg-opacity-25 text-success rounded px-1 fw-bold">jjf</span>
+                            <span class="bg-danger bg-opacity-25 text-danger rounded px-1 fw-bold">f</span><span class="border-bottom border-2 border-primary fw-bold text-primary">_</span>
+                        </div>
+                        <div class="text-muted opacity-75 border-top pt-0.5">jjf jjf</div>
+                    </div>
+                </div>
+                <p class="text-muted mb-0" style="font-size: 0.75rem;">Natural multi-line paragraph flow with backspace & non-blocking typing.</p>
             </label>
         </div>
     </div>

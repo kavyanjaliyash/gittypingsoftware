@@ -279,52 +279,90 @@
                     </div>
                 </div>
 
-                <h4 class="fw-bold text-white mb-4 fs-4">Getting Started</h4>
-
-                <!-- Lessons List -->
+                <!-- Lessons Grouped by Chapters (Beginner, Intermediate, Advanced) -->
                 {% if c.lessons %}
-                <div class="lessons-container">
-                    {% for l in c.lessons %}
-                    {% set is_completed = (completed_lesson_ids and l.lesson_id in completed_lesson_ids) %}
-                    {% set prog = progress_map.get(l.lesson_id) %}
-                    
-                    <div class="lesson-item-card {% if is_completed %}completed-card{% else %}white-card{% endif %} shadow-sm">
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="number-circle">
-                                    {{ l.display_order }}
+                    {% set chapters_list = ['Beginner', 'Intermediate', 'Advanced'] %}
+                    {% for chap in chapters_list %}
+                        {% set ns = namespace(chap_lessons=[]) %}
+                        {% for l in c.lessons %}
+                            {% if (l.chapter or 'Beginner') == chap %}
+                                {% set ns.chap_lessons = ns.chap_lessons + [l] %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if ns.chap_lessons %}
+                        <div class="chapter-group mb-4">
+                            <!-- Chapter Heading Bar -->
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-white border-opacity-25">
+                                <div class="d-flex align-items-center gap-2.5">
+                                    {% if chap == 'Advanced' %}
+                                    <span class="badge bg-danger text-white px-3 py-1.5 rounded-pill fs-7 fw-bold shadow-sm">
+                                        <i class="fa-solid fa-trophy me-1"></i> Advanced Chapter
+                                    </span>
+                                    <span class="text-white small opacity-75 d-none d-md-inline">Paragraphs, Flow & Speed Mastery</span>
+                                    {% elif chap == 'Intermediate' %}
+                                    <span class="badge bg-warning text-dark px-3 py-1.5 rounded-pill fs-7 fw-bold shadow-sm">
+                                        <i class="fa-solid fa-bolt me-1"></i> Intermediate Chapter
+                                    </span>
+                                    <span class="text-white small opacity-75 d-none d-md-inline">Numbers, Symbols & Combined Keys</span>
+                                    {% else %}
+                                    <span class="badge bg-success text-white px-3 py-1.5 rounded-pill fs-7 fw-bold shadow-sm">
+                                        <i class="fa-solid fa-seedling me-1"></i> Beginner Chapter
+                                    </span>
+                                    <span class="text-white small opacity-75 d-none d-md-inline">Home Row & Foundation Keys</span>
+                                    {% endif %}
                                 </div>
-                                <div>
-                                    <h5 class="fw-bold mb-1 fs-5">{{ l.lesson_title }}</h5>
-                                    <div class="fs-7 opacity-75 d-flex align-items-center gap-3">
-                                        <span>Avg Speed: <strong>{% if prog %}{{ prog.wpm or 20 }}{% else %}20{% endif %} WPM</strong></span>
-                                        <span>Avg Acc: <strong>{% if prog %}{{ prog.accuracy|round|int or 100 }}{% else %}100{% endif %}%</strong></span>
-                                        <span>Time: <strong>{% if prog %}{% if prog.time_taken >= 60 %}{{ (prog.time_taken // 60) }}:{{ "%02d"|format(prog.time_taken % 60) }}{% else %}0:{{ "%02d"|format(prog.time_taken) }}{% endif %}{% else %}0:57{% endif %}</strong></span>
+                                <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 font-monospace fs-7 fw-semibold">
+                                    {{ ns.chap_lessons|length }} {% if ns.chap_lessons|length == 1 %}Lesson{% else %}Lessons{% endif %}
+                                </span>
+                            </div>
+
+                            <!-- Chapter Lessons List -->
+                            <div class="lessons-container">
+                                {% for l in ns.chap_lessons %}
+                                {% set is_completed = (completed_lesson_ids and l.lesson_id in completed_lesson_ids) %}
+                                {% set prog = progress_map.get(l.lesson_id) %}
+                                
+                                <div class="lesson-item-card {% if is_completed %}completed-card{% else %}white-card{% endif %} shadow-sm">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="number-circle">
+                                                {{ l.display_order }}
+                                            </div>
+                                            <div>
+                                                <h5 class="fw-bold mb-1 fs-5">{{ l.lesson_title }}</h5>
+                                                <div class="fs-7 opacity-75 d-flex align-items-center gap-3">
+                                                    <span>Avg Speed: <strong>{% if prog %}{{ prog.wpm or 20 }}{% else %}20{% endif %} WPM</strong></span>
+                                                    <span>Avg Acc: <strong>{% if prog %}{{ prog.accuracy|round|int or 100 }}{% else %}100{% endif %}%</strong></span>
+                                                    <span>Time: <strong>{% if prog %}{% if prog.time_taken >= 60 %}{{ (prog.time_taken // 60) }}:{{ "%02d"|format(prog.time_taken % 60) }}{% else %}0:{{ "%02d"|format(prog.time_taken) }}{% endif %}{% else %}0:57{% endif %}</strong></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <a href="/student/lesson/{{ l.lesson_id }}" class="btn-resume-yellow text-decoration-none">
+                                                <i class="fa-solid fa-play"></i>
+                                                <span>{% if is_completed %}Retry{% else %}Resume{% endif %}</span>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Segmented Progress Bar at bottom of Lesson Card -->
+                                    <div class="d-flex gap-1 mt-3 rounded-2 overflow-hidden bg-black bg-opacity-10 p-1" style="height: 12px;">
+                                        {% for screen in l.screens %}
+                                        <div class="flex-fill rounded-1 {% if is_completed %}bg-white{% else %}bg-primary opacity-50{% endif %}"></div>
+                                        {% else %}
+                                        <div class="flex-fill rounded-1 bg-white opacity-50"></div>
+                                        <div class="flex-fill rounded-1 bg-white opacity-50"></div>
+                                        <div class="flex-fill rounded-1 bg-white opacity-50"></div>
+                                        {% endfor %}
                                     </div>
                                 </div>
-                            </div>
-
-                            <div>
-                                <a href="/student/lesson/{{ l.lesson_id }}" class="btn-resume-yellow text-decoration-none">
-                                    <i class="fa-solid fa-play"></i>
-                                    <span>{% if is_completed %}Retry{% else %}Resume{% endif %}</span>
-                                </a>
+                                {% endfor %}
                             </div>
                         </div>
-
-                        <!-- Segmented Progress Bar at bottom of Lesson Card -->
-                        <div class="d-flex gap-1 mt-3 rounded-2 overflow-hidden bg-black bg-opacity-10 p-1" style="height: 12px;">
-                            {% for screen in l.screens %}
-                            <div class="flex-fill rounded-1 {% if is_completed %}bg-white{% else %}bg-primary opacity-50{% endif %}"></div>
-                            {% else %}
-                            <div class="flex-fill rounded-1 bg-white opacity-50"></div>
-                            <div class="flex-fill rounded-1 bg-white opacity-50"></div>
-                            <div class="flex-fill rounded-1 bg-white opacity-50"></div>
-                            {% endfor %}
-                        </div>
-                    </div>
+                        {% endif %}
                     {% endfor %}
-                </div>
                 {% else %}
                 <div class="text-center py-5 bg-white bg-opacity-10 rounded-4">
                     <p class="mb-0 text-white opacity-75">No lessons configured for this course yet.</p>
