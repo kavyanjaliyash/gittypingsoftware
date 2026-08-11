@@ -112,7 +112,7 @@
     </div>
 
     <div class="sidebar-bottom">
-        <a href="/logout" class="text-danger fw-semibold"><i class="fa-solid fa-right-from-bracket me-3 fs-5"></i>Logout</a>
+        <a href="{{ url_for('auth.logout', role='admin') }}" class="text-danger fw-semibold"><i class="fa-solid fa-right-from-bracket me-3 fs-5"></i>Logout</a>
     </div>
 </div>
 

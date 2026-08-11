@@ -263,7 +263,7 @@
         </div>
 
         <div class="sidebar-footer">
-            <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+            <a href="{{ url_for('auth.logout', role='branch') }}" class="btn-logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span>Logout</span>
             </a>
@@ -280,7 +280,7 @@
             </a>
             
             <div class="user-profile-badge text-end px-2 py-1 rounded-3">
-                <div class="fw-bold text-dark mb-0 fs-6">{{ session.get('username', branch.branch_name if branch else 'hoskote14') }}</div>
+                <div class="fw-bold text-dark mb-0 fs-6">{{ session.get('branch_username', session.get('username', branch.branch_name if branch else 'hoskote14')) }}</div>
                 <small class="text-muted fs-7">{% if is_faculty %}Faculty Trainer <i class="fa-solid fa-user-tie ms-1 text-success"></i>{% else %}Branch Admin <i class="fa-solid fa-user-gear ms-1 text-primary"></i>{% endif %}</small>
             </div>
         </div>

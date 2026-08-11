@@ -6,12 +6,20 @@ import json
 
 branch_bp = Blueprint('branch', __name__, url_prefix='/branch')
 
+def get_branch_user_id():
+    if session.get('branch_user_id'):
+        return session['branch_user_id']
+    if session.get('role') in ['branch', 'branch_admin', 'branch admin'] and session.get('user_id'):
+        return session['user_id']
+    return None
+
 @branch_bp.route('/dashboard')
 def dashboard():
-    if 'user_id' not in session or session.get('role') not in ['branch', 'branch_admin', 'branch admin']:
-        return redirect(url_for('auth.login'))
+    branch_user_id = get_branch_user_id()
+    if not branch_user_id:
+        return redirect(url_for('auth.login', role='branch'))
     
-    branch = Branch.query.filter_by(user_id=session['user_id']).first()
+    branch = Branch.query.filter_by(user_id=branch_user_id).first()
     if not branch:
         branch = Branch.query.first()
 
@@ -121,10 +129,11 @@ def dashboard():
 
 @branch_bp.route('/student/add', methods=['POST'])
 def add_student():
-    if 'user_id' not in session or session.get('role') not in ['branch', 'branch_admin', 'branch admin']:
-        return redirect(url_for('auth.login'))
+    branch_user_id = get_branch_user_id()
+    if not branch_user_id:
+        return redirect(url_for('auth.login', role='branch'))
 
-    branch = Branch.query.filter_by(user_id=session['user_id']).first()
+    branch = Branch.query.filter_by(user_id=branch_user_id).first()
     if not branch:
         branch = Branch.query.first()
 
@@ -177,8 +186,9 @@ def add_student():
 
 @branch_bp.route('/student/update/<int:student_id>', methods=['POST'])
 def update_student(student_id):
-    if 'user_id' not in session or session.get('role') not in ['branch', 'branch_admin', 'branch admin']:
-        return redirect(url_for('auth.login'))
+    branch_user_id = get_branch_user_id()
+    if not branch_user_id:
+        return redirect(url_for('auth.login', role='branch'))
 
     student = Student.query.get_or_404(student_id)
     first_name = request.form.get("first_name", "").strip()
@@ -202,8 +212,9 @@ def update_student(student_id):
 
 @branch_bp.route('/student/reset/<int:student_id>', methods=['POST'])
 def reset_student_password(student_id):
-    if 'user_id' not in session or session.get('role') not in ['branch', 'branch_admin', 'branch admin']:
-        return redirect(url_for('auth.login'))
+    branch_user_id = get_branch_user_id()
+    if not branch_user_id:
+        return redirect(url_for('auth.login', role='branch'))
 
     student = Student.query.get_or_404(student_id)
     new_password = request.form.get("password", "").strip()
@@ -218,8 +229,9 @@ def reset_student_password(student_id):
 
 @branch_bp.route('/student/delete/<int:student_id>', methods=['POST'])
 def delete_student(student_id):
-    if 'user_id' not in session or session.get('role') not in ['branch', 'branch_admin', 'branch admin']:
-        return redirect(url_for('auth.login'))
+    branch_user_id = get_branch_user_id()
+    if not branch_user_id:
+        return redirect(url_for('auth.login', role='branch'))
 
     student = Student.query.get_or_404(student_id)
     if student.user_id:
@@ -234,10 +246,17 @@ def delete_student(student_id):
 
 @branch_bp.route('/student/<int:student_id>/details')
 def student_details(student_id):
-    if 'user_id' not in session or session.get('role') not in ['branch', 'branch_admin', 'branch admin', 'faculty']:
-        return redirect(url_for('auth.login'))
+    branch_user_id = get_branch_user_id()
+    faculty_user_id = session.get('faculty_user_id') or (session.get('user_id') if session.get('role') == 'faculty' else None)
+    
+    if not branch_user_id and not faculty_user_id:
+        return redirect(url_for('auth.login', role='branch'))
 
-    branch = Branch.query.filter_by(user_id=session['user_id']).first()
+    if branch_user_id:
+        branch = Branch.query.filter_by(user_id=branch_user_id).first()
+    else:
+        faculty = Faculty.query.filter_by(user_id=faculty_user_id).first()
+        branch = Branch.query.get(faculty.branch_id) if faculty else None
     if not branch:
         branch = Branch.query.first()
 

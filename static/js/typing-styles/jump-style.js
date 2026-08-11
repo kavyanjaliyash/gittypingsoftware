@@ -296,6 +296,7 @@ class JumpStyleRenderer {
     }
 
     destroy() {
+        this.container.className = "";
         this.container.innerHTML = "";
     }
 }

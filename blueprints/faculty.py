@@ -5,12 +5,20 @@ from datetime import datetime
 
 faculty_bp = Blueprint('faculty', __name__, url_prefix='/faculty')
 
+def get_faculty_user_id():
+    if session.get('faculty_user_id'):
+        return session['faculty_user_id']
+    if session.get('role') == 'faculty' and session.get('user_id'):
+        return session['user_id']
+    return None
+
 @faculty_bp.route('/dashboard')
 def dashboard():
-    if 'user_id' not in session or session.get('role') != 'faculty':
-        return redirect(url_for('auth.login'))
+    faculty_user_id = get_faculty_user_id()
+    if not faculty_user_id:
+        return redirect(url_for('auth.login', role='faculty'))
 
-    faculty = Faculty.query.filter_by(user_id=session['user_id']).first()
+    faculty = Faculty.query.filter_by(user_id=faculty_user_id).first()
     if not faculty:
         faculty = Faculty.query.first()
 
@@ -37,10 +45,11 @@ def dashboard():
 
 @faculty_bp.route('/add-student', methods=['POST'])
 def add_student():
-    if 'user_id' not in session or session.get('role') != 'faculty':
-        return redirect(url_for('auth.login'))
+    faculty_user_id = get_faculty_user_id()
+    if not faculty_user_id:
+        return redirect(url_for('auth.login', role='faculty'))
 
-    faculty = Faculty.query.filter_by(user_id=session['user_id']).first()
+    faculty = Faculty.query.filter_by(user_id=faculty_user_id).first()
     first_name = request.form.get('first_name', '').strip()
     last_name = request.form.get('last_name', '').strip()
     full_name = f"{first_name} {last_name}".strip()
@@ -91,8 +100,9 @@ def add_student():
 
 @faculty_bp.route('/student/update/<int:student_id>', methods=['POST'])
 def update_student(student_id):
-    if 'user_id' not in session or session.get('role') != 'faculty':
-        return redirect(url_for('auth.login'))
+    faculty_user_id = get_faculty_user_id()
+    if not faculty_user_id:
+        return redirect(url_for('auth.login', role='faculty'))
 
     student = Student.query.get_or_404(student_id)
     first_name = request.form.get("first_name", "").strip()
@@ -115,8 +125,9 @@ def update_student(student_id):
 
 @faculty_bp.route('/student/reset/<int:student_id>', methods=['POST'])
 def reset_student_password(student_id):
-    if 'user_id' not in session or session.get('role') != 'faculty':
-        return redirect(url_for('auth.login'))
+    faculty_user_id = get_faculty_user_id()
+    if not faculty_user_id:
+        return redirect(url_for('auth.login', role='faculty'))
 
     student = Student.query.get_or_404(student_id)
     new_password = request.form.get("password", "").strip()
@@ -131,8 +142,9 @@ def reset_student_password(student_id):
 
 @faculty_bp.route('/student/delete/<int:student_id>', methods=['POST'])
 def delete_student(student_id):
-    if 'user_id' not in session or session.get('role') != 'faculty':
-        return redirect(url_for('auth.login'))
+    faculty_user_id = get_faculty_user_id()
+    if not faculty_user_id:
+        return redirect(url_for('auth.login', role='faculty'))
 
     student = Student.query.get_or_404(student_id)
     if student.user_id:
@@ -147,10 +159,11 @@ def delete_student(student_id):
 
 @faculty_bp.route('/student/<int:student_id>/details')
 def student_details(student_id):
-    if 'user_id' not in session or session.get('role') != 'faculty':
-        return redirect(url_for('auth.login'))
+    faculty_user_id = get_faculty_user_id()
+    if not faculty_user_id:
+        return redirect(url_for('auth.login', role='faculty'))
 
-    faculty = Faculty.query.filter_by(user_id=session['user_id']).first()
+    faculty = Faculty.query.filter_by(user_id=faculty_user_id).first()
     if not faculty:
         faculty = Faculty.query.first()
 

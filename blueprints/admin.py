@@ -1,9 +1,22 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from database import db
 from models import User, Branch, Faculty, Student, Course, Lesson, Screen, TypingGame
 from datetime import datetime
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
+
+def get_admin_user_id():
+    if session.get('admin_user_id'):
+        return session['admin_user_id']
+    if session.get('role') == 'admin' and session.get('user_id'):
+        return session['user_id']
+    return None
+
+@admin_bp.before_request
+def require_admin_login():
+    admin_uid = get_admin_user_id()
+    if not admin_uid:
+        return redirect(url_for('auth.login', role='admin'))
 
 @admin_bp.route("/dashboard", methods=["GET"])
 def dashboard():

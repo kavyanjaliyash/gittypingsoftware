@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Demo Practice Mode - Global IT Typing Software</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5.3.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Typing Styles CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/typing-styles.css') }}">
+
+    <style>
+        body { 
+            background: #f1f5f9; 
+            margin: 0; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            color: #0f172a;
+            min-height: 100vh;
+        }
+
+        /* Demo Top Navigation Bar */
+        .demo-navbar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #38bdf8;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .demo-pill-badge {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            color: #38bdf8;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 50px;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Demo Navigation & Control Toolbar */
+        .demo-toolbar-card {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+            padding: 14px 20px;
+            margin-bottom: 18px;
+        }
+
+        .portal-container {
+            max-width: 1180px;
+            margin: 18px auto 40px auto;
+            padding: 0 16px;
+        }
+
+        .lesson-container {
+            max-width: 1140px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        #typing-text-box {
+            width: 100%;
+            max-width: 1140px;
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 0 0.5rem 0 !important;
+            box-shadow: none !important;
+        }
+
+        /* Virtual Keyboard Styles */
+        .virtual-keyboard {
+            background: #d8dde3;
+            border: 1px solid #c8ced6;
+            border-radius: 16px;
+            padding: 12px 16px 14px 16px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            user-select: none;
+            max-width: 1140px;
+            width: 100%;
+            margin: 0 auto;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .keyboard-row:last-child {
+            margin-bottom: 0;
+        }
+        .keyboard-key {
+            background: #ffffff;
+            border: 1px solid #cfd5dc;
+            border-radius: 8px;
+            min-width: 56px;
+            height: 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.18rem;
+            color: #1e293b;
+            box-shadow: 0 2.5px 0 #b3b9c2, 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.12s ease;
+            line-height: 1.05;
+            text-align: center;
+            padding: 2px 5px;
+            position: relative;
+        }
+        .keyboard-key .key-top {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-bottom: -1px;
+        }
+        .keyboard-key .key-bottom {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .keyboard-key.key-fn {
+            background: #eef2f6;
+            color: #475569;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .keyboard-key.key-space {
+            min-width: 290px;
+            font-size: 0.88rem;
+            letter-spacing: 2px;
+            color: #64748b;
+        }
+        .keyboard-key.key-wide { min-width: 80px; }
+        .keyboard-key.key-wider { min-width: 96px; }
+        .keyboard-key.key-widest { min-width: 116px; }
+
+        /* Key Highlight Animations */
+        .keyboard-key.key-active {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.35), 0 3px 8px rgba(2, 132, 199, 0.4) !important;
+            transform: translateY(-2px);
+        }
+        .keyboard-key.key-active .key-top,
+        .keyboard-key.key-active .key-bottom {
+            color: #ffffff !important;
+        }
+
+        .keyboard-key.key-mistake {
+            background: #ef4444 !important;
+            color: #ffffff !important;
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.4) !important;
+            animation: keyErrorFlash 0.3s ease;
+        }
+        .keyboard-key.key-mistake .key-top,
+        .keyboard-key.key-mistake .key-bottom {
+            color: #ffffff !important;
+        }
+
+        @keyframes keyErrorFlash {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        /* Screen Progress Clickable Item */
+        .screen-progress-chip {
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+        .screen-progress-chip:hover {
+            transform: translateY(-1px);
+            filter: brightness(0.95);
+        }
+    </style>
+</head>
+<body>
+
+<!-- 1. Top Demo Header -->
+<header class="demo-navbar">
+    <div class="d-flex align-items-center gap-3">
+        <a href="{{ back_url }}" class="text-decoration-none d-flex align-items-center gap-2">
+            <div class="bg-white px-2.5 py-1 rounded-2 shadow-sm d-flex align-items-center">
+                <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Logo" style="height: 28px;" onerror="this.style.display='none'; document.getElementById('demo-fallback-logo').style.display='inline';">
+                <span id="demo-fallback-logo" class="fw-bold fs-6 text-primary" style="display:none;">Global <span class="text-warning">IT</span></span>
+            </div>
+        </a>
+        <div class="demo-pill-badge">
+            <i class="fa-solid fa-flask-vial text-warning"></i>
+            <span>LMS DEMO &amp; TEST MODE</span>
+        </div>
+        <span class="text-white-50 small d-none d-md-inline">&bull; Sandboxed View &amp; Practice (No data is saved)</span>
+    </div>
+
+    <div class="d-flex align-items-center gap-2.5">
+        <span class="badge bg-secondary bg-opacity-25 text-light fw-normal py-1.5 px-2.5 rounded-2 d-none d-lg-inline">
+            <i class="fa-solid fa-user-shield me-1"></i> Logged in: <strong class="text-white text-capitalize">{{ user_role }}</strong>
+        </span>
+        <a href="{{ back_url }}" class="btn btn-outline-light btn-sm fw-semibold rounded-3 px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-arrow-left"></i> <span>Exit Demo ({{ portal_name }})</span>
+        </a>
+    </div>
+</header>
+
+<!-- Main Demo Container -->
+<div class="portal-container">
+
+    <!-- 2. Course, Lesson, and Screen Interactive Selector Toolbar -->
+    <div class="demo-toolbar-card">
+        <div class="row g-3 align-items-center">
+            
+            <!-- Course Selector -->
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label text-secondary small fw-bold text-uppercase mb-1" style="letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-graduation-cap text-primary me-1"></i> Course:
+                </label>
+                <select id="course-selector" class="form-select fw-bold border-primary border-opacity-50 shadow-sm" onchange="switchCourse(this.value)">
+                    {% for c in courses %}
+                    <option value="{{ c.course_id }}" {% if current_course and current_course.course_id == c.course_id %}selected{% endif %}>
+                        {{ c.course_name }} ({{ c.lessons|length }} Lessons)
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Lesson Selector -->
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label text-secondary small fw-bold text-uppercase mb-1" style="letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-book-open text-info me-1"></i> Jump to Lesson:
+                </label>
+                <select id="lesson-selector" class="form-select fw-bold border-info border-opacity-50 shadow-sm" onchange="switchLesson(this.value)">
+                    {% for l in lessons %}
+                    <option value="{{ l.lesson_id }}" {% if current_lesson and current_lesson.lesson_id == l.lesson_id %}selected{% endif %}>
+                        #{{ l.display_order }} [{{ l.chapter or 'Beginner' }}] {{ l.lesson_title }} ({{ l.screens|length }} screens)
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Screen Quick Jump Selector -->
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label text-secondary small fw-bold text-uppercase mb-1" style="letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-desktop text-success me-1"></i> Jump to Screen:
+                </label>
+                <select id="screen-selector" class="form-select fw-bold border-success border-opacity-50 shadow-sm" onchange="switchScreen(this.value)">
+                    {% for s in screens %}
+                    <option value="{{ loop.index0 }}" {% if loop.index0 == start_screen_idx %}selected{% endif %}>
+                        Screen {{ loop.index }}: {{ s.screen_title }} ({{ s.screen_type|capitalize }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Fast Prev/Next Quick Controls -->
+            <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-end gap-1.5 pt-md-3 pt-lg-0">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-2.5 py-2 rounded-2 fw-semibold" title="Previous Lesson" onclick="navigateLesson(-1)">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm px-2.5 py-2 rounded-2 fw-semibold" title="Previous Screen" onclick="navigateScreen(-1)">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm px-2.5 py-2 rounded-2 fw-semibold" title="Next Screen" onclick="navigateScreen(1)">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm px-2.5 py-2 rounded-2 fw-semibold" title="Next Lesson" onclick="navigateLesson(1)">
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Active Lesson & Screen Details Card -->
+    {% if current_lesson and screens %}
+    <div class="lesson-container">
+
+        <!-- Header Information Banner -->
+        <div class="card border-0 shadow-sm rounded-4 p-3.5 mb-3 bg-white d-flex flex-row justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge {% if current_lesson.chapter == 'Advanced' %}bg-danger{% elif current_lesson.chapter == 'Intermediate' %}bg-primary{% else %}bg-success{% endif %} text-white rounded-pill px-3 py-1 font-monospace fw-bold">
+                        <i class="fa-solid fa-layer-group me-1"></i>{{ current_lesson.chapter or 'Beginner' }}
+                    </span>
+                    <h4 class="fw-bold mb-0 text-dark fs-5">
+                        Lesson {{ current_lesson.display_order }}: {{ current_lesson.lesson_title }}
+                    </h4>
+                </div>
+                <div class="text-muted small">
+                    <span id="screen-badge-title" class="fw-semibold text-primary"><i class="fa-solid fa-desktop me-1"></i>Screen 1</span> &bull; 
+                    Template Style: <span id="screen-style-badge" class="badge bg-secondary bg-opacity-15 text-dark fw-bold rounded-2 px-2 py-0.5">Block</span>
+                </div>
+            </div>
+
+            <!-- Demo Live Metrics Pills -->
+            <div class="d-flex gap-2 align-items-center">
+                <div class="bg-light px-3 py-1.5 rounded-3 border text-center">
+                    <span class="text-muted small fw-semibold d-block">Time</span>
+                    <strong id="timer" class="text-dark fs-5 font-monospace">0s</strong>
+                </div>
+                <div class="bg-light px-3 py-1.5 rounded-3 border text-center">
+                    <span class="text-muted small fw-semibold d-block">WPM</span>
+                    <strong id="wpm" class="text-primary fs-5 font-monospace">0</strong>
+                </div>
+                <div class="bg-light px-3 py-1.5 rounded-3 border text-center">
+                    <span class="text-muted small fw-semibold d-block">Accuracy</span>
+                    <strong id="accuracy" class="text-success fs-5 font-monospace">100%</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Interactive Clickable Segmented Screen Progress Bar -->
+        <div class="mb-3 p-3 bg-white rounded-4 border shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                <span class="text-secondary fw-bold font-monospace small">
+                    <i class="fa-solid fa-mouse-pointer text-primary me-1"></i> Interactive Screens (Click any block to jump directly):
+                </span>
+                <span class="badge bg-primary text-white rounded-pill px-3 py-1 font-monospace fw-bold" id="top-screen-counter">
+                    Screen 1 of {{ screens|length }}
+                </span>
+            </div>
+            <div id="progress-bar-container" class="d-flex gap-2 w-100 rounded-3 overflow-hidden p-1.5 bg-light border" style="min-height: 32px;">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- 5. Typing Stage (Modular Dynamic Render Canvas) -->
+        <div id="typing-text-box"></div>
+
+        <!-- 6. Apple / TypingClub Virtual Keyboard -->
+        <div class="virtual-keyboard mb-3">
+            <!-- Row 1: Numbers & Symbols -->
+            <div class="keyboard-row">
+                <div class="keyboard-key" data-key="`"><span class="key-top">~</span><span class="key-bottom">`</span></div>
+                <div class="keyboard-key" data-key="1"><span class="key-top">!</span><span class="key-bottom">1</span></div>
+                <div class="keyboard-key" data-key="2"><span class="key-top">@</span><span class="key-bottom">2</span></div>
+                <div class="keyboard-key" data-key="3"><span class="key-top">#</span><span class="key-bottom">3</span></div>
+                <div class="keyboard-key" data-key="4"><span class="key-top">$</span><span class="key-bottom">4</span></div>
+                <div class="keyboard-key" data-key="5"><span class="key-top">%</span><span class="key-bottom">5</span></div>
+                <div class="keyboard-key" data-key="6"><span class="key-top">^</span><span class="key-bottom">6</span></div>
+                <div class="keyboard-key" data-key="7"><span class="key-top">&amp;</span><span class="key-bottom">7</span></div>
+                <div class="keyboard-key" data-key="8"><span class="key-top">*</span><span class="key-bottom">8</span></div>
+                <div class="keyboard-key" data-key="9"><span class="key-top">(</span><span class="key-bottom">9</span></div>
+                <div class="keyboard-key" data-key="0"><span class="key-top">)</span><span class="key-bottom">0</span></div>
+                <div class="keyboard-key" data-key="-"><span class="key-top">_</span><span class="key-bottom">-</span></div>
+                <div class="keyboard-key" data-key="="><span class="key-top">+</span><span class="key-bottom">=</span></div>
+                <div class="keyboard-key key-fn key-wider" data-key="Backspace">delete</div>
+            </div>
+
+            <!-- Row 2: Top Row QWERTY -->
+            <div class="keyboard-row">
+                <div class="keyboard-key key-fn key-wide" data-key="Tab">tab</div>
+                <div class="keyboard-key" data-key="q"><span class="key-bottom">Q</span></div>
+                <div class="keyboard-key" data-key="w"><span class="key-bottom">W</span></div>
+                <div class="keyboard-key" data-key="e"><span class="key-bottom">E</span></div>
+                <div class="keyboard-key" data-key="r"><span class="key-bottom">R</span></div>
+                <div class="keyboard-key" data-key="t"><span class="key-bottom">T</span></div>
+                <div class="keyboard-key" data-key="y"><span class="key-bottom">Y</span></div>
+                <div class="keyboard-key" data-key="u"><span class="key-bottom">U</span></div>
+                <div class="keyboard-key" data-key="i"><span class="key-bottom">I</span></div>
+                <div class="keyboard-key" data-key="o"><span class="key-bottom">O</span></div>
+                <div class="keyboard-key" data-key="p"><span class="key-bottom">P</span></div>
+                <div class="keyboard-key" data-key="["><span class="key-top">{</span><span class="key-bottom">[</span></div>
+                <div class="keyboard-key" data-key="]"><span class="key-top">}</span><span class="key-bottom">]</span></div>
+                <div class="keyboard-key" data-key="\\"><span class="key-top">|</span><span class="key-bottom">\</span></div>
+            </div>
+
+            <!-- Row 3: Home Row ASDF -->
+            <div class="keyboard-row">
+                <div class="keyboard-key key-fn key-wider" data-key="CapsLock">caps lock</div>
+                <div class="keyboard-key" data-key="a"><span class="key-bottom">A</span></div>
+                <div class="keyboard-key" data-key="s"><span class="key-bottom">S</span></div>
+                <div class="keyboard-key" data-key="d"><span class="key-bottom">D</span></div>
+                <div class="keyboard-key" data-key="f"><span class="key-bottom">F</span></div>
+                <div class="keyboard-key" data-key="g"><span class="key-bottom">G</span></div>
+                <div class="keyboard-key" data-key="h"><span class="key-bottom">H</span></div>
+                <div class="keyboard-key" data-key="j"><span class="key-bottom">J</span></div>
+                <div class="keyboard-key" data-key="k"><span class="key-bottom">K</span></div>
+                <div class="keyboard-key" data-key="l"><span class="key-bottom">L</span></div>
+                <div class="keyboard-key" data-key=";"><span class="key-top">:</span><span class="key-bottom">;</span></div>
+                <div class="keyboard-key" data-key="'"><span class="key-top">"</span><span class="key-bottom">'</span></div>
+                <div class="keyboard-key key-fn key-widest" data-key="Enter">return ↵</div>
+            </div>
+
+            <!-- Row 4: Bottom Row ZXCV -->
+            <div class="keyboard-row">
+                <div class="keyboard-key key-fn key-widest" data-key="Shift">shift</div>
+                <div class="keyboard-key" data-key="z"><span class="key-bottom">Z</span></div>
+                <div class="keyboard-key" data-key="x"><span class="key-bottom">X</span></div>
+                <div class="keyboard-key" data-key="c"><span class="key-bottom">C</span></div>
+                <div class="keyboard-key" data-key="v"><span class="key-bottom">V</span></div>
+                <div class="keyboard-key" data-key="b"><span class="key-bottom">B</span></div>
+                <div class="keyboard-key" data-key="n"><span class="key-bottom">N</span></div>
+                <div class="keyboard-key" data-key="m"><span class="key-bottom">M</span></div>
+                <div class="keyboard-key" data-key=","><span class="key-top">&lt;</span><span class="key-bottom">,</span></div>
+                <div class="keyboard-key" data-key="."><span class="key-top">&gt;</span><span class="key-bottom">.</span></div>
+                <div class="keyboard-key" data-key="/"><span class="key-top">?</span><span class="key-bottom">/</span></div>
+                <div class="keyboard-key key-fn key-widest" data-key="Shift">shift</div>
+            </div>
+
+            <!-- Row 5: Space Bar -->
+            <div class="keyboard-row">
+                <div class="keyboard-key key-fn" style="min-width: 60px;">fn</div>
+                <div class="keyboard-key key-fn" style="min-width: 60px;">control</div>
+                <div class="keyboard-key key-fn" style="min-width: 65px;">option</div>
+                <div class="keyboard-key key-fn" style="min-width: 75px;">command</div>
+                <div class="keyboard-key key-space" data-key="Space">space</div>
+                <div class="keyboard-key key-fn" style="min-width: 75px;">command</div>
+                <div class="keyboard-key key-fn" style="min-width: 65px;">option</div>
+            </div>
+        </div>
+
+        <!-- 7. Dynamic Finger Guidance Bar -->
+        <div class="card border-0 shadow-sm rounded-3 p-2.5 mb-3 bg-white d-flex flex-row align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2" id="finger-guide-text">
+                <span class="text-primary fw-bold"><i class="fa-solid fa-hand-point-up me-1"></i> Hand Guide:</span>
+                <span class="text-muted">Start typing on your keyboard...</span>
+            </div>
+            <div class="d-flex align-items-center gap-3 small text-muted d-none d-md-flex">
+                <span><i class="fa-solid fa-circle text-primary me-1 fs-8"></i>Left Hand (A S D F)</span>
+                <span><i class="fa-solid fa-circle text-success me-1 fs-8"></i>Right Hand (J K L ;)</span>
+            </div>
+        </div>
+
+        <!-- Hidden Global Input Receiver -->
+        <input type="text" id="typing-input" style="opacity: 0; position: fixed; left: -9999px; top: -9999px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+        <!-- 8. Bottom Action Controls Bar -->
+        <div class="d-flex justify-content-between align-items-center bg-white p-3.5 rounded-4 border shadow-sm">
+            <div class="d-flex align-items-center gap-2">
+                <button id="retry-btn" type="button" class="btn btn-outline-secondary px-3.5 py-2 fw-semibold rounded-3 shadow-sm d-flex align-items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-right"></i> <span>Reset Screen</span>
+                </button>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="next-screen-btn" type="button" class="btn btn-primary px-4 py-2 fw-bold rounded-3 shadow-sm d-flex align-items-center gap-2 disabled" disabled>
+                    <span id="next-btn-text">Next Screen</span> <i id="next-btn-icon" class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+        <i class="fa-solid fa-folder-open text-muted fs-1 mb-3"></i>
+        <h4 class="fw-bold text-dark">No lessons or screens found for this course.</h4>
+        <p class="text-muted">Please configure lessons and practice screens in the LMS management portal.</p>
+        <div class="mt-3">
+            <a href="{{ back_url }}" class="btn btn-primary fw-semibold px-4 py-2 rounded-3">Return to {{ portal_name }}</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 9. Lesson Completion & Performance Summary Modal (Demo Sandbox) -->
+<div class="modal fade" id="demoCompletionModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden text-center">
+            <div class="p-4 text-white" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                <div class="mb-2">
+                    <i class="fa-solid fa-trophy text-warning" style="font-size: 3.5rem;"></i>
+                </div>
+                <h3 class="fw-bold mb-1">Lesson Demo Completed!</h3>
+                <p class="text-white-50 mb-0 small">Great job testing this lesson module.</p>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-4">
+                        <div class="p-2.5 rounded-3 bg-light border">
+                            <span class="text-muted small d-block">Speed</span>
+                            <h4 id="modal-wpm" class="fw-bold text-primary mb-0 font-monospace">0 WPM</h4>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2.5 rounded-3 bg-light border">
+                            <span class="text-muted small d-block">Accuracy</span>
+                            <h4 id="modal-accuracy" class="fw-bold text-success mb-0 font-monospace">100%</h4>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2.5 rounded-3 bg-light border">
+                            <span class="text-muted small d-block">Time</span>
+                            <h4 id="modal-time" class="fw-bold text-dark mb-0 font-monospace">0s</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0 rounded-3 small py-2 px-3 mb-4 d-flex align-items-center gap-2 text-start">
+                    <i class="fa-solid fa-circle-info fs-5"></i>
+                    <span><strong>Demo Mode Active:</strong> Results were calculated live in preview mode and have <u>not</u> modified student database records.</span>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <button type="button" class="btn btn-primary fw-bold py-2.5 rounded-3" onclick="navigateLesson(1)">
+                        <i class="fa-solid fa-forward-step me-1"></i> Test Next Lesson
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary fw-semibold py-2 rounded-3" onclick="restartCurrentLesson()">
+                        <i class="fa-solid fa-rotate-right me-1"></i> Retry This Lesson
+                    </button>
+                    <a href="{{ back_url }}" class="btn btn-light fw-semibold py-2 rounded-3 text-secondary">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Exit to {{ portal_name }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nudi Kannada Modal if course is Kannada -->
+{% if current_course and 'Kannada' in current_course.course_name %}
+<div id="nudi-modal-overlay" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); z-index: 1050; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div class="card border-0 shadow-lg rounded-4 p-4 text-center bg-white" style="max-width: 520px; width: 100%;">
+        <div class="mb-3">
+            <i class="fa-solid fa-language text-success" style="font-size: 3rem;"></i>
+        </div>
+        <h4 class="fw-bold text-dark mb-2">Kannada Typing Verification (Nudi IME)</h4>
+        <p class="text-muted small mb-4">Please ensure your Nudi Kannada typing software is active (Press <code>Scroll Lock</code> / <code>F12</code>) and type a Kannada character below to begin.</p>
+        
+        <div class="mb-3">
+            <input type="text" id="nudi-test-input" class="form-control form-control-lg text-center font-monospace rounded-3" placeholder="Type Kannada letter here...">
+        </div>
+        <div id="nudi-status-badge" class="alert alert-warning py-2 px-3 mb-4 d-inline-block fw-bold small">
+            <i class="fa-solid fa-circle-exclamation me-1"></i> Waiting for keypress...
+        </div>
+
+        <div class="d-flex gap-2 justify-content-center">
+            <button id="start-kannada-practice-btn" type="button" class="btn btn-success fw-bold px-4 py-2 rounded-3 disabled" disabled>
+                <i class="fa-solid fa-play me-1"></i> Start Practice
+            </button>
+            <button id="bypass-nudi-btn" type="button" class="btn btn-outline-secondary fw-semibold px-3 py-2 rounded-3">
+                Bypass &amp; Test Direct
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Core Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/nudi-mapper.js') }}"></script>
+<script src="{{ url_for('static', filename='js/typing-styles/block-style.js') }}"></script>
+<script src="{{ url_for('static', filename='js/typing-styles/waterfall-style.js') }}"></script>
+<script src="{{ url_for('static', filename='js/typing-styles/jump-style.js') }}"></script>
+<script src="{{ url_for('static', filename='js/typing-styles/paragraph-style.js') }}"></script>
+
+<script>
+    // Data Structures
+    const screens = [
+        {% for s in screens %}
+        {
+            id: {{ s.screen_id }},
+            title: "{{ s.screen_title }}",
+            type: "{{ s.screen_type or 'block' }}",
+            content: {{ s.screen_content | tojson | safe }}
+        },
+        {% endfor %}
+    ];
+
+    const currentCourseId = {{ current_course.course_id if current_course else 1 }};
+    const currentLessonId = {{ current_lesson.lesson_id if current_lesson else 1 }};
+    let currentScreenIdx = {{ start_screen_idx|default(0) }};
+
+    let currentRenderer = null;
+    let timerInterval = null;
+    let inactivityTimeout = null;
+    let isTimerRunning = false;
+    let secondsElapsed = 0;
+    let cumulativeWords = 0;
+    let cumulativeMistakes = 0;
+    let cumulativeSeconds = 0;
+    let currentProgressIdx = 0;
+    let screenMistakes = 0;
+    let screenCorrect = 0;
+    let charHistory = {};
+    let partialGrapheme = "";
+
+    const titleEl = document.getElementById("screen-badge-title");
+    const styleBadgeEl = document.getElementById("screen-style-badge");
+    const textBoxEl = document.getElementById("typing-text-box");
+    const inputEl = document.getElementById("typing-input");
+    const timerEl = document.getElementById("timer");
+    const wpmEl = document.getElementById("wpm");
+    const accuracyEl = document.getElementById("accuracy");
+    const nextBtn = document.getElementById("next-screen-btn");
+    const retryBtn = document.getElementById("retry-btn");
+    const nextBtnText = document.getElementById("next-btn-text");
+    const screenSelector = document.getElementById("screen-selector");
+
+    // Course & Lesson Switching Helpers
+    function switchCourse(cId) {
+        window.location.href = `/lms/demo?course_id=${cId}`;
+    }
+
+    function switchLesson(lId) {
+        window.location.href = `/lms/demo?lesson_id=${lId}`;
+    }
+
+    function switchScreen(idx) {
+        idx = parseInt(idx);
+        if (!isNaN(idx) && idx >= 0 && idx < screens.length) {
+            loadScreen(idx);
+        }
+    }
+
+    function navigateScreen(delta) {
+        const nextIdx = currentScreenIdx + delta;
+        if (nextIdx >= 0 && nextIdx < screens.length) {
+            loadScreen(nextIdx);
+        }
+    }
+
+    function navigateLesson(delta) {
+        const lessonSel = document.getElementById("lesson-selector");
+        if (lessonSel) {
+            const currentIdx = lessonSel.selectedIndex;
+            const targetIdx = currentIdx + delta;
+            if (targetIdx >= 0 && targetIdx < lessonSel.options.length) {
+                const targetLessonId = lessonSel.options[targetIdx].value;
+                switchLesson(targetLessonId);
+            }
+        }
+    }
+
+    function restartCurrentLesson() {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('demoCompletionModal'));
+        if (modal) modal.hide();
+        cumulativeWords = 0;
+        cumulativeMistakes = 0;
+        cumulativeSeconds = 0;
+        loadScreen(0);
+    }
+
+    // Timer and Inactivity Controls
+    function stopTimerInterval() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        isTimerRunning = false;
+    }
+
+    function startTimerInterval() {
+        stopTimerInterval();
+        isTimerRunning = true;
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            timerEl.innerText = `${secondsElapsed}s`;
+        }, 1000);
+    }
+
+    function handleKeystrokeActivity(isFinished) {
+        if (inactivityTimeout) {
+            clearTimeout(inactivityTimeout);
+            inactivityTimeout = null;
+        }
+
+        if (isFinished) {
+            stopTimerInterval();
+            return;
+        }
+
+        if (!isTimerRunning) {
+            startTimerInterval();
+        }
+
+        inactivityTimeout = setTimeout(() => {
+            stopTimerInterval();
+        }, 3000);
+    }
+
+    // Render Clickable Segmented Progress Bar
+    function updateProgressBar(idx) {
+        const container = document.getElementById("progress-bar-container");
+        const topCounter = document.getElementById("top-screen-counter");
+        if (!container) return;
+
+        if (topCounter) topCounter.innerText = `Screen ${idx + 1} of ${screens.length}`;
+        container.innerHTML = "";
+
+        screens.forEach((s, i) => {
+            const block = document.createElement("div");
+            block.className = "flex-fill d-flex align-items-center justify-content-center fw-bold rounded-2 py-1 transition-all screen-progress-chip";
+            block.style.fontSize = "0.78rem";
+            block.style.minHeight = "24px";
+            block.innerText = (i + 1);
+            block.title = `Click to jump to Screen ${i + 1}: ${s.title}`;
+            block.onclick = () => switchScreen(i);
+
+            if (i === idx) {
+                // Current Active Screen -> Bright Blue with Ring
+                block.style.background = "#0284c7";
+                block.style.color = "#ffffff";
+                block.style.boxShadow = "0 0 0 2px #38bdf8, 0 2px 6px rgba(2, 132, 199, 0.4)";
+                block.style.transform = "scale(1.05)";
+            } else if (i < idx) {
+                // Completed Screen -> Soft Green
+                block.style.background = "#10b981";
+                block.style.color = "#ffffff";
+            } else {
+                // Remaining Screen -> Crisp Light Gray
+                block.style.background = "#e2e8f0";
+                block.style.color = "#64748b";
+            }
+            container.appendChild(block);
+        });
+
+        // Synchronize Screen Selector dropdown
+        if (screenSelector) {
+            screenSelector.value = idx;
+        }
+    }
+
+    // Virtual Keyboard Key Highlighting
+    function updateKeyboardHighlighting(targetSegments, activeIdx) {
+        document.querySelectorAll(".keyboard-key").forEach(k => {
+            k.classList.remove("key-active");
+            k.classList.remove("key-mistake");
+        });
+        if (!targetSegments || activeIdx >= targetSegments.length) return;
+
+        let remainingStr = targetSegments[activeIdx];
+
+        if (remainingStr === '\n') {
+            document.querySelectorAll('[data-key="Enter"]').forEach(k => k.classList.add("key-active"));
+            return;
+        }
+        if (remainingStr === ' ') {
+            document.querySelectorAll('[data-key="Space"]').forEach(k => k.classList.add("key-active"));
+            return;
+        }
+
+        let nextChar = remainingStr[0];
+        let keyChar = nextChar;
+
+        if (window.nudiReverseMap) {
+            if (window.nudiReverseMap[remainingStr]) {
+                keyChar = window.nudiReverseMap[remainingStr][0];
+            } else if (window.nudiReverseMap[nextChar]) {
+                keyChar = window.nudiReverseMap[nextChar];
+            }
+        }
+
+        const shiftSymbols = {
+            '~':'`', '!':'1', '@':'2', '#':'3', '$':'4', '%':'5', '^':'6', '&':'7', '*':'8', '(':'9', ')':'0', '_':'-', '+':'=',
+            '{':'[', '}':']', '|':'\\', ':':';', '"':'\'', '<':',', '>':'.', '?':'/'
+        };
+
+        let isShifted = false;
+        let lookupKey = keyChar;
+
+        if (keyChar >= 'A' && keyChar <= 'Z') {
+            isShifted = true;
+            lookupKey = keyChar.toLowerCase();
+        } else if (shiftSymbols[keyChar]) {
+            isShifted = true;
+            lookupKey = shiftSymbols[keyChar];
+        }
+
+        if (isShifted) {
+            document.querySelectorAll('[data-key="Shift"]').forEach(k => k.classList.add("key-active"));
+        }
+
+        try {
+            document.querySelectorAll(`[data-key="${CSS.escape(lookupKey.toLowerCase())}"]`).forEach(k => k.classList.add("key-active"));
+        } catch (e) {}
+
+        // Dynamic Finger Guide Text Update
+        const fingerMap = {
+            'a':'Left Pinky Finger', 'q':'Left Pinky Finger', 'z':'Left Pinky Finger', '1':'Left Pinky Finger', '`':'Left Pinky Finger',
+            's':'Left Ring Finger', 'w':'Left Ring Finger', 'x':'Left Ring Finger', '2':'Left Ring Finger',
+            'd':'Left Middle Finger', 'e':'Left Middle Finger', 'c':'Left Middle Finger', '3':'Left Middle Finger',
+            'f':'Left Index Finger', 'r':'Left Index Finger', 'v':'Left Index Finger', 'g':'Left Index Finger', 't':'Left Index Finger', 'b':'Left Index Finger', '4':'Left Index Finger', '5':'Left Index Finger',
+            'j':'Right Index Finger', 'u':'Right Index Finger', 'm':'Right Index Finger', 'h':'Right Index Finger', 'y':'Right Index Finger', 'n':'Right Index Finger', '6':'Right Index Finger', '7':'Right Index Finger',
+            'k':'Right Middle Finger', 'i':'Right Middle Finger', ',':'Right Middle Finger', '8':'Right Middle Finger',
+            'l':'Right Ring Finger', 'o':'Right Ring Finger', '.':'Right Ring Finger', '9':'Right Ring Finger',
+            ';':'Right Pinky Finger', 'p':'Right Pinky Finger', '/':'Right Pinky Finger', '\'':'Right Pinky Finger', '[':'Right Pinky Finger', ']':'Right Pinky Finger', '0':'Right Pinky Finger', '-':'Right Pinky Finger', '=':'Right Pinky Finger',
+            ' ':'Left or Right Thumb'
+        };
+
+        const targetKeyUpper = remainingStr === ' ' ? 'SPACE' : remainingStr[0].toUpperCase();
+        const fingerName = fingerMap[remainingStr[0].toLowerCase()] || 'Index Finger';
+        const guideEl = document.getElementById("finger-guide-text");
+        if (guideEl) {
+            guideEl.innerHTML = `<span class="text-primary fw-bold"><i class="fa-solid fa-hand-point-up me-1"></i> Press key</span> <span class="badge bg-primary fs-6 px-2.5 py-1 font-monospace">${targetKeyUpper}</span> <span class="text-muted">using</span> <strong class="text-dark"><u>${fingerName}</u></strong>`;
+        }
+    }
+
+    // Load Screen Engine
+    function loadScreen(idx) {
+        if (!screens || screens.length === 0) return;
+        currentScreenIdx = idx;
+        currentProgressIdx = 0;
+        screenMistakes = 0;
+        screenCorrect = 0;
+        charHistory = {};
+        partialGrapheme = "";
+        updateProgressBar(idx);
+
+        const screen = screens[idx];
+        if (titleEl) titleEl.innerText = `Screen ${idx + 1}: ${screen.title}`;
+        if (styleBadgeEl) {
+            styleBadgeEl.innerText = screen.type ? screen.type.toUpperCase() : 'BLOCK';
+        }
+
+        // Destroy previous renderer if any and clean container
+        if (currentRenderer && typeof currentRenderer.destroy === 'function') {
+            currentRenderer.destroy();
+        }
+        if (textBoxEl) {
+            textBoxEl.className = "";
+            textBoxEl.innerHTML = "";
+        }
+
+        // Instantiate chosen template renderer
+        const screenType = (screen.type || 'block').toLowerCase();
+        if (screenType === 'waterfall' && typeof WaterfallStyleRenderer !== 'undefined') {
+            currentRenderer = new WaterfallStyleRenderer(textBoxEl);
+        } else if (screenType === 'jump' && typeof JumpStyleRenderer !== 'undefined') {
+            currentRenderer = new JumpStyleRenderer(textBoxEl);
+        } else if (screenType === 'paragraph' && typeof ParagraphStyleRenderer !== 'undefined') {
+            currentRenderer = new ParagraphStyleRenderer(textBoxEl);
+        } else {
+            currentRenderer = new BlockStyleRenderer(textBoxEl);
+        }
+
+        // Initialize chosen renderer with content
+        currentRenderer.init(screen.content);
+
+        const normalizedContent = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+        const targetSegs = Array.from(segmenter.segment(normalizedContent)).map(s => s.segment);
+        updateKeyboardHighlighting(targetSegs, 0);
+
+        if (inputEl) {
+            inputEl.value = "";
+            inputEl.disabled = false;
+            inputEl.focus();
+        }
+
+        // Setup next button state
+        nextBtn.disabled = true;
+        nextBtn.classList.add("disabled");
+        if (idx === screens.length - 1) {
+            nextBtnText.innerText = "Finish Lesson Demo";
+        } else {
+            nextBtnText.innerText = "Next Screen";
+        }
+
+        stopTimerInterval();
+        if (inactivityTimeout) {
+            clearTimeout(inactivityTimeout);
+            inactivityTimeout = null;
+        }
+        secondsElapsed = 0;
+        timerEl.innerText = "0s";
+        wpmEl.innerText = "0";
+        accuracyEl.innerText = "100%";
+    }
+
+    // Auto-focus receiver ONLY when clicking on typing stage or keyboard, NOT on dropdowns or controls
+    document.addEventListener("click", (e) => {
+        // If clicking on any interactive control, dropdown, modal, navbar, or button, do NOT steal focus!
+        if (e.target.closest('select, option, button, a, input, textarea, label, .modal, .screen-progress-chip, .demo-toolbar-card, .demo-navbar, .card')) {
+            return;
+        }
+        if (inputEl && !inputEl.disabled) {
+            inputEl.focus();
+        }
+    });
+
+    // Keystroke Input Handler
+    function handleKeystrokeInput(typedChar) {
+        if (!typedChar || !screens[currentScreenIdx]) return;
+        const screen = screens[currentScreenIdx];
+        const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+        const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
+
+        if (currentProgressIdx >= targetSegments.length) return;
+
+        const expectedTarget = targetSegments[currentProgressIdx];
+        const testTyped = partialGrapheme + typedChar;
+
+        if (expectedTarget === '\n') {
+            if (testTyped === '\n') {
+                screenCorrect++;
+                charHistory[currentProgressIdx] = 'correct';
+                if (currentRenderer && typeof currentRenderer.onKeyTyped === 'function') {
+                    currentRenderer.onKeyTyped(typedChar, expectedTarget, currentProgressIdx, true);
+                }
+                currentProgressIdx++;
+                partialGrapheme = "";
+                updateKeyboardHighlighting(targetSegments, currentProgressIdx);
+            } else {
+                screenMistakes++;
+                partialGrapheme = "";
+
+                if (currentRenderer && typeof currentRenderer.onMistake === 'function') {
+                    currentRenderer.onMistake(currentProgressIdx);
+                }
+
+                flashMistakeKey(typedChar);
+            }
+        } else {
+            if (testTyped === expectedTarget) {
+                screenCorrect++;
+                charHistory[currentProgressIdx] = 'correct';
+                if (currentRenderer && typeof currentRenderer.onKeyTyped === 'function') {
+                    currentRenderer.onKeyTyped(typedChar, expectedTarget, currentProgressIdx, true);
+                }
+            } else if (expectedTarget.startsWith(testTyped)) {
+                partialGrapheme = testTyped;
+                return;
+            } else {
+                screenMistakes++;
+                charHistory[currentProgressIdx] = 'mistake';
+                if (currentRenderer && typeof currentRenderer.onKeyTyped === 'function') {
+                    currentRenderer.onKeyTyped(typedChar, expectedTarget, currentProgressIdx, false);
+                }
+                flashMistakeKey(typedChar);
+            }
+
+            currentProgressIdx++;
+            partialGrapheme = "";
+            updateKeyboardHighlighting(targetSegments, currentProgressIdx);
+        }
+
+        // Real-time Metrics Calculation
+        const minutes = secondsElapsed > 0 ? secondsElapsed / 60 : 1 / 60;
+        const wordsTyped = screenCorrect / 5;
+        const wpm = secondsElapsed >= 2 ? Math.round(wordsTyped / minutes) : 0;
+        wpmEl.innerText = wpm >= 0 ? wpm : 0;
+
+        const totalAttempts = screenCorrect + screenMistakes;
+        const accuracy = totalAttempts > 0 ? Math.max(0, Math.round((screenCorrect / totalAttempts) * 100)) : 100;
+        accuracyEl.innerText = `${accuracy}%`;
+
+        // Check if current screen is completed
+        const isFinished = currentProgressIdx >= targetSegments.length;
+        handleKeystrokeActivity(isFinished);
+
+        if (isFinished) {
+            inputEl.disabled = true;
+            nextBtn.disabled = false;
+            nextBtn.classList.remove("disabled");
+            nextBtn.style.opacity = "1";
+            nextBtn.style.cursor = "pointer";
+        }
+    }
+
+    function flashMistakeKey(typedChar) {
+        let mistakeKeyLookup = typedChar.toLowerCase();
+        if (typedChar === ' ') mistakeKeyLookup = 'Space';
+        if (typedChar === '\n') mistakeKeyLookup = 'Enter';
+        try {
+            const wrongKeyEl = document.querySelector(`[data-key="${CSS.escape(mistakeKeyLookup)}"]`);
+            if (wrongKeyEl) {
+                wrongKeyEl.classList.remove("key-mistake");
+                void wrongKeyEl.offsetWidth;
+                wrongKeyEl.classList.add("key-mistake");
+                setTimeout(() => {
+                    if (wrongKeyEl) wrongKeyEl.classList.remove("key-mistake");
+                }, 400);
+            }
+        } catch (e) {}
+    }
+
+    // Keystroke Listeners
+    if (inputEl) {
+        inputEl.addEventListener("input", (e) => {
+            const val = inputEl.value;
+            if (!val || val.length === 0) return;
+
+            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+            const graphemes = Array.from(segmenter.segment(val)).map(s => s.segment);
+            
+            graphemes.forEach(g => {
+                handleKeystrokeInput(g);
+            });
+
+            inputEl.value = "";
+        });
+
+        inputEl.addEventListener("keydown", (e) => {
+            if (currentProgressIdx < (screens[currentScreenIdx] ? screens[currentScreenIdx].content.length : 0)) {
+                handleKeystrokeActivity(false);
+            }
+
+            if (e.key === "Backspace" || e.key === "Delete") {
+                e.preventDefault();
+                if (currentProgressIdx > 0) {
+                    currentProgressIdx--;
+                    partialGrapheme = "";
+
+                    if (charHistory[currentProgressIdx] === 'correct') {
+                        screenCorrect = Math.max(0, screenCorrect - 1);
+                    } else if (charHistory[currentProgressIdx] === 'mistake') {
+                        screenMistakes = Math.max(0, screenMistakes - 1);
+                    }
+                    delete charHistory[currentProgressIdx];
+
+                    if (currentRenderer && typeof currentRenderer.onBackspace === 'function') {
+                        currentRenderer.onBackspace(currentProgressIdx);
+                    }
+
+                    const screen = screens[currentScreenIdx];
+                    const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+                    const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
+                    updateKeyboardHighlighting(targetSegments, currentProgressIdx);
+                    handleKeystrokeActivity(false);
+
+                    const minutes = secondsElapsed > 0 ? secondsElapsed / 60 : 1 / 60;
+                    const wordsTyped = screenCorrect / 5;
+                    const wpm = secondsElapsed >= 2 ? Math.round(wordsTyped / minutes) : 0;
+                    wpmEl.innerText = wpm >= 0 ? wpm : 0;
+
+                    const totalAttempts = screenCorrect + screenMistakes;
+                    const accuracy = totalAttempts > 0 ? Math.max(0, Math.round((screenCorrect / totalAttempts) * 100)) : 100;
+                    accuracyEl.innerText = `${accuracy}%`;
+                }
+                return false;
+            }
+
+            if (e.key === "Enter") {
+                e.preventDefault();
+                handleKeystrokeInput('\n');
+                return false;
+            }
+
+            if (e.key === " " || e.code === "Space") {
+                e.preventDefault();
+                handleKeystrokeInput(' ');
+                return false;
+            }
+        });
+    }
+
+    // Action Buttons
+    if (retryBtn) {
+        retryBtn.addEventListener("click", () => {
+            loadScreen(currentScreenIdx);
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+            if (nextBtn.disabled) return;
+
+            const wordsTyped = screenCorrect / 5;
+            cumulativeWords += wordsTyped;
+            cumulativeMistakes += screenMistakes;
+            cumulativeSeconds += secondsElapsed;
+
+            const nextScreenIdx = currentScreenIdx + 1;
+            if (nextScreenIdx < screens.length) {
+                // Advance to next screen in memory
+                loadScreen(nextScreenIdx);
+            } else {
+                // Last screen completed -> Show Demo Summary Modal without DB writes
+                const totalLessonMinutes = cumulativeSeconds > 0 ? cumulativeSeconds / 60 : 1 / 60;
+                const lessonWpm = Math.round(cumulativeWords / totalLessonMinutes);
+                const totalAttempts = (cumulativeWords * 5) + cumulativeMistakes;
+                const lessonAccuracy = totalAttempts > 0 ? Math.round(((cumulativeWords * 5) / totalAttempts) * 100) : 100;
+
+                document.getElementById("modal-wpm").innerText = `${lessonWpm} WPM`;
+                document.getElementById("modal-accuracy").innerText = `${lessonAccuracy}%`;
+                document.getElementById("modal-time").innerText = `${cumulativeSeconds}s`;
+
+                const modal = new bootstrap.Modal(document.getElementById('demoCompletionModal'));
+                modal.show();
+            }
+        });
+    }
+
+    // Nudi Modal Logic for Kannada
+    const nudiTestInput = document.getElementById("nudi-test-input");
+    const nudiStatusBadge = document.getElementById("nudi-status-badge");
+    const startKannadaBtn = document.getElementById("start-kannada-practice-btn");
+    const bypassNudiBtn = document.getElementById("bypass-nudi-btn");
+    const nudiModalOverlay = document.getElementById("nudi-modal-overlay");
+
+    if (nudiTestInput) {
+        if (inputEl) inputEl.disabled = true;
+
+        nudiTestInput.addEventListener("input", () => {
+            const val = nudiTestInput.value;
+            const containsKannada = /[\u0C80-\u0CFF]/.test(val);
+            
+            if (containsKannada) {
+                nudiStatusBadge.className = "alert alert-success py-2 px-3 mb-0 d-inline-block fw-bold small";
+                nudiStatusBadge.innerHTML = `<i class="fa-solid fa-circle-check me-1"></i> Nudi is ACTIVE! Verified Kannada typing.`;
+                startKannadaBtn.disabled = false;
+                startKannadaBtn.classList.remove("disabled");
+            } else if (val.length > 0) {
+                nudiStatusBadge.className = "alert alert-danger py-2 px-3 mb-0 d-inline-block fw-bold small";
+                nudiStatusBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> Nudi is OFF! Press Scroll Lock / F12.`;
+                startKannadaBtn.disabled = true;
+                startKannadaBtn.classList.add("disabled");
+            }
+        });
+
+        startKannadaBtn.addEventListener("click", () => {
+            if (nudiModalOverlay) nudiModalOverlay.style.display = "none";
+            if (inputEl) {
+                inputEl.disabled = false;
+                inputEl.focus();
+            }
+        });
+
+        bypassNudiBtn.addEventListener("click", () => {
+            if (nudiModalOverlay) nudiModalOverlay.style.display = "none";
+            if (inputEl) {
+                inputEl.disabled = false;
+                inputEl.focus();
+            }
+        });
+    }
+
+    // Explicit event listeners for Select Dropdowns
+    const courseSelector = document.getElementById("course-selector");
+    const lessonSelector = document.getElementById("lesson-selector");
+
+    if (courseSelector) {
+        courseSelector.addEventListener("change", function() {
+            if (this.value) switchCourse(this.value);
+        });
+    }
+
+    if (lessonSelector) {
+        lessonSelector.addEventListener("change", function() {
+            if (this.value) switchLesson(this.value);
+        });
+    }
+
+    if (screenSelector) {
+        screenSelector.addEventListener("change", function() {
+            if (this.value !== "") switchScreen(this.value);
+        });
+    }
+
+    // Initial Load
+    if (screens.length > 0) {
+        loadScreen(currentScreenIdx);
+    }
+</script>
+
+</body>
+</html>

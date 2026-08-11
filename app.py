@@ -7,6 +7,7 @@ from blueprints.admin import admin_bp
 from blueprints.student import student_bp
 from blueprints.branch import branch_bp
 from blueprints.faculty import faculty_bp
+from blueprints.demo import demo_bp
 
 app = Flask(__name__)
 app.secret_key = "globalit123"
@@ -20,6 +21,7 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(student_bp)
 app.register_blueprint(branch_bp)
 app.register_blueprint(faculty_bp)
+app.register_blueprint(demo_bp)
 
 with app.app_context():
     db.create_all()

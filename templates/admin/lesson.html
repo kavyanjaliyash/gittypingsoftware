@@ -10,6 +10,9 @@
             <p class="text-white-50 mb-0 fs-6">Manage chapters (Beginner, Intermediate, Advanced), organize sequence order, and update content statuses.</p>
         </div>
         <div class="d-flex gap-2">
+            <a href="/lms/demo?course_id={{ course.course_id }}" class="btn btn-light fw-bold px-3 py-2.5 rounded-3 shadow-sm text-dark border-0 d-flex align-items-center gap-1.5">
+                <i class="fa-solid fa-flask-vial text-primary"></i> <span>Demo Test Course</span>
+            </a>
             <a href="/admin/lms-content" class="btn btn-light fw-semibold px-3 py-2.5 rounded-3 shadow-sm text-secondary border-0 d-flex align-items-center gap-2 text-decoration-none">
                 <i class="fa-solid fa-arrow-left"></i> <span>Back to Courses</span>
             </a>
@@ -78,6 +81,9 @@
                             </td>
                             <td class="py-3 px-4 text-end">
                                 <div class="d-flex gap-2 justify-content-end">
+                                    <a href="/lms/demo?lesson_id={{ l.lesson_id }}" class="btn btn-outline-success btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1">
+                                        <i class="fa-solid fa-play"></i> Demo Test
+                                    </a>
                                     <a href="/admin/lesson/{{ l.lesson_id }}/screens" class="btn btn-outline-primary btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1">
                                         <i class="fa-solid fa-desktop"></i> Manage Screens
                                     </a>

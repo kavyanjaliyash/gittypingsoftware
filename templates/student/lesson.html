@@ -658,9 +658,13 @@
         const screen = screens[idx];
         titleEl.innerText = screen.title;
 
-        // Destroy previous renderer if any
+        // Destroy previous renderer if any and clean container
         if (currentRenderer && typeof currentRenderer.destroy === 'function') {
             currentRenderer.destroy();
+        }
+        if (textBoxEl) {
+            textBoxEl.className = "";
+            textBoxEl.innerHTML = "";
         }
 
         // Instantiate chosen template renderer (Block, Waterfall, Jump, or Paragraph)

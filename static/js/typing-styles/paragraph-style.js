@@ -19,6 +19,7 @@ class ParagraphStyleRenderer {
     }
 
     init(screenContent) {
+        this.container.className = "";
         this.container.innerHTML = "";
         this.charSpans = [];
         this.lineDivs = [];
@@ -169,6 +170,7 @@ class ParagraphStyleRenderer {
     }
 
     destroy() {
+        this.container.className = "";
         this.container.innerHTML = "";
     }
 }

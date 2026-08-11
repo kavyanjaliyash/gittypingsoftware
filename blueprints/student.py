@@ -6,12 +6,20 @@ import unicodedata
 
 student_bp = Blueprint('student', __name__, url_prefix='/student')
 
+def get_student_user_id():
+    if session.get('student_user_id'):
+        return session['student_user_id']
+    if session.get('role') == 'student' and session.get('user_id'):
+        return session['user_id']
+    return None
+
 @student_bp.route('/dashboard')
 def dashboard():
-    if 'user_id' not in session or session.get('role') != 'student':
-        return redirect(url_for('auth.login'))
+    student_user_id = get_student_user_id()
+    if not student_user_id:
+        return redirect(url_for('auth.login', role='student'))
     
-    student = Student.query.filter_by(user_id=session['user_id']).first()
+    student = Student.query.filter_by(user_id=student_user_id).first()
     courses = Course.query.filter_by(status='Active').all()
     
     completed_progress = StudentProgress.query.filter_by(
@@ -48,7 +56,8 @@ def dashboard():
 @student_bp.route('/certificate/<int:course_id>')
 @student_bp.route('/certificate')
 def print_certificate(course_id=1):
-    if 'user_id' not in session:
+    student_user_id = get_student_user_id()
+    if not student_user_id and 'user_id' not in session and 'branch_user_id' not in session and 'faculty_user_id' not in session:
         return redirect(url_for('auth.login'))
 
     user_role = session.get('role', '')
@@ -57,7 +66,7 @@ def print_certificate(course_id=1):
     if student_id_arg:
         student = Student.query.get(student_id_arg)
     else:
-        student = Student.query.filter_by(user_id=session['user_id']).first()
+        student = Student.query.filter_by(user_id=student_user_id or session.get('user_id')).first()
 
     if not student:
         student = Student.query.first()
@@ -82,11 +91,11 @@ def print_certificate(course_id=1):
 
 @student_bp.route("/courses")
 def student_courses():
-    if "username" not in session:
-        return redirect(url_for('auth.login'))
+    student_user_id = get_student_user_id()
+    if not student_user_id:
+        return redirect(url_for('auth.login', role='student'))
 
-    user = User.query.filter_by(username=session["username"]).first()
-    student = Student.query.filter_by(user_id=user.user_id).first()
+    student = Student.query.filter_by(user_id=student_user_id).first()
     courses = Course.query.filter_by(status="Active").all()
 
     return render_template(
@@ -97,10 +106,11 @@ def student_courses():
 
 @student_bp.route("/course/<int:course_id>")
 def student_course(course_id):
-    if 'user_id' not in session or session.get('role') != 'student':
-        return redirect(url_for('auth.login'))
+    student_user_id = get_student_user_id()
+    if not student_user_id:
+        return redirect(url_for('auth.login', role='student'))
         
-    student = Student.query.filter_by(user_id=session['user_id']).first()
+    student = Student.query.filter_by(user_id=student_user_id).first()
     course = Course.query.get_or_404(course_id)
     lessons = Lesson.query.filter_by(
         course_id=course_id,
@@ -116,10 +126,11 @@ def student_course(course_id):
 
 @student_bp.route('/lesson/<int:lesson_id>')
 def student_lesson(lesson_id):
-    if 'user_id' not in session or session.get('role') != 'student':
-        return redirect(url_for('auth.login'))
+    student_user_id = get_student_user_id()
+    if not student_user_id:
+        return redirect(url_for('auth.login', role='student'))
     
-    student = Student.query.filter_by(user_id=session['user_id']).first()
+    student = Student.query.filter_by(user_id=student_user_id).first()
     lesson = Lesson.query.get_or_404(lesson_id)
     screens = Screen.query.filter_by(lesson_id=lesson_id).all()
     
@@ -137,10 +148,11 @@ def student_lesson(lesson_id):
 
 @student_bp.route('/lesson/<int:lesson_id>/save_screen_progress', methods=['POST'])
 def save_screen_progress(lesson_id):
-    if 'user_id' not in session or session.get('role') != 'student':
+    student_user_id = get_student_user_id()
+    if not student_user_id:
         return jsonify({'success': False, 'error': 'Unauthorized'}), 401
     
-    student = Student.query.filter_by(user_id=session['user_id']).first()
+    student = Student.query.filter_by(user_id=student_user_id).first()
     if not student:
         return jsonify({'success': False, 'error': 'Student not found'}), 404
         
@@ -186,10 +198,11 @@ def save_screen_progress(lesson_id):
 
 @student_bp.route('/lesson/<int:lesson_id>/complete', methods=['POST'])
 def complete_lesson(lesson_id):
-    if 'user_id' not in session or session.get('role') != 'student':
-        return redirect(url_for('auth.login'))
+    student_user_id = get_student_user_id()
+    if not student_user_id:
+        return redirect(url_for('auth.login', role='student'))
     
-    student = Student.query.filter_by(user_id=session['user_id']).first()
+    student = Student.query.filter_by(user_id=student_user_id).first()
     lesson = Lesson.query.get_or_404(lesson_id)
     
     wpm = int(request.form.get('wpm', 0))

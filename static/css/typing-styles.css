@@ -29,7 +29,7 @@
     border-radius: 4px;
 }
 
-.block-typing-area span {
+.block-typing-area .block-char {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -47,7 +47,7 @@
     transition: all 0.15s ease;
 }
 
-.block-typing-area span.active-char {
+.block-typing-area .block-char.active-char {
     color: #ffffff !important;
     background-color: #0284c7 !important;
     border-color: #0284c7 !important;
@@ -55,14 +55,14 @@
     transform: translateY(-2px);
 }
 
-.block-typing-area span.correct-char {
+.block-typing-area .block-char.correct-char {
     color: #059669 !important;
     background-color: #d1e7dd !important;
     border-color: #10b981 !important;
     box-shadow: none !important;
 }
 
-.block-typing-area span.incorrect-char {
+.block-typing-area .block-char.incorrect-char {
     color: #dc2626 !important;
     background-color: #fee2e2 !important;
     border-color: #ef4444 !important;

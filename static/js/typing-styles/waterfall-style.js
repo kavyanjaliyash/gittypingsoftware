@@ -158,6 +158,7 @@ class WaterfallStyleRenderer {
     }
 
     destroy() {
+        this.container.className = "";
         this.container.innerHTML = "";
     }
 }

@@ -231,6 +231,151 @@
             text-align: right;
             color: #0284c7;
         }
+        /* Premium Modern Chapter Accordion Card Design */
+        .chapter-accordion-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            margin-bottom: 14px;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chapter-accordion-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.07);
+        }
+
+        .chapter-accordion-header {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .chapter-accordion-header:hover {
+            background-color: #f8fafc;
+        }
+        .chapter-accordion-header:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .chapter-icon-box {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+        .chapter-icon-box.beginner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
+        }
+        .chapter-icon-box.intermediate {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.28);
+        }
+        .chapter-icon-box.advanced {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            box-shadow: 0 4px 12px rgba(244, 63, 94, 0.28);
+        }
+
+        .chapter-title-text {
+            font-size: 0.96rem;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+        }
+        .chapter-sub-text {
+            font-size: 0.78rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .chapter-pill-count {
+            font-size: 0.76rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 30px;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+        .chapter-pill-count.beginner {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        .chapter-pill-count.intermediate {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+        .chapter-pill-count.advanced {
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fecdd3;
+        }
+
+        .chapter-chevron-circle {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chapter-accordion-header:not(.collapsed) .chapter-chevron-circle {
+            transform: rotate(180deg);
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+        .chapter-accordion-header.collapsed .chapter-chevron-circle {
+            transform: rotate(0deg);
+        }
+
+        .chapter-lesson-list {
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .lms-lesson-tile {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
+        }
+        .lms-lesson-tile:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -274,7 +419,7 @@
 
         <!-- Sidebar Footer & Logout Only -->
         <div class="sidebar-footer">
-            <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+            <a href="{{ url_for('auth.logout', role='branch') }}" class="btn-logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span>Logout</span>
             </a>
@@ -288,7 +433,7 @@
         <div class="top-search-header d-flex justify-content-end mb-4">
             <!-- Top Right Profile Click Badge (Directly opens Profile View Page) -->
             <div class="user-profile-badge text-end px-2 py-1 rounded-3" onclick="switchTab('account')" style="cursor: pointer;" title="View Account Profile">
-                <div class="fw-bold text-dark mb-0 fs-6 text-primary-hover">{{ session.get('username', branch.branch_name if branch else 'hoskote14') }}</div>
+                <div class="fw-bold text-dark mb-0 fs-6 text-primary-hover">{{ session.get('branch_username', session.get('username', branch.branch_name if branch else 'hoskote14')) }}</div>
                 <small class="text-muted fs-7">Branch Admin <i class="fa-solid fa-user-gear ms-1 text-primary"></i></small>
             </div>
         </div>
@@ -812,14 +957,19 @@
 
         <!-- 5. LMS TAB CONTENT (Ultra-Modern Executive LMS Design) -->
         <div id="tab-content-lms" class="tab-pane-content {% if active_tab != 'lms' %}d-none{% endif %}">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                 <div>
                     <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-book-open-reader text-primary me-2"></i>LMS Curriculum & Courses</h3>
                     <p class="text-muted small mb-0">Active typing courses, lesson modules, and interactive practice screens configured for students.</p>
                 </div>
-                <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3.5 py-2 rounded-pill font-monospace fs-6 border border-primary border-opacity-20">
-                    <i class="fa-solid fa-graduation-cap me-1"></i> {{ courses|length }} Enrolled Courses
-                </span>
+                <div class="d-flex gap-2 align-items-center">
+                    <a href="/lms/demo" class="btn btn-primary fw-bold px-3.5 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-flask-vial"></i> <span>Launch Demo Practice Mode</span>
+                    </a>
+                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3.5 py-2 rounded-pill font-monospace fs-6 border border-primary border-opacity-20">
+                        <i class="fa-solid fa-graduation-cap me-1"></i> {{ courses|length }} Enrolled Courses
+                    </span>
+                </div>
             </div>
 
             <!-- Top Summary Stats Grid -->
@@ -867,40 +1017,109 @@
                 <div class="col-md-6">
                     <div class="analytics-card p-0 overflow-hidden border-0 shadow-sm">
                         <!-- Course Gradient Header -->
-                        <div class="p-4 text-white d-flex justify-content-between align-items-center" style="background: {% if 'Kannada' in c.course_name %}linear-gradient(135deg, #059669 0%, #047857 100%){% else %}linear-gradient(135deg, #0284c7 0%, #0369a1 100%){% endif %};">
+                        <div class="p-4 text-white d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: {% if 'Kannada' in c.course_name %}linear-gradient(135deg, #059669 0%, #047857 100%){% else %}linear-gradient(135deg, #0284c7 0%, #0369a1 100%){% endif %};">
                             <div>
                                 <h5 class="fw-bold mb-1 fs-5 d-flex align-items-center gap-2">
                                     <i class="fa-solid fa-graduation-cap"></i> {{ c.course_name }}
                                 </h5>
                                 <small class="text-white-50">Global IT Standard Touch Typing Curriculum</small>
                             </div>
-                            <span class="badge bg-white text-dark fw-bold px-3 py-2 rounded-pill font-monospace shadow-sm">
-                                {{ c.lessons|length }} Lessons
-                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="/lms/demo?course_id={{ c.course_id }}" class="btn btn-light btn-sm fw-bold text-dark shadow-sm px-3 py-1.5 rounded-pill d-flex align-items-center gap-1.5">
+                                    <i class="fa-solid fa-play text-primary"></i> <span>Demo Practice</span>
+                                </a>
+                                <span class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-1.5 rounded-pill font-monospace">
+                                    {{ c.lessons|length }} Lessons
+                                </span>
+                            </div>
                         </div>
 
-                        <!-- Course Lessons List -->
-                        <div class="p-3">
-                            <div class="d-flex flex-column gap-2.5">
-                                {% for l in c.lessons %}
-                                <div class="p-3 rounded-3 border bg-light bg-opacity-50 d-flex justify-content-between align-items-center transition-all hover-shadow">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="badge bg-primary bg-opacity-10 text-primary font-monospace fw-bold px-2.5 py-2 rounded-2 fs-7">
-                                            Lesson {{ l.display_order }}
-                                        </div>
-                                        <div>
-                                            <h6 class="fw-bold text-dark mb-0.5 fs-6">{{ l.lesson_title }}</h6>
-                                            <small class="text-muted"><i class="fa-solid fa-desktop text-secondary me-1"></i>{{ l.screens|length }} Practice Screens</small>
+                        <!-- Course Lessons List Grouped by Chapters: Beginner, Intermediate, Advanced -->
+                        <div class="p-3.5">
+                            {% if c.lessons %}
+                                {% set chapters_list = ['Beginner', 'Intermediate', 'Advanced'] %}
+                                {% for chap in chapters_list %}
+                                    {% set ns = namespace(chap_lessons=[]) %}
+                                    {% for l in c.lessons %}
+                                        {% if (l.chapter or 'Beginner') == chap %}
+                                            {% set ns.chap_lessons = ns.chap_lessons + [l] %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if ns.chap_lessons %}
+                                    <div class="chapter-accordion-card">
+                                        <!-- Collapsible Chapter Header Button -->
+                                        <button class="chapter-accordion-header {% if not loop.first %}collapsed{% endif %}" 
+                                                type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#collapse-branch-{{ c.course_id }}-chap-{{ chap|lower }}" 
+                                                aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" 
+                                                aria-controls="collapse-branch-{{ c.course_id }}-chap-{{ chap|lower }}">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="chapter-icon-box {{ chap|lower }}">
+                                                    {% if chap == 'Advanced' %}
+                                                    <i class="fa-solid fa-trophy"></i>
+                                                    {% elif chap == 'Intermediate' %}
+                                                    <i class="fa-solid fa-bolt"></i>
+                                                    {% else %}
+                                                    <i class="fa-solid fa-seedling"></i>
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <div class="chapter-title-text">{{ chap }} Chapter</div>
+                                                    <div class="chapter-sub-text">
+                                                        {% if chap == 'Advanced' %}
+                                                        Paragraphs, Flow & Speed Mastery
+                                                        {% elif chap == 'Intermediate' %}
+                                                        Numbers, Symbols & Combined Keys
+                                                        {% else %}
+                                                        Home Row & Foundation Keys
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2.5">
+                                                <span class="chapter-pill-count {{ chap|lower }}">
+                                                    {{ ns.chap_lessons|length }} Lessons
+                                                </span>
+                                                <div class="chapter-chevron-circle">
+                                                    <i class="fa-solid fa-chevron-down"></i>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        <!-- Collapsible Lessons in this Chapter -->
+                                        <div class="collapse {% if loop.first %}show{% endif %}" id="collapse-branch-{{ c.course_id }}-chap-{{ chap|lower }}">
+                                            <div class="chapter-lesson-list">
+                                                {% for l in ns.chap_lessons %}
+                                                <div class="lms-lesson-tile">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <div class="badge {% if chap == 'Advanced' %}bg-danger bg-opacity-10 text-danger{% elif chap == 'Intermediate' %}bg-warning bg-opacity-15 text-dark{% else %}bg-primary bg-opacity-10 text-primary{% endif %} font-monospace fw-bold px-2.5 py-1.5 rounded-2 fs-7">
+                                                            Lesson {{ l.display_order }}
+                                                        </div>
+                                                        <div>
+                                                            <h6 class="fw-bold text-dark mb-0.5 fs-6">{{ l.lesson_title }}</h6>
+                                                            <small class="text-muted"><i class="fa-solid fa-desktop text-secondary me-1"></i>{{ l.screens|length }} Practice Screens</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <a href="/lms/demo?lesson_id={{ l.lesson_id }}&portal=branch" class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3 py-1 text-decoration-none d-flex align-items-center gap-1.5 shadow-none">
+                                                            <i class="fa-solid fa-play fs-8 text-primary"></i> Demo
+                                                        </a>
+                                                        <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1.5 rounded-pill border border-success border-opacity-20">
+                                                            <i class="fa-solid fa-circle-check me-1"></i> Active
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
                                         </div>
                                     </div>
-                                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-1.5 rounded-pill border border-success border-opacity-20">
-                                        <i class="fa-solid fa-circle-check me-1"></i> Active
-                                    </span>
-                                </div>
-                                {% else %}
-                                <div class="p-4 text-muted small text-center">No lessons configured for this course yet.</div>
+                                    {% endif %}
                                 {% endfor %}
-                            </div>
+                            {% else %}
+                                <div class="p-4 text-muted small text-center">No lessons configured for this course yet.</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

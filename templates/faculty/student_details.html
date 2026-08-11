@@ -220,7 +220,7 @@
         </div>
 
         <div class="sidebar-footer">
-            <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+            <a href="{{ url_for('auth.logout', role='faculty') }}" class="btn-logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span>Logout</span>
             </a>
@@ -237,7 +237,7 @@
             </a>
             
             <div class="user-profile-badge text-end px-2 py-1 rounded-3">
-                <div class="fw-bold text-dark mb-0 fs-6">{{ faculty.faculty_name if faculty else session.get('username', 'hoskote14') }}</div>
+                <div class="fw-bold text-dark mb-0 fs-6">{{ faculty.faculty_name if faculty else session.get('faculty_username', session.get('username', 'chaithra')) }}</div>
                 <small class="text-muted fs-7">Faculty Trainer <i class="fa-solid fa-user-tie ms-1 text-success"></i></small>
             </div>
         </div>
