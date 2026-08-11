@@ -47,7 +47,7 @@
             <p class="text-white-50 mb-0 fs-6">Configure practice text passages, manage exercise ordering, and update statuses.</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="/lms/demo?lesson_id={{ lesson.lesson_id }}" class="btn btn-light fw-bold px-3 py-2.5 rounded-3 shadow-sm text-dark border-0 d-flex align-items-center gap-1.5">
+            <a href="/lms/demo?lesson_id={{ lesson.lesson_id }}&portal=admin" class="btn btn-light fw-bold px-3 py-2.5 rounded-3 shadow-sm text-dark border-0 d-flex align-items-center gap-1.5">
                 <i class="fa-solid fa-flask-vial text-primary"></i> <span>Demo Test Lesson</span>
             </a>
             <a href="/admin/course/{{ lesson.course_id }}/lessons" class="btn btn-light fw-semibold px-3 py-2.5 rounded-3 shadow-sm text-secondary border-0 d-flex align-items-center gap-2 text-decoration-none">
@@ -107,7 +107,7 @@
                             </td>
                             <td class="py-3 px-4 text-end">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="/lms/demo?lesson_id={{ lesson.lesson_id }}&screen_idx={{ loop.index0 }}" class="btn btn-outline-success btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1">
+                                    <a href="/lms/demo?lesson_id={{ lesson.lesson_id }}&screen_idx={{ loop.index0 }}&portal=admin" class="btn btn-outline-success btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1">
                                         <i class="fa-solid fa-play"></i> Test Screen
                                     </a>
                                     <button type="button" class="btn btn-outline-warning btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1 text-dark border-warning" data-bs-toggle="modal" data-bs-target="#editScreen{{ s.screen_id }}">

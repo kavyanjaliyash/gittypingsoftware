@@ -562,6 +562,7 @@
         });
     }
 
+    // Virtual Keyboard Key Highlighting
     function updateKeyboardHighlighting(targetSegments, activeIdx) {
         document.querySelectorAll(".keyboard-key").forEach(k => {
             k.classList.remove("key-active");
@@ -569,26 +570,37 @@
         });
         if (!targetSegments || activeIdx >= targetSegments.length) return;
 
-        let remainingStr = targetSegments[activeIdx];
+        const target = targetSegments[activeIdx];
+        const expectedKeys = (window.getNudiKeySequence ? window.getNudiKeySequence(target) : target);
 
-        if (remainingStr === '\n') {
-            document.querySelectorAll('[data-key="Enter"]').forEach(k => k.classList.add("key-active"));
-            return;
-        }
-        if (remainingStr === ' ') {
-            document.querySelectorAll('[data-key="Space"]').forEach(k => k.classList.add("key-active"));
-            return;
-        }
-
-        let nextChar = remainingStr[0];
-        let keyChar = nextChar;
-
-        if (window.nudiReverseMap) {
-            if (window.nudiReverseMap[remainingStr]) {
-                keyChar = window.nudiReverseMap[remainingStr][0];
-            } else if (window.nudiReverseMap[nextChar]) {
-                keyChar = window.nudiReverseMap[nextChar];
+        let remainingKeys = expectedKeys;
+        if (partialKeySequence && remainingKeys.startsWith(partialKeySequence)) {
+            remainingKeys = remainingKeys.slice(partialKeySequence.length);
+        } else if (partialGrapheme && target.startsWith(partialGrapheme)) {
+            const typedKeys = (window.getNudiKeySequence ? window.getNudiKeySequence(partialGrapheme) : partialGrapheme);
+            if (remainingKeys.startsWith(typedKeys)) {
+                remainingKeys = remainingKeys.slice(typedKeys.length);
             }
+        }
+        if (!remainingKeys || remainingKeys.length === 0) return;
+
+        const nextKey = remainingKeys[0];
+
+        if (nextKey === '\n') {
+            document.querySelectorAll('[data-key="Enter"]').forEach(k => k.classList.add("key-active"));
+            const guideEl = document.getElementById("finger-guide-text");
+            if (guideEl) {
+                guideEl.innerHTML = `<span class="text-primary fw-bold"><i class="fa-solid fa-hand-point-up me-1"></i> Press key</span> <span class="badge bg-primary fs-6 px-2.5 py-1 font-monospace">ENTER ↵</span> <span class="text-muted">using</span> <strong class="text-dark"><u>Right Pinky Finger</u></strong>`;
+            }
+            return;
+        }
+        if (nextKey === ' ') {
+            document.querySelectorAll('[data-key="Space"]').forEach(k => k.classList.add("key-active"));
+            const guideEl = document.getElementById("finger-guide-text");
+            if (guideEl) {
+                guideEl.innerHTML = `<span class="text-primary fw-bold"><i class="fa-solid fa-hand-point-up me-1"></i> Press key</span> <span class="badge bg-primary fs-6 px-2.5 py-1 font-monospace">SPACE</span> <span class="text-muted">using</span> <strong class="text-dark"><u>Left or Right Thumb</u></strong>`;
+            }
+            return;
         }
 
         const shiftSymbols = {
@@ -597,14 +609,14 @@
         };
 
         let isShifted = false;
-        let lookupKey = keyChar;
+        let lookupKey = nextKey;
 
-        if (keyChar >= 'A' && keyChar <= 'Z') {
+        if (nextKey >= 'A' && nextKey <= 'Z') {
             isShifted = true;
-            lookupKey = keyChar.toLowerCase();
-        } else if (shiftSymbols[keyChar]) {
+            lookupKey = nextKey.toLowerCase();
+        } else if (shiftSymbols[nextKey]) {
             isShifted = true;
-            lookupKey = shiftSymbols[keyChar];
+            lookupKey = shiftSymbols[nextKey];
         }
 
         if (isShifted) {
@@ -628,11 +640,11 @@
             ' ':'Left or Right Thumb'
         };
 
-        const targetKeyUpper = remainingStr === ' ' ? 'SPACE' : remainingStr[0].toUpperCase();
-        const fingerName = fingerMap[remainingStr[0].toLowerCase()] || 'Index Finger';
+        const displayKey = isShifted ? `SHIFT + ${lookupKey.toUpperCase()}` : lookupKey.toUpperCase();
+        const fingerName = fingerMap[lookupKey.toLowerCase()] || 'Index Finger';
         const guideEl = document.getElementById("finger-guide-text");
         if (guideEl) {
-            guideEl.innerHTML = `Press key <span class="badge bg-primary fs-6 px-2.5 py-1 font-monospace">${targetKeyUpper}</span> using <u>${fingerName}</u>`;
+            guideEl.innerHTML = `Press key <span class="badge bg-primary fs-6 px-2.5 py-1 font-monospace">${displayKey}</span> using <u>${fingerName}</u>`;
         }
     }
 
@@ -640,6 +652,7 @@
     let screenMistakes = 0;
     let screenCorrect = 0;
     let partialGrapheme = "";
+    let partialKeySequence = "";
 
     function loadScreen(idx) {
         currentScreenIdx = idx;
@@ -648,6 +661,7 @@
         screenCorrect = 0;
         charHistory = {};
         partialGrapheme = "";
+        partialKeySequence = "";
         updateProgressBar(idx);
 
         const topCounter = document.getElementById("top-screen-counter");
@@ -656,7 +670,7 @@
         if (subTitle) subTitle.innerText = `• Screen ${idx + 1} of ${screens.length}`;
 
         const screen = screens[idx];
-        titleEl.innerText = screen.title;
+        if (titleEl) titleEl.innerText = screen.title;
 
         // Destroy previous renderer if any and clean container
         if (currentRenderer && typeof currentRenderer.destroy === 'function') {
@@ -667,8 +681,9 @@
             textBoxEl.innerHTML = "";
         }
 
-        // Instantiate chosen template renderer (Block, Waterfall, Jump, or Paragraph)
         const screenType = (screen.type || 'block').toLowerCase();
+
+        // Dynamically instantiate corresponding style renderer
         if (screenType === 'waterfall' && typeof WaterfallStyleRenderer !== 'undefined') {
             currentRenderer = new WaterfallStyleRenderer(textBoxEl);
         } else if (screenType === 'jump' && typeof JumpStyleRenderer !== 'undefined') {
@@ -683,8 +698,8 @@
         currentRenderer.init(screen.content);
 
         const normalizedContent = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-        const targetSegs = Array.from(segmenter.segment(normalizedContent)).map(s => s.segment);
+        const segmentFn = window.segmentTextIntoGraphemes || function(txt) { return Array.from(txt); };
+        const targetSegs = segmentFn(normalizedContent);
         updateKeyboardHighlighting(targetSegs, 0);
 
         inputEl.value = "";
@@ -800,17 +815,20 @@
             if (!typedChar) return;
             const screen = screens[currentScreenIdx];
             const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-            const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
+            const segmentFn = window.segmentTextIntoGraphemes || function(txt) { return Array.from(txt); };
+            const targetSegments = segmentFn(targetText);
 
             if (currentProgressIdx >= targetSegments.length) return;
 
             const expectedTarget = targetSegments[currentProgressIdx];
-            const testTyped = partialGrapheme + typedChar;
+            const expectedKeys = (window.getNudiKeySequence ? window.getNudiKeySequence(expectedTarget) : expectedTarget);
+
+            const testTypedKeys = partialKeySequence + typedChar;
+            const testTypedRaw = partialGrapheme + typedChar;
 
             // Strict handling for Enter key ('\n'): student must press Enter to advance to next line/platform!
             if (expectedTarget === '\n') {
-                if (testTyped === '\n') {
+                if (typedChar === '\n' || testTypedKeys === '\n') {
                     // Enter pressed correctly!
                     screenCorrect++;
                     charHistory[currentProgressIdx] = 'correct';
@@ -819,11 +837,13 @@
                     }
                     currentProgressIdx++;
                     partialGrapheme = "";
+                    partialKeySequence = "";
                     updateKeyboardHighlighting(targetSegments, currentProgressIdx);
                 } else {
                     // Pressed a key other than Enter: DO NOT MOVE FORWARD!
                     screenMistakes++;
                     partialGrapheme = "";
+                    partialKeySequence = "";
 
                     // Shake / flash active Enter block in red
                     if (currentRenderer && typeof currentRenderer.onMistake === 'function') {
@@ -853,17 +873,25 @@
                     }
                 }
             } else {
-                // Regular character (letters, numbers, space, punctuation)
-                if (testTyped === expectedTarget) {
+                const isFullMatch = (testTypedKeys === expectedKeys) || (testTypedRaw === expectedTarget) || (window.getNudiKeySequence && window.getNudiKeySequence(testTypedRaw) === expectedKeys);
+                const isPartialMatch = expectedKeys.startsWith(testTypedKeys) || expectedTarget.startsWith(testTypedRaw) || (window.getNudiKeySequence && expectedKeys.startsWith(window.getNudiKeySequence(testTypedRaw)));
+
+                if (isFullMatch) {
                     // Correct key typed!
                     screenCorrect++;
                     charHistory[currentProgressIdx] = 'correct';
                     if (currentRenderer && typeof currentRenderer.onKeyTyped === 'function') {
                         currentRenderer.onKeyTyped(typedChar, expectedTarget, currentProgressIdx, true);
                     }
-                } else if (expectedTarget.startsWith(testTyped)) {
-                    // In-progress partial compound grapheme
-                    partialGrapheme = testTyped;
+                    currentProgressIdx++;
+                    partialGrapheme = "";
+                    partialKeySequence = "";
+                    updateKeyboardHighlighting(targetSegments, currentProgressIdx);
+                } else if (isPartialMatch) {
+                    // In-progress partial compound grapheme / keystroke
+                    partialKeySequence = testTypedKeys;
+                    partialGrapheme = testTypedRaw;
+                    updateKeyboardHighlighting(targetSegments, currentProgressIdx);
                     return;
                 } else {
                     // Wrong key typed: Mark as mistake, stays red, and ADVANCE TO NEXT BLOCK!
@@ -888,14 +916,11 @@
                             }, 400);
                         }
                     } catch (e) {}
+                    currentProgressIdx++;
+                    partialGrapheme = "";
+                    partialKeySequence = "";
+                    updateKeyboardHighlighting(targetSegments, currentProgressIdx);
                 }
-
-                // Advance to next block / letter
-                currentProgressIdx++;
-                partialGrapheme = "";
-
-                // Highlight next target key on virtual keyboard & update finger guide
-                updateKeyboardHighlighting(targetSegments, currentProgressIdx);
             }
 
             // Real-time WPM Calculation
@@ -927,8 +952,8 @@
             const val = inputEl.value;
             if (!val || val.length === 0) return;
 
-            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-            const graphemes = Array.from(segmenter.segment(val)).map(s => s.segment);
+            const segmentFn = window.segmentTextIntoGraphemes || function(txt) { return Array.from(txt); };
+            const graphemes = segmentFn(val);
             
             // Process each typed grapheme
             graphemes.forEach(g => {
@@ -946,9 +971,19 @@
 
             if (e.key === "Backspace" || e.key === "Delete") {
                 e.preventDefault();
-                if (currentProgressIdx > 0) {
+                if (partialKeySequence.length > 0) {
+                    partialKeySequence = partialKeySequence.slice(0, -1);
+                    partialGrapheme = "";
+                    const screen = screens[currentScreenIdx];
+                    const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    const segmentFn = window.segmentTextIntoGraphemes || function(txt) { return Array.from(txt); };
+                    const targetSegments = segmentFn(targetText);
+                    updateKeyboardHighlighting(targetSegments, currentProgressIdx);
+                    handleKeystrokeActivity(false);
+                } else if (currentProgressIdx > 0) {
                     currentProgressIdx--;
                     partialGrapheme = "";
+                    partialKeySequence = "";
 
                     // Decrement the corresponding stat based on history
                     if (charHistory[currentProgressIdx] === 'correct') {
@@ -964,8 +999,8 @@
 
                     const screen = screens[currentScreenIdx];
                     const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-                    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-                    const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
+                    const segmentFn = window.segmentTextIntoGraphemes || function(txt) { return Array.from(txt); };
+                    const targetSegments = segmentFn(targetText);
                     updateKeyboardHighlighting(targetSegments, currentProgressIdx);
                     handleKeystrokeActivity(false);
 

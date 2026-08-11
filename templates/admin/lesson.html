@@ -10,7 +10,7 @@
             <p class="text-white-50 mb-0 fs-6">Manage chapters (Beginner, Intermediate, Advanced), organize sequence order, and update content statuses.</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="/lms/demo?course_id={{ course.course_id }}" class="btn btn-light fw-bold px-3 py-2.5 rounded-3 shadow-sm text-dark border-0 d-flex align-items-center gap-1.5">
+            <a href="/lms/demo?course_id={{ course.course_id }}&portal=admin" class="btn btn-light fw-bold px-3 py-2.5 rounded-3 shadow-sm text-dark border-0 d-flex align-items-center gap-1.5">
                 <i class="fa-solid fa-flask-vial text-primary"></i> <span>Demo Test Course</span>
             </a>
             <a href="/admin/lms-content" class="btn btn-light fw-semibold px-3 py-2.5 rounded-3 shadow-sm text-secondary border-0 d-flex align-items-center gap-2 text-decoration-none">
@@ -26,14 +26,14 @@
     <!-- Chapter Filter Tabs -->
     <div class="d-flex align-items-center gap-2 mb-3">
         <span class="text-muted small fw-bold text-uppercase me-2" style="letter-spacing: 0.5px;"><i class="fa-solid fa-filter me-1"></i>Filter Chapter:</span>
-        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold chapter-filter-btn" onclick="filterByChapter('all', this)">All Chapters</button>
-        <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold chapter-filter-btn" onclick="filterByChapter('Beginner', this)">
+        <button type="button" id="filter-btn-all" class="btn btn-sm {% if active_chapter == 'all' or not active_chapter %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-3 fw-bold chapter-filter-btn" onclick="filterByChapter('all', this)">All Chapters</button>
+        <button type="button" id="filter-btn-Beginner" class="btn btn-sm {% if active_chapter == 'Beginner' %}btn-success text-white{% else %}btn-outline-success{% endif %} rounded-pill px-3 fw-bold chapter-filter-btn" onclick="filterByChapter('Beginner', this)">
             <i class="fa-solid fa-seedling me-1"></i> Beginner
         </button>
-        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold chapter-filter-btn" onclick="filterByChapter('Intermediate', this)">
+        <button type="button" id="filter-btn-Intermediate" class="btn btn-sm {% if active_chapter == 'Intermediate' %}btn-primary text-white{% else %}btn-outline-primary{% endif %} rounded-pill px-3 fw-bold chapter-filter-btn" onclick="filterByChapter('Intermediate', this)">
             <i class="fa-solid fa-bolt me-1"></i> Intermediate
         </button>
-        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold chapter-filter-btn" onclick="filterByChapter('Advanced', this)">
+        <button type="button" id="filter-btn-Advanced" class="btn btn-sm {% if active_chapter == 'Advanced' %}btn-danger text-white{% else %}btn-outline-danger{% endif %} rounded-pill px-3 fw-bold chapter-filter-btn" onclick="filterByChapter('Advanced', this)">
             <i class="fa-solid fa-trophy me-1"></i> Advanced
         </button>
     </div>
@@ -81,7 +81,7 @@
                             </td>
                             <td class="py-3 px-4 text-end">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="/lms/demo?lesson_id={{ l.lesson_id }}" class="btn btn-outline-success btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1">
+                                    <a href="/lms/demo?lesson_id={{ l.lesson_id }}&portal=admin" class="btn btn-outline-success btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1">
                                         <i class="fa-solid fa-play"></i> Demo Test
                                     </a>
                                     <a href="/admin/lesson/{{ l.lesson_id }}/screens" class="btn btn-outline-primary btn-sm px-3 py-1.5 rounded-2 fw-semibold d-flex align-items-center gap-1">
@@ -163,7 +163,7 @@
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-secondary">Chapter / Level</label>
-                        <select name="chapter" class="form-select rounded-3">
+                        <select name="chapter" id="addModalChapterSelect" class="form-select rounded-3">
                             <option value="Beginner" selected>🔰 Beginner</option>
                             <option value="Intermediate">⚡ Intermediate</option>
                             <option value="Advanced">🏆 Advanced</option>
@@ -195,19 +195,41 @@
 </div>
 
 <script>
+let currentActiveChapter = "{{ active_chapter or 'all' }}";
+
 function filterByChapter(chapter, btn) {
+    currentActiveChapter = chapter;
+    
+    // Update URL query string without reloading page
+    const url = new URL(window.location);
+    if (chapter === 'all') {
+        url.searchParams.delete('chapter');
+    } else {
+        url.searchParams.set('chapter', chapter);
+    }
+    window.history.replaceState({}, '', url);
+
     document.querySelectorAll('.chapter-filter-btn').forEach(b => {
-        b.classList.remove('btn-primary', 'btn-success', 'btn-danger');
+        b.classList.remove('btn-primary', 'btn-success', 'btn-danger', 'text-white');
         if (b.innerText.includes('All')) b.className = 'btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold chapter-filter-btn';
         else if (b.innerText.includes('Beginner')) b.className = 'btn btn-sm btn-outline-success rounded-pill px-3 fw-bold chapter-filter-btn';
         else if (b.innerText.includes('Intermediate')) b.className = 'btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold chapter-filter-btn';
         else if (b.innerText.includes('Advanced')) b.className = 'btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold chapter-filter-btn';
     });
 
-    if (chapter === 'all') btn.className = 'btn btn-sm btn-primary rounded-pill px-3 fw-bold chapter-filter-btn';
-    else if (chapter === 'Beginner') btn.className = 'btn btn-sm btn-success text-white rounded-pill px-3 fw-bold chapter-filter-btn';
-    else if (chapter === 'Intermediate') btn.className = 'btn btn-sm btn-primary text-white rounded-pill px-3 fw-bold chapter-filter-btn';
-    else if (chapter === 'Advanced') btn.className = 'btn btn-sm btn-danger text-white rounded-pill px-3 fw-bold chapter-filter-btn';
+    if (chapter === 'all') {
+        const target = btn || document.getElementById('filter-btn-all');
+        if (target) target.className = 'btn btn-sm btn-primary rounded-pill px-3 fw-bold chapter-filter-btn';
+    } else if (chapter === 'Beginner') {
+        const target = btn || document.getElementById('filter-btn-Beginner');
+        if (target) target.className = 'btn btn-sm btn-success text-white rounded-pill px-3 fw-bold chapter-filter-btn';
+    } else if (chapter === 'Intermediate') {
+        const target = btn || document.getElementById('filter-btn-Intermediate');
+        if (target) target.className = 'btn btn-sm btn-primary text-white rounded-pill px-3 fw-bold chapter-filter-btn';
+    } else if (chapter === 'Advanced') {
+        const target = btn || document.getElementById('filter-btn-Advanced');
+        if (target) target.className = 'btn btn-sm btn-danger text-white rounded-pill px-3 fw-bold chapter-filter-btn';
+    }
 
     document.querySelectorAll('.lesson-row').forEach(row => {
         if (chapter === 'all' || row.dataset.chapter === chapter) {
@@ -216,6 +238,28 @@ function filterByChapter(chapter, btn) {
             row.style.display = 'none';
         }
     });
+
+    // Also sync Add Modal chapter select
+    const addSelect = document.getElementById('addModalChapterSelect');
+    if (addSelect && chapter !== 'all') {
+        addSelect.value = chapter;
+    }
 }
+
+// When opening Add Lesson modal, pre-select the active chapter
+document.getElementById('addLessonModal')?.addEventListener('show.bs.modal', function () {
+    const addSelect = document.getElementById('addModalChapterSelect');
+    if (addSelect && currentActiveChapter && currentActiveChapter !== 'all') {
+        addSelect.value = currentActiveChapter;
+    }
+});
+
+// Run initial filter on page load based on active_chapter parameter
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialChapter = urlParams.get('chapter') || "{{ active_chapter or 'all' }}";
+    const targetBtn = document.getElementById('filter-btn-' + initialChapter) || document.getElementById('filter-btn-all');
+    filterByChapter(initialChapter, targetBtn);
+});
 </script>
 {% endblock %}

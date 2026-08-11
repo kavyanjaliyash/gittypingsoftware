@@ -67,8 +67,13 @@ class WaterfallStyleRenderer {
         this.container.className = "waterfall-container mb-4 shadow-sm";
 
         const normalizedContent = screenContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-        this.targetSegments = Array.from(segmenter.segment(normalizedContent)).map(s => s.segment);
+        const segmentFn = window.segmentTextIntoGraphemes || function(txt) {
+            if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+                return Array.from(new Intl.Segmenter('kn', { granularity: 'grapheme' }).segment(txt)).map(s => s.segment);
+            }
+            return Array.from(txt);
+        };
+        this.targetSegments = segmentFn(normalizedContent);
         this.currentIdx = 0;
 
         // 1. Vertical Column Guide Beam

@@ -15,39 +15,79 @@ def practice_demo():
     if not (admin_uid or branch_uid or faculty_uid or student_uid or session.get('user_id')):
         return redirect(url_for('auth.login'))
 
-    portal_arg = request.args.get('portal', '').lower()
+    portal_arg = request.args.get('portal', '').strip().lower()
 
-    # Determine back to LMS destination based on portal parameter or active user roles
-    if portal_arg == 'admin' or (admin_uid and not portal_arg and not branch_uid and not faculty_uid):
-        back_url = url_for('admin.lms_content')
-        portal_name = 'Admin LMS'
+    # Priority 1: Explicit portal query parameter
+    if portal_arg == 'admin':
         user_role = 'admin'
-    elif portal_arg == 'branch' or (branch_uid and not portal_arg and not faculty_uid):
-        back_url = url_for('branch.dashboard', tab='lms')
-        portal_name = 'Branch LMS'
+        portal_name = 'Admin LMS'
+        back_url = url_for('admin.lms_content')
+    elif portal_arg == 'branch':
         user_role = 'branch'
-    elif portal_arg == 'faculty' or (faculty_uid and not portal_arg):
-        back_url = url_for('faculty.dashboard', tab='lms')
-        portal_name = 'Faculty LMS'
+        portal_name = 'Branch LMS'
+        back_url = url_for('branch.dashboard', tab='lms')
+    elif portal_arg == 'faculty':
         user_role = 'faculty'
-    elif student_uid:
-        back_url = url_for('student.dashboard')
-        portal_name = 'Student Dashboard'
+        portal_name = 'Faculty LMS'
+        back_url = url_for('faculty.dashboard', tab='lms')
+    elif portal_arg == 'student':
         user_role = 'student'
+        portal_name = 'Student Dashboard'
+        back_url = url_for('student.dashboard')
     else:
-        user_role = session.get('role', '').lower()
-        if user_role == 'admin':
-            back_url = url_for('admin.lms_content')
+        # Priority 2: Check referrer header
+        ref = request.referrer or ''
+        if '/admin' in ref and admin_uid:
+            user_role = 'admin'
             portal_name = 'Admin LMS'
-        elif user_role in ['branch', 'branch_admin', 'branch admin']:
-            back_url = url_for('branch.dashboard', tab='lms')
+            back_url = url_for('admin.lms_content')
+        elif '/branch' in ref and branch_uid:
+            user_role = 'branch'
             portal_name = 'Branch LMS'
-        elif user_role == 'faculty':
-            back_url = url_for('faculty.dashboard', tab='lms')
+            back_url = url_for('branch.dashboard', tab='lms')
+        elif '/faculty' in ref and faculty_uid:
+            user_role = 'faculty'
             portal_name = 'Faculty LMS'
-        else:
-            back_url = url_for('student.dashboard')
+            back_url = url_for('faculty.dashboard', tab='lms')
+        elif '/student' in ref and student_uid:
+            user_role = 'student'
             portal_name = 'Student Dashboard'
+            back_url = url_for('student.dashboard')
+        # Priority 3: Check active role from session in priority order
+        elif admin_uid:
+            user_role = 'admin'
+            portal_name = 'Admin LMS'
+            back_url = url_for('admin.lms_content')
+        elif branch_uid:
+            user_role = 'branch'
+            portal_name = 'Branch LMS'
+            back_url = url_for('branch.dashboard', tab='lms')
+        elif faculty_uid:
+            user_role = 'faculty'
+            portal_name = 'Faculty LMS'
+            back_url = url_for('faculty.dashboard', tab='lms')
+        elif student_uid:
+            user_role = 'student'
+            portal_name = 'Student Dashboard'
+            back_url = url_for('student.dashboard')
+        else:
+            role_val = session.get('role', 'student').lower()
+            if role_val == 'admin':
+                user_role = 'admin'
+                portal_name = 'Admin LMS'
+                back_url = url_for('admin.lms_content')
+            elif role_val in ['branch', 'branch_admin', 'branch admin']:
+                user_role = 'branch'
+                portal_name = 'Branch LMS'
+                back_url = url_for('branch.dashboard', tab='lms')
+            elif role_val == 'faculty':
+                user_role = 'faculty'
+                portal_name = 'Faculty LMS'
+                back_url = url_for('faculty.dashboard', tab='lms')
+            else:
+                user_role = 'student'
+                portal_name = 'Student Dashboard'
+                back_url = url_for('student.dashboard')
 
     courses = Course.query.filter_by(status='Active').all()
     if not courses:

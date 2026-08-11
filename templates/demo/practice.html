@@ -592,6 +592,7 @@
     let screenCorrect = 0;
     let charHistory = {};
     let partialGrapheme = "";
+    let partialKeySequence = "";
 
     const titleEl = document.getElementById("screen-badge-title");
     const styleBadgeEl = document.getElementById("screen-style-badge");
@@ -605,13 +606,15 @@
     const nextBtnText = document.getElementById("next-btn-text");
     const screenSelector = document.getElementById("screen-selector");
 
+    const activePortalRole = "{{ user_role }}";
+
     // Course & Lesson Switching Helpers
     function switchCourse(cId) {
-        window.location.href = `/lms/demo?course_id=${cId}`;
+        window.location.href = `/lms/demo?course_id=${cId}&portal=${encodeURIComponent(activePortalRole)}`;
     }
 
     function switchLesson(lId) {
-        window.location.href = `/lms/demo?lesson_id=${lId}`;
+        window.location.href = `/lms/demo?lesson_id=${lId}&portal=${encodeURIComponent(activePortalRole)}`;
     }
 
     function switchScreen(idx) {
@@ -649,22 +652,29 @@
         loadScreen(0);
     }
 
-    // Timer and Inactivity Controls
+    // Timer & Metrics Management
+    function startTimerInterval() {
+        if (isTimerRunning) return;
+        isTimerRunning = true;
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            cumulativeSeconds++;
+            timerEl.innerText = `${secondsElapsed}s`;
+
+            // Calculate live WPM
+            const minutes = secondsElapsed / 60;
+            const wordsTyped = screenCorrect / 5;
+            const currentWpm = minutes > 0 ? Math.round(wordsTyped / minutes) : 0;
+            wpmEl.innerText = currentWpm >= 0 ? currentWpm : 0;
+        }, 1000);
+    }
+
     function stopTimerInterval() {
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
         }
         isTimerRunning = false;
-    }
-
-    function startTimerInterval() {
-        stopTimerInterval();
-        isTimerRunning = true;
-        timerInterval = setInterval(() => {
-            secondsElapsed++;
-            timerEl.innerText = `${secondsElapsed}s`;
-        }, 1000);
     }
 
     function handleKeystrokeActivity(isFinished) {
@@ -682,12 +692,13 @@
             startTimerInterval();
         }
 
+        // Auto pause after 5s of inactivity
         inactivityTimeout = setTimeout(() => {
             stopTimerInterval();
-        }, 3000);
+        }, 5000);
     }
 
-    // Render Clickable Segmented Progress Bar
+    // Render interactive Screen Progress Tracker
     function updateProgressBar(idx) {
         const container = document.getElementById("progress-bar-container");
         const topCounter = document.getElementById("top-screen-counter");
@@ -737,26 +748,37 @@
         });
         if (!targetSegments || activeIdx >= targetSegments.length) return;
 
-        let remainingStr = targetSegments[activeIdx];
+        const target = targetSegments[activeIdx];
+        const expectedKeys = (window.getNudiKeySequence ? window.getNudiKeySequence(target) : target);
 
-        if (remainingStr === '\n') {
-            document.querySelectorAll('[data-key="Enter"]').forEach(k => k.classList.add("key-active"));
-            return;
-        }
-        if (remainingStr === ' ') {
-            document.querySelectorAll('[data-key="Space"]').forEach(k => k.classList.add("key-active"));
-            return;
-        }
-
-        let nextChar = remainingStr[0];
-        let keyChar = nextChar;
-
-        if (window.nudiReverseMap) {
-            if (window.nudiReverseMap[remainingStr]) {
-                keyChar = window.nudiReverseMap[remainingStr][0];
-            } else if (window.nudiReverseMap[nextChar]) {
-                keyChar = window.nudiReverseMap[nextChar];
+        let remainingKeys = expectedKeys;
+        if (partialKeySequence && remainingKeys.startsWith(partialKeySequence)) {
+            remainingKeys = remainingKeys.slice(partialKeySequence.length);
+        } else if (partialGrapheme && target.startsWith(partialGrapheme)) {
+            const typedKeys = (window.getNudiKeySequence ? window.getNudiKeySequence(partialGrapheme) : partialGrapheme);
+            if (remainingKeys.startsWith(typedKeys)) {
+                remainingKeys = remainingKeys.slice(typedKeys.length);
             }
+        }
+        if (!remainingKeys || remainingKeys.length === 0) return;
+
+        const nextKey = remainingKeys[0];
+
+        if (nextKey === '\n') {
+            document.querySelectorAll('[data-key="Enter"]').forEach(k => k.classList.add("key-active"));
+            const guideEl = document.getElementById("finger-guide-text");
+            if (guideEl) {
+                guideEl.innerHTML = `<span class="text-primary fw-bold"><i class="fa-solid fa-hand-point-up me-1"></i> Press key</span> <span class="badge bg-primary fs-6 px-2.5 py-1 font-monospace">ENTER ↵</span> <span class="text-muted">using</span> <strong class="text-dark"><u>Right Pinky Finger</u></strong>`;
+            }
+            return;
+        }
+        if (nextKey === ' ') {
+            document.querySelectorAll('[data-key="Space"]').forEach(k => k.classList.add("key-active"));
+            const guideEl = document.getElementById("finger-guide-text");
+            if (guideEl) {
+                guideEl.innerHTML = `<span class="text-primary fw-bold"><i class="fa-solid fa-hand-point-up me-1"></i> Press key</span> <span class="badge bg-primary fs-6 px-2.5 py-1 font-monospace">SPACE</span> <span class="text-muted">using</span> <strong class="text-dark"><u>Left or Right Thumb</u></strong>`;
+            }
+            return;
         }
 
         const shiftSymbols = {
@@ -765,14 +787,14 @@
         };
 
         let isShifted = false;
-        let lookupKey = keyChar;
+        let lookupKey = nextKey;
 
-        if (keyChar >= 'A' && keyChar <= 'Z') {
+        if (nextKey >= 'A' && nextKey <= 'Z') {
             isShifted = true;
-            lookupKey = keyChar.toLowerCase();
-        } else if (shiftSymbols[keyChar]) {
+            lookupKey = nextKey.toLowerCase();
+        } else if (shiftSymbols[nextKey]) {
             isShifted = true;
-            lookupKey = shiftSymbols[keyChar];
+            lookupKey = shiftSymbols[nextKey];
         }
 
         if (isShifted) {
@@ -796,11 +818,11 @@
             ' ':'Left or Right Thumb'
         };
 
-        const targetKeyUpper = remainingStr === ' ' ? 'SPACE' : remainingStr[0].toUpperCase();
-        const fingerName = fingerMap[remainingStr[0].toLowerCase()] || 'Index Finger';
+        const displayKey = isShifted ? `SHIFT + ${lookupKey.toUpperCase()}` : lookupKey.toUpperCase();
+        const fingerName = fingerMap[lookupKey.toLowerCase()] || 'Index Finger';
         const guideEl = document.getElementById("finger-guide-text");
         if (guideEl) {
-            guideEl.innerHTML = `<span class="text-primary fw-bold"><i class="fa-solid fa-hand-point-up me-1"></i> Press key</span> <span class="badge bg-primary fs-6 px-2.5 py-1 font-monospace">${targetKeyUpper}</span> <span class="text-muted">using</span> <strong class="text-dark"><u>${fingerName}</u></strong>`;
+            guideEl.innerHTML = `<span class="text-primary fw-bold"><i class="fa-solid fa-hand-point-up me-1"></i> Press key</span> <span class="badge bg-primary fs-6 px-2.5 py-1 font-monospace">${displayKey}</span> <span class="text-muted">using</span> <strong class="text-dark"><u>${fingerName}</u></strong>`;
         }
     }
 
@@ -813,6 +835,7 @@
         screenCorrect = 0;
         charHistory = {};
         partialGrapheme = "";
+        partialKeySequence = "";
         updateProgressBar(idx);
 
         const screen = screens[idx];
@@ -830,7 +853,7 @@
             textBoxEl.innerHTML = "";
         }
 
-        // Instantiate chosen template renderer
+        // Instantiate chosen template renderer (Block, Waterfall, Jump, or Paragraph)
         const screenType = (screen.type || 'block').toLowerCase();
         if (screenType === 'waterfall' && typeof WaterfallStyleRenderer !== 'undefined') {
             currentRenderer = new WaterfallStyleRenderer(textBoxEl);
@@ -846,8 +869,8 @@
         currentRenderer.init(screen.content);
 
         const normalizedContent = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-        const targetSegs = Array.from(segmenter.segment(normalizedContent)).map(s => s.segment);
+        const segmentFn = window.segmentTextIntoGraphemes || function(txt) { return Array.from(txt); };
+        const targetSegs = segmentFn(normalizedContent);
         updateKeyboardHighlighting(targetSegs, 0);
 
         if (inputEl) {
@@ -892,16 +915,19 @@
         if (!typedChar || !screens[currentScreenIdx]) return;
         const screen = screens[currentScreenIdx];
         const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-        const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
+        const segmentFn = window.segmentTextIntoGraphemes || function(txt) { return Array.from(txt); };
+        const targetSegments = segmentFn(targetText);
 
         if (currentProgressIdx >= targetSegments.length) return;
 
         const expectedTarget = targetSegments[currentProgressIdx];
-        const testTyped = partialGrapheme + typedChar;
+        const expectedKeys = (window.getNudiKeySequence ? window.getNudiKeySequence(expectedTarget) : expectedTarget);
+
+        const testTypedKeys = partialKeySequence + typedChar;
+        const testTypedRaw = partialGrapheme + typedChar;
 
         if (expectedTarget === '\n') {
-            if (testTyped === '\n') {
+            if (typedChar === '\n' || testTypedKeys === '\n') {
                 screenCorrect++;
                 charHistory[currentProgressIdx] = 'correct';
                 if (currentRenderer && typeof currentRenderer.onKeyTyped === 'function') {
@@ -909,10 +935,12 @@
                 }
                 currentProgressIdx++;
                 partialGrapheme = "";
+                partialKeySequence = "";
                 updateKeyboardHighlighting(targetSegments, currentProgressIdx);
             } else {
                 screenMistakes++;
                 partialGrapheme = "";
+                partialKeySequence = "";
 
                 if (currentRenderer && typeof currentRenderer.onMistake === 'function') {
                     currentRenderer.onMistake(currentProgressIdx);
@@ -921,14 +949,23 @@
                 flashMistakeKey(typedChar);
             }
         } else {
-            if (testTyped === expectedTarget) {
+            const isFullMatch = (testTypedKeys === expectedKeys) || (testTypedRaw === expectedTarget) || (window.getNudiKeySequence && window.getNudiKeySequence(testTypedRaw) === expectedKeys);
+            const isPartialMatch = expectedKeys.startsWith(testTypedKeys) || expectedTarget.startsWith(testTypedRaw) || (window.getNudiKeySequence && expectedKeys.startsWith(window.getNudiKeySequence(testTypedRaw)));
+
+            if (isFullMatch) {
                 screenCorrect++;
                 charHistory[currentProgressIdx] = 'correct';
                 if (currentRenderer && typeof currentRenderer.onKeyTyped === 'function') {
                     currentRenderer.onKeyTyped(typedChar, expectedTarget, currentProgressIdx, true);
                 }
-            } else if (expectedTarget.startsWith(testTyped)) {
-                partialGrapheme = testTyped;
+                currentProgressIdx++;
+                partialGrapheme = "";
+                partialKeySequence = "";
+                updateKeyboardHighlighting(targetSegments, currentProgressIdx);
+            } else if (isPartialMatch) {
+                partialKeySequence = testTypedKeys;
+                partialGrapheme = testTypedRaw;
+                updateKeyboardHighlighting(targetSegments, currentProgressIdx);
                 return;
             } else {
                 screenMistakes++;
@@ -937,11 +974,11 @@
                     currentRenderer.onKeyTyped(typedChar, expectedTarget, currentProgressIdx, false);
                 }
                 flashMistakeKey(typedChar);
+                currentProgressIdx++;
+                partialGrapheme = "";
+                partialKeySequence = "";
+                updateKeyboardHighlighting(targetSegments, currentProgressIdx);
             }
-
-            currentProgressIdx++;
-            partialGrapheme = "";
-            updateKeyboardHighlighting(targetSegments, currentProgressIdx);
         }
 
         // Real-time Metrics Calculation
@@ -990,8 +1027,8 @@
             const val = inputEl.value;
             if (!val || val.length === 0) return;
 
-            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-            const graphemes = Array.from(segmenter.segment(val)).map(s => s.segment);
+            const segmentFn = window.segmentTextIntoGraphemes || function(txt) { return Array.from(txt); };
+            const graphemes = segmentFn(val);
             
             graphemes.forEach(g => {
                 handleKeystrokeInput(g);
@@ -1007,9 +1044,19 @@
 
             if (e.key === "Backspace" || e.key === "Delete") {
                 e.preventDefault();
-                if (currentProgressIdx > 0) {
+                if (partialKeySequence.length > 0) {
+                    partialKeySequence = partialKeySequence.slice(0, -1);
+                    partialGrapheme = "";
+                    const screen = screens[currentScreenIdx];
+                    const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    const segmentFn = window.segmentTextIntoGraphemes || function(txt) { return Array.from(txt); };
+                    const targetSegments = segmentFn(targetText);
+                    updateKeyboardHighlighting(targetSegments, currentProgressIdx);
+                    handleKeystrokeActivity(false);
+                } else if (currentProgressIdx > 0) {
                     currentProgressIdx--;
                     partialGrapheme = "";
+                    partialKeySequence = "";
 
                     if (charHistory[currentProgressIdx] === 'correct') {
                         screenCorrect = Math.max(0, screenCorrect - 1);
@@ -1024,8 +1071,8 @@
 
                     const screen = screens[currentScreenIdx];
                     const targetText = screen.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-                    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-                    const targetSegments = Array.from(segmenter.segment(targetText)).map(s => s.segment);
+                    const segmentFn = window.segmentTextIntoGraphemes || function(txt) { return Array.from(txt); };
+                    const targetSegments = segmentFn(targetText);
                     updateKeyboardHighlighting(targetSegments, currentProgressIdx);
                     handleKeystrokeActivity(false);
 

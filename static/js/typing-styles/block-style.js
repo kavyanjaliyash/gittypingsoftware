@@ -15,14 +15,20 @@ class BlockStyleRenderer {
 
         const normalizedContent = screenContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
         const lines = normalizedContent.split('\n');
-        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
 
         lines.forEach((lineText, lineIdx) => {
             const rowEl = document.createElement("div");
             rowEl.className = "d-flex flex-nowrap align-items-center w-100 py-1";
             rowEl.style.overflowX = "auto";
 
-            const lineSegments = Array.from(segmenter.segment(lineText)).map(s => s.segment);
+            const segmentFn = window.segmentTextIntoGraphemes || function(txt) {
+                if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+                    return Array.from(new Intl.Segmenter('kn', { granularity: 'grapheme' }).segment(txt)).map(s => s.segment);
+                }
+                return Array.from(txt);
+            };
+
+            const lineSegments = segmentFn(lineText);
             lineSegments.forEach(seg => {
                 const span = document.createElement("span");
                 span.className = "block-char";

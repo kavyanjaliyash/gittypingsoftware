@@ -87,10 +87,14 @@ class JumpStyleRenderer {
         this.stageEl.className = "jump-stage";
         this.container.appendChild(this.stageEl);
 
-        // 5. Chunk text passage cleanly into platform segments (words or 3-4 char groups)
         const normalizedContent = screenContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-        const allGraphemes = Array.from(segmenter.segment(normalizedContent)).map(s => s.segment);
+        const segmentFn = window.segmentTextIntoGraphemes || function(txt) {
+            if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+                return Array.from(new Intl.Segmenter('kn', { granularity: 'grapheme' }).segment(txt)).map(s => s.segment);
+            }
+            return Array.from(txt);
+        };
+        const allGraphemes = segmentFn(normalizedContent);
 
         const chunks = [];
         let curChunk = [];

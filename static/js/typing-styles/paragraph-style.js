@@ -37,8 +37,13 @@ class ParagraphStyleRenderer {
         const maxCharsPerLine = 44;
 
         rawLines.forEach((rawLine, lIdx) => {
-            const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-            const lineSegments = Array.from(segmenter.segment(rawLine)).map(s => s.segment);
+            const segmentFn = window.segmentTextIntoGraphemes || function(txt) {
+                if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+                    return Array.from(new Intl.Segmenter('kn', { granularity: 'grapheme' }).segment(txt)).map(s => s.segment);
+                }
+                return Array.from(txt);
+            };
+            const lineSegments = segmentFn(rawLine);
 
             let currentLineEl = document.createElement("div");
             currentLineEl.className = "paragraph-line";

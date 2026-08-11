@@ -365,10 +365,11 @@ def delete_game(game_id):
 @admin_bp.route("/course/<int:course_id>/lessons")
 def manage_lessons(course_id):
     course = Course.query.get_or_404(course_id)
+    active_chapter = request.args.get("chapter", "all")
     chapter_order = {'Beginner': 1, 'Intermediate': 2, 'Advanced': 3}
     lessons = Lesson.query.filter_by(course_id=course_id).all()
     lessons = sorted(lessons, key=lambda l: (chapter_order.get(l.chapter or 'Beginner', 1), l.display_order or 0, l.lesson_id))
-    return render_template("admin/lesson.html", course=course, lessons=lessons)
+    return render_template("admin/lesson.html", course=course, lessons=lessons, active_chapter=active_chapter)
 
 @admin_bp.route("/course/<int:course_id>/lesson/add", methods=["POST"])
 def add_lesson(course_id):
@@ -384,7 +385,7 @@ def add_lesson(course_id):
     )
     db.session.add(lesson)
     db.session.commit()
-    return redirect(url_for("admin.manage_lessons", course_id=course_id))
+    return redirect(url_for("admin.manage_lessons", course_id=course_id, chapter=chapter))
 
 @admin_bp.route("/lesson/update/<int:lesson_id>", methods=["POST"])
 def update_lesson(lesson_id):
@@ -408,7 +409,7 @@ def update_lesson(lesson_id):
             l.display_order = idx
         db.session.commit()
 
-    return redirect(url_for("admin.manage_lessons", course_id=lesson.course_id))
+    return redirect(url_for("admin.manage_lessons", course_id=lesson.course_id, chapter=new_chapter))
 
 @admin_bp.route("/lesson/delete/<int:lesson_id>")
 def delete_lesson(lesson_id):
@@ -429,7 +430,7 @@ def delete_lesson(lesson_id):
         l.display_order = idx
     db.session.commit()
     
-    return redirect(url_for("admin.manage_lessons", course_id=course_id))
+    return redirect(url_for("admin.manage_lessons", course_id=course_id, chapter=chapter))
 
 @admin_bp.route("/lesson/<int:lesson_id>/screens")
 def manage_screens(lesson_id):
