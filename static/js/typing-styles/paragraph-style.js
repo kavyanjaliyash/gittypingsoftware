@@ -1,31 +1,28 @@
 /**
  * Paragraph Style Typing Renderer
  * Matches authentic TypingClub Paragraph / Flow mechanics:
- * - Natural multi-line paragraph layout with clean horizontal divider guidelines.
- * - Monospaced typography with generous tracking.
- * - Active character indicated with blue text and a crisp blue underline cursor (_).
+ * - Natural multi-line paragraph layout with clean baseline line-height.
+ * - Word-level wrapping so words and complex Kannada Ottaksharas never clip or overlap.
+ * - Active character indicated with bright blue text and crisp underline cursor (_).
  * - Correct letters turn green.
- * - Incorrect letters turn red with subtle soft red highlight.
- * - Word wrapping for long paragraphs into structured baseline lines.
- * - Continuous non-blocking typing flow with full Backspace / Delete support.
+ * - Incorrect letters turn red with soft red highlight.
+ * - Smooth auto-scrolling to keep active line in view.
+ * - Continuous typing flow with full Backspace / Delete support.
  */
 class ParagraphStyleRenderer {
     constructor(containerEl) {
         this.container = containerEl;
         this.charSpans = [];
-        this.lineDivs = [];
         this.activeIdx = 0;
-        this.rawSegments = [];
+        this.flowContainer = null;
     }
 
     init(screenContent) {
         this.container.className = "";
         this.container.innerHTML = "";
         this.charSpans = [];
-        this.lineDivs = [];
         this.activeIdx = 0;
 
-        // Clean white card container with subtle divider lines & smooth scrolling
         this.flowContainer = document.createElement("div");
         this.flowContainer.className = "paragraph-typing-container mb-4";
         this.container.appendChild(this.flowContainer);
@@ -34,52 +31,52 @@ class ParagraphStyleRenderer {
         const rawLines = normalized.split('\n');
         let globalCharIdx = 0;
 
-        const maxCharsPerLine = 44;
+        const segmentFn = window.segmentTextIntoGraphemes || function(txt) {
+            if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+                return Array.from(new Intl.Segmenter('kn', { granularity: 'grapheme' }).segment(txt)).map(s => s.segment);
+            }
+            return Array.from(txt);
+        };
 
         rawLines.forEach((rawLine, lIdx) => {
-            const segmentFn = window.segmentTextIntoGraphemes || function(txt) {
-                if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-                    return Array.from(new Intl.Segmenter('kn', { granularity: 'grapheme' }).segment(txt)).map(s => s.segment);
-                }
-                return Array.from(txt);
-            };
-            const lineSegments = segmentFn(rawLine);
+            const lineEl = document.createElement("div");
+            lineEl.className = "paragraph-line";
+            this.flowContainer.appendChild(lineEl);
 
-            let currentLineEl = document.createElement("div");
-            currentLineEl.className = "paragraph-line";
-            this.flowContainer.appendChild(currentLineEl);
-            this.lineDivs.push(currentLineEl);
+            const rawWords = rawLine.split(' ');
 
-            let currentLineCount = 0;
+            rawWords.forEach((word, wIdx) => {
+                const wordEl = document.createElement("span");
+                wordEl.className = "paragraph-word";
+                lineEl.appendChild(wordEl);
 
-            for (let i = 0; i < lineSegments.length; i++) {
-                const char = lineSegments[i];
-                const span = document.createElement("span");
-                span.className = (globalCharIdx === 0) ? "paragraph-char char-active" : "paragraph-char";
-                span.dataset.idx = globalCharIdx;
-                span.dataset.expected = char;
-
-                if (char === ' ') {
-                    span.innerHTML = "&nbsp;";
-                    span.classList.add("char-space");
-                } else {
+                const wordGraphemes = segmentFn(word);
+                for (let i = 0; i < wordGraphemes.length; i++) {
+                    const char = wordGraphemes[i];
+                    const span = document.createElement("span");
+                    span.className = (globalCharIdx === 0) ? "paragraph-char char-active" : "paragraph-char";
+                    span.dataset.idx = globalCharIdx;
+                    span.dataset.expected = char;
                     span.innerText = char;
+
+                    wordEl.appendChild(span);
+                    this.charSpans.push(span);
+                    globalCharIdx++;
                 }
 
-                currentLineEl.appendChild(span);
-                this.charSpans.push(span);
-                globalCharIdx++;
-                currentLineCount++;
+                // Add space between words
+                if (wIdx < rawWords.length - 1) {
+                    const spaceSpan = document.createElement("span");
+                    spaceSpan.className = (globalCharIdx === 0) ? "paragraph-char char-space char-active" : "paragraph-char char-space";
+                    spaceSpan.dataset.idx = globalCharIdx;
+                    spaceSpan.dataset.expected = ' ';
+                    spaceSpan.innerHTML = "&nbsp;";
 
-                // If line exceeds target width and we are at a space or near word boundary, wrap to next line
-                if (currentLineCount >= maxCharsPerLine && char === ' ' && i < lineSegments.length - 1) {
-                    currentLineEl = document.createElement("div");
-                    currentLineEl.className = "paragraph-line";
-                    this.flowContainer.appendChild(currentLineEl);
-                    this.lineDivs.push(currentLineEl);
-                    currentLineCount = 0;
+                    lineEl.appendChild(spaceSpan);
+                    this.charSpans.push(spaceSpan);
+                    globalCharIdx++;
                 }
-            }
+            });
 
             // If not last line, append Enter symbol marker
             if (lIdx < rawLines.length - 1) {
@@ -88,8 +85,8 @@ class ParagraphStyleRenderer {
                 newlineSpan.dataset.idx = globalCharIdx;
                 newlineSpan.dataset.expected = '\n';
                 newlineSpan.innerHTML = '<i class="fa-solid fa-arrow-turn-down fa-rotate-90 ms-1 opacity-50 fs-8"></i>';
-                
-                currentLineEl.appendChild(newlineSpan);
+
+                lineEl.appendChild(newlineSpan);
                 this.charSpans.push(newlineSpan);
                 globalCharIdx++;
             }
@@ -145,15 +142,13 @@ class ParagraphStyleRenderer {
     }
 
     scrollToActive() {
-        if (this.charSpans[this.activeIdx]) {
+        if (this.charSpans[this.activeIdx] && this.flowContainer) {
             const span = this.charSpans[this.activeIdx];
-            const line = span.closest(".paragraph-line");
-            if (line && this.flowContainer) {
-                const containerRect = this.flowContainer.getBoundingClientRect();
-                const lineRect = line.getBoundingClientRect();
-                if (lineRect.bottom > containerRect.bottom - 10 || lineRect.top < containerRect.top + 10) {
-                    line.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
+            const line = span.closest(".paragraph-line") || span;
+            const containerRect = this.flowContainer.getBoundingClientRect();
+            const lineRect = line.getBoundingClientRect();
+            if (lineRect.bottom > containerRect.bottom - 15 || lineRect.top < containerRect.top + 15) {
+                line.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
     }

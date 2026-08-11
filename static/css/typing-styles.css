@@ -522,28 +522,29 @@
 
 
 /* --------------------------------------------------------------------------
-   5. PARAGRAPH STYLE (Continuous Multi-Line Typing with Backspace & Guideline Rules)
+   5. PARAGRAPH STYLE (Continuous Multi-Line Typing with Clean Baseline Spacing)
    -------------------------------------------------------------------------- */
 .paragraph-typing-container {
     background: #ffffff;
     border: 1.5px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 14px 28px 16px 28px;
-    min-height: 250px;
-    max-height: 275px;
+    border-radius: 14px;
+    padding: 24px 32px;
+    min-height: 220px;
+    max-height: 320px;
     overflow-y: auto;
     width: 100%;
     max-width: 1140px;
     margin: 0 auto;
-    font-family: 'Courier Prime', 'Consolas', 'Courier New', monospace;
-    font-size: 2.15rem;
-    color: #374151;
+    font-family: 'Noto Sans Kannada', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 1.65rem;
+    line-height: 2.5;
+    color: #334155;
     user-select: none;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .paragraph-typing-container::-webkit-scrollbar {
-    width: 8px;
+    width: 7px;
 }
 .paragraph-typing-container::-webkit-scrollbar-track {
     background: #f8fafc;
@@ -559,64 +560,77 @@
 
 .paragraph-line {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: baseline;
-    border-bottom: 1.5px solid #eaeaea;
-    padding-top: 8px;
+    line-height: 2.5;
+    row-gap: 8px;
+    margin-bottom: 16px;
     padding-bottom: 8px;
-    margin-bottom: 0px;
-    min-height: 50px;
-    width: 100%;
+    border-bottom: 1.5px solid #f1f5f9;
+}
+.paragraph-line:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.paragraph-word {
+    display: inline-flex;
+    align-items: baseline;
+    white-space: nowrap;
+    line-height: inherit;
 }
 
 .paragraph-char {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 23px;
-    height: 34px;
-    padding: 0 1px;
+    display: inline-block;
+    vertical-align: baseline;
+    padding: 0 1.5px;
     margin: 0;
-    color: #4b5563;
+    color: #475569;
     font-weight: 500;
-    font-family: 'Courier Prime', 'Consolas', 'Courier New', monospace;
-    transition: color 0.1s ease;
-    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    transition: all 0.12s ease;
     border-bottom: 3.5px solid transparent;
     box-sizing: border-box;
 }
 
 .paragraph-char.char-space {
-    min-width: 22px;
+    display: inline-block;
+    min-width: 14px;
+    padding: 0 2px;
 }
 
 .paragraph-char.char-newline {
     color: #94a3b8;
+    margin-left: 6px;
 }
 
-/* Active Character Cursor Underline (Bright Blue Underline beneath character) */
+/* Active Character Underline Cursor */
 .paragraph-char.char-active {
     color: #0284c7 !important;
     border-bottom: 3.5px solid #0284c7 !important;
-    background: transparent !important;
-    font-weight: 600;
+    background: rgba(2, 132, 199, 0.08) !important;
+    border-radius: 3px 3px 0 0;
+    font-weight: 700;
 }
 
-/* Correctly Typed Character (Green text) */
+/* Correctly Typed Character (Green) */
 .paragraph-char.char-correct {
     color: #16a34a !important;
-    background: transparent !important;
     border-bottom: 3.5px solid transparent !important;
+    background: transparent !important;
     font-weight: 500;
 }
 
-/* Incorrectly Typed Character (Red text with soft red pill) */
+/* Incorrectly Typed Character (Soft Red Pill) */
 .paragraph-char.char-error {
     color: #dc2626 !important;
     background: #fee2e2 !important;
     border-radius: 4px;
-    border-bottom: 3.5px solid transparent !important;
-    font-weight: 600;
+    border-bottom: 3.5px solid #ef4444 !important;
+    font-weight: 700;
 }
 
 
