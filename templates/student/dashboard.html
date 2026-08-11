@@ -185,133 +185,175 @@
         color: #0284c7;
     }
 
-    /* Modern Student Chapter Accordion System */
-    .student-chapter-card {
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-        margin-bottom: 20px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .student-chapter-card:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        transform: translateY(-2px);
+    /* Left Sidebar Chapter Item Cards (Under Course Tab - Matching Image 2) */
+    .sidebar-chapters-container {
+        margin-top: 10px;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
     }
 
-    .student-chapter-header {
-        width: 100%;
+    .sidebar-chapter-card {
         background: #ffffff;
-        border: none;
-        padding: 16px 22px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 12px 14px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        text-align: left;
+        gap: 8px;
         cursor: pointer;
-        transition: background 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 62px;
+        overflow: hidden;
     }
-    .student-chapter-header:hover {
+    .sidebar-chapter-card:hover {
+        border-color: #cbd5e1;
         background-color: #f8fafc;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
-    .student-chapter-header:focus {
-        outline: none;
-        box-shadow: none;
+    .sidebar-chapter-card.active {
+        border-color: #0284c7;
+        background-color: #f0f9ff;
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.18);
     }
 
-    .student-chapter-icon {
-        width: 46px;
-        height: 46px;
-        min-width: 46px;
-        border-radius: 14px;
+    .sidebar-chapter-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
+    }
+
+    .sidebar-chapter-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #ffffff;
-        font-size: 1.15rem;
+        font-size: 1rem;
+        flex-shrink: 0;
     }
-    .student-chapter-icon.beginner {
+    .sidebar-chapter-icon.beginner {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.32);
+        box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
     }
-    .student-chapter-icon.intermediate {
+    .sidebar-chapter-icon.intermediate {
         background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.32);
+        box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
     }
-    .student-chapter-icon.advanced {
+    .sidebar-chapter-icon.advanced {
         background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
-        box-shadow: 0 4px 14px rgba(244, 63, 94, 0.32);
+        box-shadow: 0 3px 10px rgba(244, 63, 94, 0.3);
     }
 
-    .student-chapter-title {
-        font-size: 1.05rem;
-        font-weight: 800;
-        color: #0f172a;
-        letter-spacing: -0.2px;
-        line-height: 1.2;
+    .sidebar-chapter-text {
+        min-width: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
     }
-    .student-chapter-sub {
-        font-size: 0.82rem;
+    .sidebar-chapter-title {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.2;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .sidebar-chapter-sub {
+        font-size: 0.74rem;
         color: #64748b;
         font-weight: 500;
-        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .student-pill-count {
-        font-size: 0.8rem;
+    .sidebar-chapter-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .sidebar-pill-count {
+        font-size: 0.73rem;
         font-weight: 700;
-        padding: 6px 14px;
-        border-radius: 30px;
-        letter-spacing: 0.2px;
+        padding: 4px 9px;
+        border-radius: 20px;
         white-space: nowrap;
     }
-    .student-pill-count.beginner {
+    .sidebar-pill-count.beginner {
         background: #ecfdf5;
         color: #059669;
         border: 1px solid #a7f3d0;
     }
-    .student-pill-count.intermediate {
+    .sidebar-pill-count.intermediate {
         background: #fffbeb;
         color: #d97706;
         border: 1px solid #fde68a;
     }
-    .student-pill-count.advanced {
+    .sidebar-pill-count.advanced {
         background: #fff1f2;
         color: #e11d48;
         border: 1px solid #fecdd3;
     }
 
-    .student-chevron-circle {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
+    .sidebar-chevron-circle {
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
         border-radius: 50%;
         background: #f1f5f9;
         border: 1px solid #e2e8f0;
         color: #64748b;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.8rem;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.7rem;
+        transition: all 0.2s ease;
     }
-    .student-chapter-header:not(.collapsed) .student-chevron-circle {
-        transform: rotate(180deg);
-        background: #e2e8f0;
-        color: #0f172a;
-    }
-    .student-chapter-header.collapsed .student-chevron-circle {
-        transform: rotate(0deg);
+    .sidebar-chapter-card.active .sidebar-chevron-circle {
+        background: #0284c7;
+        border-color: #0284c7;
+        color: #ffffff;
     }
 
-    .student-lesson-container {
-        background: #f8fafc;
-        border-top: 1px solid #f1f5f9;
-        padding: 18px 20px;
+    /* Sleek Scrollbar for Lesson List (Shows 6 lessons, scrolls from 7th onwards) */
+    .lessons-scroll-container {
+        max-height: 720px;
+        overflow-y: auto;
+        padding-right: 6px;
         display: flex;
         flex-direction: column;
         gap: 14px;
+    }
+    .lessons-scroll-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    .lessons-scroll-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+    }
+    .lessons-scroll-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.55);
+        border-radius: 10px;
+    }
+    .lessons-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.85);
     }
 </style>
 
@@ -362,39 +404,91 @@
         </div>
     </div>
 
-    <!-- Main Layout Grid: Left Sidebar + Right Course Panel -->
-    <div class="row g-4">
+    <!-- Main Layout Grid: Left Sidebar (Courses + Nested Chapters) + Right Course Panel (Matching Image 2) -->
+    <div class="row g-4 align-items-start">
         
-        <!-- Left Sidebar: Learn to Type Course Tabs -->
-        <div class="col-lg-3 col-md-4">
+        <!-- Left Sidebar: Learn to Type Course Tabs & Nested Chapters -->
+        <div class="col-xl-4 col-lg-4 col-md-5">
             <h6 class="fw-bold text-muted text-uppercase fs-7 mb-3" style="letter-spacing: 1px;">Learn to Type</h6>
             
             {% for c in courses %}
-            <button class="course-tab-btn {% if loop.first %}active{% else %}inactive{% endif %}" onclick="switchCourseTab({{ c.course_id }}, this)">
-                <div class="d-flex align-items-center gap-2">
-                    {% if 'Kannada' in c.course_name %}
-                    <i class="fa-solid fa-language me-1"></i>
-                    {% else %}
-                    <i class="fa-solid fa-keyboard me-1"></i>
-                    {% endif %}
-                    <span>{{ c.course_name }}</span>
+            <div class="course-tab-group mb-3">
+                <!-- Course Main Tab Button -->
+                <button class="course-tab-btn {% if loop.first %}active{% else %}inactive{% endif %}" onclick="switchCourseTab({{ c.course_id }}, this)">
+                    <div class="d-flex align-items-center gap-2">
+                        {% if 'Kannada' in c.course_name %}
+                        <i class="fa-solid fa-language me-1"></i>
+                        {% else %}
+                        <i class="fa-solid fa-keyboard me-1"></i>
+                        {% endif %}
+                        <span>{{ c.course_name }}</span>
+                    </div>
+                    <div class="{% if loop.first %}play-badge-yellow{% else %}play-badge-gray{% endif %}">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                </button>
+
+                <!-- Nested Chapters Under This Course (Matching Image 2) -->
+                <div id="course-chapters-sidebar-{{ c.course_id }}" class="sidebar-chapters-container {% if not loop.first %}d-none{% endif %}">
+                    {% set chapters_list = ['Beginner', 'Intermediate', 'Advanced'] %}
+                    {% for chap in chapters_list %}
+                        {% set ns = namespace(chap_lessons=[]) %}
+                        {% for l in c.lessons %}
+                            {% if (l.chapter or 'Beginner') == chap %}
+                                {% set ns.chap_lessons = ns.chap_lessons + [l] %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if ns.chap_lessons %}
+                        <div class="sidebar-chapter-card {% if loop.first %}active{% endif %}" onclick="showChapterLessons({{ c.course_id }}, '{{ chap|lower }}', this)">
+                            <div class="sidebar-chapter-left">
+                                <div class="sidebar-chapter-icon {{ chap|lower }}">
+                                    {% if chap == 'Advanced' %}
+                                    <i class="fa-solid fa-trophy"></i>
+                                    {% elif chap == 'Intermediate' %}
+                                    <i class="fa-solid fa-bolt"></i>
+                                    {% else %}
+                                    <i class="fa-solid fa-seedling"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="sidebar-chapter-text">
+                                    <div class="sidebar-chapter-title">{{ chap }} Chapter</div>
+                                    <div class="sidebar-chapter-sub" title="{% if chap == 'Advanced' %}Paragraphs, Flow & Speed Mastery{% elif chap == 'Intermediate' %}Numbers, Symbols & Combined Keys{% else %}Home Row & Foundation Keys{% endif %}">
+                                        {% if chap == 'Advanced' %}
+                                        Paragraphs, Flow & Speed Mastery
+                                        {% elif chap == 'Intermediate' %}
+                                        Numbers, Symbols & Combined Keys
+                                        {% else %}
+                                        Home Row & Foundation Keys
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sidebar-chapter-right">
+                                <span class="sidebar-pill-count {{ chap|lower }}">
+                                    {{ ns.chap_lessons|length }} Lessons
+                                </span>
+                                <div class="sidebar-chevron-circle">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-                <div class="{% if loop.first %}play-badge-yellow{% else %}play-badge-gray{% endif %}">
-                    <i class="fa-solid fa-play"></i>
-                </div>
-            </button>
+            </div>
             {% endfor %}
         </div>
 
-        <!-- Right Course Display Panel (Matching Blue `#0284c7` Design) -->
-        <div class="col-lg-9 col-md-8">
+        <!-- Right Course Display Panel (Matching Blue `#0284c7` Design in Image 2) -->
+        <div class="col-xl-8 col-lg-8 col-md-7">
             {% for c in courses %}
             <div id="course-panel-{{ c.course_id }}" class="course-main-panel {% if not loop.first %}d-none{% endif %}">
                 
                 <!-- Course Top Bar: Overall Progress & Certificate Button -->
                 <div class="d-flex flex-wrap align-items-center justify-content-between pb-3 mb-4 border-bottom border-white border-opacity-25 gap-3">
-                    <div class="d-flex align-items-center gap-3 flex-grow-1" style="max-width: 400px;">
-                        <div class="progress flex-grow-1 bg-white bg-opacity-25" style="height: 18px; border-radius: 10px;">
+                    <div class="d-flex align-items-center gap-3 flex-grow-1" style="max-width: 420px;">
+                        <div class="progress flex-grow-1 bg-white bg-opacity-25" style="height: 16px; border-radius: 10px;">
                             <div class="progress-bar bg-white" role="progressbar" style="width: {{ course_stats[c.course_id].pct }}%;" aria-valuenow="{{ course_stats[c.course_id].pct }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <span class="fw-bold text-white fs-6 font-monospace">{{ course_stats[c.course_id].pct }}% Complete</span>
@@ -408,7 +502,7 @@
                     </div>
                 </div>
 
-                <!-- Lessons Grouped by Chapters (Beginner, Intermediate, Advanced) -->
+                <!-- Lessons Content Area for this Course -->
                 {% if c.lessons %}
                     {% set chapters_list = ['Beginner', 'Intermediate', 'Advanced'] %}
                     {% for chap in chapters_list %}
@@ -420,43 +514,17 @@
                         {% endfor %}
 
                         {% if ns.chap_lessons %}
-                        <div class="chapter-group mb-4">
-                            <!-- Chapter Heading Bar -->
-                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-white border-opacity-25">
-                                <div class="d-flex align-items-center gap-2.5">
-                                    {% if chap == 'Advanced' %}
-                                    <span class="badge bg-danger text-white px-3 py-1.5 rounded-pill fs-7 fw-bold shadow-sm">
-                                        <i class="fa-solid fa-trophy me-1"></i> Advanced Chapter
-                                    </span>
-                                    <span class="text-white small opacity-75 d-none d-md-inline">Paragraphs, Flow & Speed Mastery</span>
-                                    {% elif chap == 'Intermediate' %}
-                                    <span class="badge bg-warning text-dark px-3 py-1.5 rounded-pill fs-7 fw-bold shadow-sm">
-                                        <i class="fa-solid fa-bolt me-1"></i> Intermediate Chapter
-                                    </span>
-                                    <span class="text-white small opacity-75 d-none d-md-inline">Numbers, Symbols & Combined Keys</span>
-                                    {% else %}
-                                    <span class="badge bg-success text-white px-3 py-1.5 rounded-pill fs-7 fw-bold shadow-sm">
-                                        <i class="fa-solid fa-seedling me-1"></i> Beginner Chapter
-                                    </span>
-                                    <span class="text-white small opacity-75 d-none d-md-inline">Home Row & Foundation Keys</span>
-                                    {% endif %}
-                                </div>
-                                <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 font-monospace fs-7 fw-semibold">
-                                    {{ ns.chap_lessons|length }} {% if ns.chap_lessons|length == 1 %}Lesson{% else %}Lessons{% endif %}
-                                </span>
-                            </div>
-
-                            <!-- Chapter Lessons List -->
-                            <div class="lessons-container">
+                        <div id="chapter-pane-{{ c.course_id }}-{{ chap|lower }}" class="chapter-pane-content {% if not loop.first %}d-none{% endif %}">
+                            <div class="lessons-scroll-container">
                                 {% for l in ns.chap_lessons %}
                                 {% set is_completed = (completed_lesson_ids and l.lesson_id in completed_lesson_ids) %}
                                 {% set prog = progress_map.get(l.lesson_id) %}
                                 
-                                <div class="lesson-item-card {% if is_completed %}completed-card{% else %}white-card{% endif %} shadow-sm">
+                                <div class="lesson-item-card {% if is_completed %}completed-card{% else %}white-card{% endif %} shadow-sm mb-0">
                                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
                                         <div class="d-flex align-items-center gap-3">
                                             <div class="number-circle">
-                                                {{ l.display_order }}
+                                                {{ loop.index }}
                                             </div>
                                             <div>
                                                 <h5 class="fw-bold mb-1 fs-5">{{ l.lesson_title }}</h5>
@@ -477,7 +545,7 @@
                                     </div>
 
                                     <!-- Segmented Progress Bar at bottom of Lesson Card -->
-                                    <div class="d-flex gap-1 mt-3 rounded-2 overflow-hidden bg-black bg-opacity-10 p-1" style="height: 12px;">
+                                    <div class="d-flex gap-1 mt-3 rounded-2 overflow-hidden bg-black bg-opacity-10 p-1" style="height: 10px;">
                                         {% for screen in l.screens %}
                                         <div class="flex-fill rounded-1 {% if is_completed %}bg-white{% else %}bg-primary opacity-50{% endif %}"></div>
                                         {% else %}
@@ -527,6 +595,21 @@
             badge.classList.add("play-badge-yellow");
         }
 
+        // Toggle sidebar nested chapters containers
+        document.querySelectorAll(".sidebar-chapters-container").forEach(c => {
+            c.classList.add("d-none");
+        });
+        const activeChapters = document.getElementById(`course-chapters-sidebar-${courseId}`);
+        if (activeChapters) {
+            activeChapters.classList.remove("d-none");
+            // Set first chapter as active
+            const firstChap = activeChapters.querySelector(".sidebar-chapter-card");
+            if (firstChap) {
+                activeChapters.querySelectorAll(".sidebar-chapter-card").forEach(sc => sc.classList.remove("active"));
+                firstChap.classList.add("active");
+            }
+        }
+
         // Toggle course main panels
         document.querySelectorAll(".course-main-panel").forEach(p => {
             p.classList.add("d-none");
@@ -535,6 +618,33 @@
         const activePanel = document.getElementById(`course-panel-${courseId}`);
         if (activePanel) {
             activePanel.classList.remove("d-none");
+            // Show first chapter pane
+            const firstPane = activePanel.querySelector(".chapter-pane-content");
+            if (firstPane) {
+                activePanel.querySelectorAll(".chapter-pane-content").forEach(cp => cp.classList.add("d-none"));
+                firstPane.classList.remove("d-none");
+            }
+        }
+    }
+
+    function showChapterLessons(courseId, chapName, btn) {
+        // Set active state on sidebar chapter cards
+        const container = document.getElementById(`course-chapters-sidebar-${courseId}`);
+        if (container) {
+            container.querySelectorAll(".sidebar-chapter-card").forEach(c => c.classList.remove("active"));
+        }
+        if (btn) {
+            btn.classList.add("active");
+        }
+
+        // Show target chapter pane in right panel
+        const coursePanel = document.getElementById(`course-panel-${courseId}`);
+        if (coursePanel) {
+            coursePanel.querySelectorAll(".chapter-pane-content").forEach(cp => cp.classList.add("d-none"));
+            const targetPane = document.getElementById(`chapter-pane-${courseId}-${chapName}`);
+            if (targetPane) {
+                targetPane.classList.remove("d-none");
+            }
         }
     }
 </script>

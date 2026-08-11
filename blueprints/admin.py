@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from database import db
-from models import User, Branch, Faculty, Student, Course, Lesson, Screen, TypingGame
+from models import User, Branch, Faculty, Student, Course, Lesson, Screen, StudentProgress, TypingGame
 from datetime import datetime
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -335,6 +335,12 @@ def update_course(course_id):
 @admin_bp.route("/course/delete/<int:course_id>")
 def delete_course(course_id):
     course = Course.query.get_or_404(course_id)
+    # Explicitly clean up all child lessons, screens, and progress records
+    lessons = Lesson.query.filter_by(course_id=course_id).all()
+    for l in lessons:
+        Screen.query.filter_by(lesson_id=l.lesson_id).delete()
+        StudentProgress.query.filter_by(lesson_id=l.lesson_id).delete()
+        db.session.delete(l)
     db.session.delete(course)
     db.session.commit()
     return redirect(url_for("admin.lms_content"))
@@ -359,13 +365,15 @@ def delete_game(game_id):
 @admin_bp.route("/course/<int:course_id>/lessons")
 def manage_lessons(course_id):
     course = Course.query.get_or_404(course_id)
-    lessons = Lesson.query.filter_by(course_id=course_id).order_by(Lesson.display_order).all()
+    chapter_order = {'Beginner': 1, 'Intermediate': 2, 'Advanced': 3}
+    lessons = Lesson.query.filter_by(course_id=course_id).all()
+    lessons = sorted(lessons, key=lambda l: (chapter_order.get(l.chapter or 'Beginner', 1), l.display_order or 0, l.lesson_id))
     return render_template("admin/lesson.html", course=course, lessons=lessons)
 
 @admin_bp.route("/course/<int:course_id>/lesson/add", methods=["POST"])
 def add_lesson(course_id):
-    display_order = Lesson.query.filter_by(course_id=course_id).count() + 1
     chapter = request.form.get("chapter", "Beginner")
+    display_order = Lesson.query.filter_by(course_id=course_id, chapter=chapter).count() + 1
     lesson = Lesson(
         course_id=course_id,
         lesson_title=request.form["lesson_title"],
@@ -381,19 +389,46 @@ def add_lesson(course_id):
 @admin_bp.route("/lesson/update/<int:lesson_id>", methods=["POST"])
 def update_lesson(lesson_id):
     lesson = Lesson.query.get_or_404(lesson_id)
+    old_chapter = lesson.chapter or "Beginner"
+    new_chapter = request.form.get("chapter", old_chapter)
     lesson.lesson_title = request.form["lesson_title"]
     lesson.lesson_description = request.form["lesson_description"]
-    lesson.chapter = request.form.get("chapter", lesson.chapter or "Beginner")
+    
+    if old_chapter != new_chapter:
+        lesson.chapter = new_chapter
+        lesson.display_order = Lesson.query.filter_by(course_id=lesson.course_id, chapter=new_chapter).count() + 1
+    
     lesson.status = request.form["status"]
     db.session.commit()
+    
+    # Re-sequence old chapter lessons if chapter changed
+    if old_chapter != new_chapter:
+        old_remaining = Lesson.query.filter_by(course_id=lesson.course_id, chapter=old_chapter).order_by(Lesson.display_order, Lesson.lesson_id).all()
+        for idx, l in enumerate(old_remaining, 1):
+            l.display_order = idx
+        db.session.commit()
+
     return redirect(url_for("admin.manage_lessons", course_id=lesson.course_id))
 
 @admin_bp.route("/lesson/delete/<int:lesson_id>")
 def delete_lesson(lesson_id):
     lesson = Lesson.query.get_or_404(lesson_id)
     course_id = lesson.course_id
+    chapter = lesson.chapter or "Beginner"
+    
+    # Explicitly clean up child screens & progress records
+    Screen.query.filter_by(lesson_id=lesson_id).delete()
+    StudentProgress.query.filter_by(lesson_id=lesson_id).delete()
+    
     db.session.delete(lesson)
     db.session.commit()
+    
+    # Re-sequence remaining lessons in this chapter to ensure no gaps
+    remaining = Lesson.query.filter_by(course_id=course_id, chapter=chapter).order_by(Lesson.display_order, Lesson.lesson_id).all()
+    for idx, l in enumerate(remaining, 1):
+        l.display_order = idx
+    db.session.commit()
+    
     return redirect(url_for("admin.manage_lessons", course_id=course_id))
 
 @admin_bp.route("/lesson/<int:lesson_id>/screens")

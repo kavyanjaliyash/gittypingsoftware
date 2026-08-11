@@ -63,7 +63,7 @@ class Course(db.Model):
     course_id = db.Column(db.Integer, primary_key=True)
     course_name = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(20), default="Active")
-    lessons = db.relationship("Lesson", backref="course", order_by="Lesson.display_order")
+    lessons = db.relationship("Lesson", backref="course", cascade="all, delete-orphan", order_by="Lesson.display_order")
 
 class Lesson(db.Model):
     __tablename__ = "lessons"
@@ -74,6 +74,8 @@ class Lesson(db.Model):
     chapter = db.Column(db.String(100), default="Beginner") # 'Beginner', 'Intermediate', 'Advanced'
     display_order = db.Column(db.Integer, default=1)
     status = db.Column(db.String(20), default="Active")
+    screens = db.relationship("Screen", backref="lesson", cascade="all, delete-orphan", order_by="Screen.display_order")
+    progresses = db.relationship("StudentProgress", backref="lesson", cascade="all, delete-orphan")
 
 class Screen(db.Model):
     __tablename__ = "lesson_screens"
@@ -84,8 +86,6 @@ class Screen(db.Model):
     screen_type = db.Column(db.String(50), default="block") # 'block', 'waterfall', 'jump'
     display_order = db.Column(db.Integer, default=1)
     status = db.Column(db.String(20), default="Active")
-    
-    lesson = db.relationship("Lesson", backref="screens")
 
 class StudentProgress(db.Model):
     __tablename__ = "student_progress"
