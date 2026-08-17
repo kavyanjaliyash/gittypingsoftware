@@ -1,0 +1,13 @@
+services:
+  typing-app:
+    build: .
+    container_name: kannada-typing-software
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      # Persist SQLite database and uploads across container restarts/rebuilds
+      - ./instance:/app/instance
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
