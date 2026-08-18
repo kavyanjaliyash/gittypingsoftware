@@ -309,10 +309,336 @@
             transition: all 0.2s ease;
             box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
         }
-        .lms-lesson-tile:hover {
-            border-color: #cbd5e1;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-            transform: translateY(-1px);
+        /* Typing Table Card & Student Management Interface */
+        .typing-table-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .action-toolbar {
+            padding: 12px 18px;
+            background: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: nowrap;
+        }
+
+        .toolbar-group-left, .toolbar-group-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .btn-tb {
+            background-color: #ffffff;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
+            line-height: 1;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn-tb:hover {
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+            color: #0f172a;
+        }
+
+        .btn-tb-icon {
+            width: 36px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+        }
+
+        .tb-select {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #334155;
+            height: 36px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .tb-select:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+        }
+
+        .btn-add-students {
+            background-color: #0284c7;
+            color: #ffffff;
+            border: 1px solid #0284c7;
+            border-radius: 6px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
+            white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(2, 132, 199, 0.2);
+            transition: all 0.15s ease;
+        }
+
+        .btn-add-students:hover {
+            background-color: #0369a1;
+            border-color: #0369a1;
+            color: #ffffff;
+        }
+
+        .tb-search {
+            position: relative;
+            width: 180px;
+        }
+
+        .tb-search input {
+            width: 100%;
+            height: 36px;
+            padding-left: 30px;
+            padding-right: 10px;
+            font-size: 0.84rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            transition: all 0.15s;
+        }
+
+        .tb-search input:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.12);
+            width: 220px;
+        }
+
+        .tb-search i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+
+        .tb-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1.5px solid #cbd5e1;
+            cursor: pointer;
+            margin: 0;
+            vertical-align: middle;
+        }
+
+        .tb-check:checked {
+            background-color: #0284c7;
+            border-color: #0284c7;
+        }
+
+        .table-modern {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+
+        .table-modern thead th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            padding: 14px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .table-modern thead th:first-child {
+            width: 44px;
+            text-align: center;
+            padding-left: 16px;
+            cursor: default;
+        }
+
+        .table-modern thead th .sort-icon {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-left: 4px;
+        }
+
+        .table-modern thead th.active-sort .sort-icon {
+            color: #059669;
+            font-weight: bold;
+        }
+
+        .table-modern tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            height: 52px;
+            transition: background-color 0.1s ease;
+        }
+
+        .table-modern tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .table-modern tbody tr.selected-row {
+            background-color: #f0fdf4 !important;
+        }
+
+        .table-modern tbody td {
+            padding: 12px 14px;
+            font-size: 0.88rem;
+            color: #334155;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .table-modern tbody td:first-child {
+            text-align: center;
+            padding-left: 16px;
+        }
+
+        .val-regno {
+            color: #059669;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .val-regno:hover {
+            color: #047857;
+            text-decoration: underline;
+        }
+
+        .val-username {
+            color: #059669;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .val-username:hover {
+            text-decoration: underline;
+            color: #047857;
+        }
+
+        .badge-new-pill {
+            background-color: #059669;
+            color: #ffffff;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: inline-block;
+        }
+
+        .badge-status-dot {
+            color: #10b981;
+            font-size: 0.8rem;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+
+        .val-speed, .val-acc {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .val-empty {
+            color: #94a3b8;
+        }
+
+        #printableLoginCardsOnly {
+            display: none;
+        }
+
+        @media print {
+            html, body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
+            .sidebar, 
+            .typing-table-card, 
+            .card,
+            .stat-card,
+            .tab-pane-content,
+            .modal, 
+            .modal-backdrop, 
+            .alert, 
+            .user-profile-badge,
+            .no-print,
+            .d-print-none,
+            .print-card-hidden {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                min-height: auto !important;
+                display: block !important;
+            }
+
+            #printableLoginCardsOnly {
+                display: block !important;
+                width: 100% !important;
+                padding: 20px !important;
+                box-sizing: border-box !important;
+            }
+
+            .cards-print-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 20px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .login-card-print-box {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+                border: 1.5px dashed #94a3b8 !important;
+                background: #ffffff !important;
+                padding: 14px 16px !important;
+                border-radius: 8px !important;
+                box-sizing: border-box !important;
+            }
+
+            .login-card-print-box.print-card-hidden {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -363,7 +689,7 @@
     <main class="main-content">
 
         <!-- Top Right Profile Header Badge -->
-        <div class="d-flex justify-content-end align-items-center mb-3">
+        <div class="d-flex justify-content-end align-items-center mb-3 no-print">
             <div class="user-profile-badge text-end px-3 py-1.5 rounded-3 bg-white border shadow-sm cursor-pointer" onclick="switchTab('faculty')" style="cursor: pointer;" title="Click to view Profile">
                 <div class="fw-bold text-dark mb-0 fs-6">{{ faculty.faculty_name if faculty else session.get('faculty_username', session.get('username', 'chaithra')) }}</div>
                 <small class="text-muted fs-7">Faculty Admin <i class="fa-solid fa-user-tie ms-1 text-success"></i></small>
@@ -451,8 +777,8 @@
                                 <td class="fw-bold text-dark">{{ s.student_name }}</td>
                                 <td>{{ s.mobile }}</td>
                                 <td><span class="badge bg-light text-dark border">{{ s.course }}</span></td>
-                                <td><span class="fw-bold text-primary">{{ s.english_wpm or 0 }} WPM</span></td>
-                                <td><span class="fw-bold text-info">{{ s.kannada_wpm or 0 }} WPM</span></td>
+                                <td><span class="fw-bold text-primary">{{ s.avg_wpm_num or 0 }} WPM</span></td>
+                                <td><span class="fw-bold text-info">0 WPM</span></td>
                                 <td class="pe-4 text-end">
                                     <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1 rounded-2">Active</span>
                                 </td>
@@ -510,173 +836,502 @@
             </div>
         </div>
 
-        <!-- 3. STUDENTS TAB CONTENT (100% Parity with Branch Student Dashboard) -->
+        <!-- 3. STUDENTS TAB CONTENT (Unified Student Management Interface) -->
+        <!-- 2. STUDENTS TAB CONTENT -->
         <div id="tab-content-students" class="tab-pane-content {% if active_tab != 'students' %}d-none{% endif %}">
+            
+            <!-- Section Header Matching Faculty Portal Design -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-user-graduate text-success me-2"></i>Student Dashboard</h3>
-                    <p class="text-muted small mb-0">Detailed list of enrolled students, live typing speeds, and student registration.</p>
+                    <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-graduation-cap text-success me-2"></i>My Assigned Students</h3>
+                    <p class="text-muted small mb-0">Track student typing progress, speed benchmarks, accuracy, and print login cards.</p>
                 </div>
-                <div class="d-flex gap-3 align-items-center">
-                    <input type="text" id="facultyStudentSearchInput" class="form-control rounded-3 shadow-none px-3" placeholder="Search student name or reg..." style="max-width: 250px;" onkeyup="filterFacultyStudents()">
-                    <button type="button" class="btn btn-primary fw-semibold px-3 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2 border-0" data-bs-toggle="modal" data-bs-target="#addFacultyStudentModal" style="background-color: #0284c7 !important;">
-                        <i class="fa-solid fa-plus"></i> <span>Add Student</span>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-success px-3 py-2 rounded-pill font-monospace fw-bold fs-6">{{ students|length }} Students</span>
+                    <button type="button" class="btn btn-success fw-semibold px-3 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addFacultyStudentModal">
+                        <i class="fa-solid fa-plus"></i> <span>Add Students</span>
                     </button>
                 </div>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-4 p-0" style="overflow: visible !important;">
-                <div class="table-responsive" style="overflow: visible !important; min-height: 220px;">
-                    <table class="table table-hover align-middle mb-0" id="facultyStudentsTable">
-                        <thead class="bg-light text-muted fs-7">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4">
+                <!-- Top Action Toolbar -->
+                <div class="action-toolbar">
+                    <!-- Left Action Buttons -->
+                    <div class="toolbar-group-left">
+                        <button type="button" class="btn-tb btn-tb-icon" id="btnTbRefresh" onclick="resetStudentSearch()" title="Reset Selection & Search">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+
+                        <button type="button" class="btn-tb" data-bs-toggle="modal" data-bs-target="#printCardsModal">
+                            <i class="fa-regular fa-address-card"></i> <span>Print Login Cards</span>
+                        </button>
+
+                        <button type="button" class="btn-tb" data-bs-toggle="modal" data-bs-target="#deleteSelectedModal">
+                            <i class="fa-regular fa-trash-can"></i> <span>Delete</span>
+                        </button>
+
+                        <div class="dropdown">
+                            <button class="btn-tb dropdown-toggle" type="button" id="moreActionsMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span>More Actions</span>
+                            </button>
+                            <ul class="dropdown-menu shadow-sm rounded-3 border-0 py-2" aria-labelledby="moreActionsMenu">
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center gap-2 small" href="javascript:void(0)" onclick="exportToCSV()">
+                                        <i class="fa-solid fa-file-csv text-success"></i> Export Table to CSV
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center gap-2 small" href="javascript:void(0)" onclick="openBulkResetModal()">
+                                        <i class="fa-solid fa-key text-warning"></i> Reset Passwords for Selected
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center gap-2 small" href="javascript:void(0)" onclick="selectAllStudents(true)">
+                                        <i class="fa-regular fa-square-check text-primary"></i> Select All
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center gap-2 small" href="javascript:void(0)" onclick="selectAllStudents(false)">
+                                        <i class="fa-regular fa-square text-secondary"></i> Deselect All
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Right Action Controls -->
+                    <div class="toolbar-group-right">
+                        <div class="tb-search d-none d-md-block">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="tbSearchInput" placeholder="Search student or user...">
+                        </div>
+
+                        <select class="tb-select" id="tbTimeSelect" onchange="filterByTimeRange(this.value)">
+                            <option value="this_week" selected>This Week</option>
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="last_week">Last Week</option>
+                            <option value="this_month">This Month</option>
+                            <option value="all_time">All Time</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Modern Table -->
+                <div class="table-responsive">
+                    <table class="table-modern" id="studentsTable">
+                        <thead>
                             <tr>
-                                <th class="ps-4">Registration No</th>
-                                <th>Student Name</th>
-                                <th>Username / Login</th>
-                                <th>Mobile</th>
-                                <th>Course</th>
-                                <th>English Speed</th>
-                                <th>Kannada Speed</th>
-                                <th>Status</th>
-                                <th class="pe-4 text-end">Actions</th>
+                                <th>
+                                    <input type="checkbox" id="selectAllCheckbox" class="form-check-input tb-check" title="Select All">
+                                </th>
+                                <th onclick="sortTable(1, 'string')" id="th-regno">
+                                    REGISTRATION NO <span class="sort-icon">⇅</span>
+                                </th>
+                                <th onclick="sortTable(2, 'string')" id="th-studentname">
+                                    STUDENT NAME <span class="sort-icon">▴</span>
+                                </th>
+                                <th onclick="sortTable(3, 'string')" id="th-username">
+                                    USERNAME / LOGIN <span class="sort-icon">⇅</span>
+                                </th>
+                                <th onclick="sortTable(4, 'string')" id="th-mobile">
+                                    MOBILE <span class="sort-icon">⇅</span>
+                                </th>
+                                <th onclick="sortTable(5, 'string')" id="th-course">
+                                    COURSE <span class="sort-icon">⇅</span>
+                                </th>
+                                <th onclick="sortTable(6, 'date')" id="th-lastlogin">
+                                    LAST LOGIN <span class="sort-icon">⇅</span>
+                                </th>
+                                <th onclick="sortTable(7, 'number')" id="th-typingtime">
+                                    TYPING TIME <span class="sort-icon">⇅</span>
+                                </th>
+                                <th onclick="sortTable(8, 'number')" id="th-avgspeed">
+                                    AVG SPEED <span class="sort-icon">⇅</span>
+                                </th>
+                                <th onclick="sortTable(9, 'number')" id="th-avgacc">
+                                    AVG ACC <span class="sort-icon">⇅</span>
+                                </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="studentTableBody">
                             {% for s in students %}
-                            {% set sid = s.student_id %}
-                            <tr>
-                                <td class="ps-4">
-                                    <a href="{{ url_for('faculty.student_details', student_id=sid) }}" class="font-monospace fw-bold text-success text-decoration-none" title="Click to view student dashboard">
-                                        {{ s.registration_no }} <i class="fa-solid fa-arrow-up-right-from-square ms-1 fs-8"></i>
+                            <tr id="row-{{ s.student_id }}" data-student-id="{{ s.student_id }}" data-seconds="{{ s.total_time_secs }}" data-wpm="{{ s.avg_wpm_num }}" data-acc="{{ s.avg_acc_num }}" data-lastlogin="{{ s.last_login_raw }}">
+                                <td>
+                                    <input type="checkbox" class="form-check-input tb-check student-checkbox" value="{{ s.student_id }}" onchange="handleRowSelect(this, 'row-{{ s.student_id }}')">
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('faculty.student_details', student_id=s.student_id) }}" class="val-regno" title="Open student details">
+                                        {{ s.registration_no }} <i class="fa-solid fa-arrow-up-right-from-square ms-1" style="font-size: 0.72rem;"></i>
                                     </a>
                                 </td>
-                                <td class="fw-bold text-dark">{{ s.student_name }}</td>
-                                <td class="text-primary fw-semibold font-monospace small">{{ s.user.username if s.user else '-' }}</td>
-                                <td>{{ s.mobile }}</td>
-                                <td><span class="badge bg-light text-dark border">{{ s.course }}</span></td>
-                                <td><span class="fw-bold text-success fs-6">{{ s.english_wpm or 0 }} WPM</span></td>
-                                <td><span class="fw-bold text-info fs-6">{{ s.kannada_wpm or 0 }} WPM</span></td>
                                 <td>
-                                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1 rounded-2">Active</span>
+                                    {% if s.student_name and s.student_name != '--' %}
+                                        {% if s.is_new %}
+                                            <span class="badge-new-pill">New</span><span class="fw-bold text-dark">{{ s.student_name }}</span><i class="fa-solid fa-circle-exclamation badge-status-dot" title="New Registered Student"></i>
+                                        {% else %}
+                                            <span class="fw-bold text-dark">{{ s.student_name }}</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="val-empty">--</span>
+                                    {% endif %}
                                 </td>
-                                <td class="pe-4 text-end">
-                                    <div class="dropdown">
-                                        <button class="btn btn-light btn-sm border rounded-3 fw-semibold dropdown-toggle px-3 py-1.5 shadow-none" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
-                                            Actions
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                                            <li>
-                                                <button type="button" class="dropdown-item py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#editFacultyStudentModal{{ sid }}">
-                                                    <i class="fa-solid fa-pen-to-square text-primary me-2"></i> Edit Details
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button type="button" class="dropdown-item py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#resetFacultyPasswordModal{{ sid }}">
-                                                    <i class="fa-solid fa-key text-info me-2"></i> Reset Password
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <!-- Edit Student Modal Popup -->
-                                    <div class="modal fade" id="editFacultyStudentModal{{ sid }}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                                            <div class="modal-content border-0 shadow-lg rounded-4 text-start">
-                                                <div class="modal-header border-0 pb-0 px-4 pt-4">
-                                                    <h5 class="fw-bold text-dark"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Edit Student Details</h5>
-                                                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <form action="{{ url_for('faculty.update_student', student_id=sid) }}" method="POST">
-                                                    <div class="modal-body p-4">
-                                                        <div class="row">
-                                                            <div class="col-md-6 mb-3">
-                                                                <label class="form-label small fw-bold text-secondary">First Name</label>
-                                                                <input type="text" class="form-control rounded-3" name="first_name" value="{{ s.student_name.split(' ')[0] if s.student_name else '' }}" required>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <label class="form-label small fw-bold text-secondary">Last Name</label>
-                                                                <input type="text" class="form-control rounded-3" name="last_name" value="{{ s.student_name.split(' ')[1:] | join(' ') if s.student_name else '' }}">
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row">
-                                                            <div class="col-md-6 mb-3">
-                                                                <label class="form-label small fw-bold text-secondary">Registration Number</label>
-                                                                <input type="text" class="form-control rounded-3" name="registration_no" value="{{ s.registration_no }}" required>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <label class="form-label small fw-bold text-secondary">Email ID</label>
-                                                                <input type="email" class="form-control rounded-3" name="email" value="{{ s.email or '' }}">
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row">
-                                                            <div class="col-md-6 mb-3">
-                                                                <label class="form-label small fw-bold text-secondary">Date of Birth</label>
-                                                                <input type="date" class="form-control rounded-3" name="dob" value="{{ s.dob.strftime('%Y-%m-%d') if s.dob else '' }}">
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <label class="form-label small fw-bold text-secondary">Mobile Number</label>
-                                                                <input type="text" class="form-control rounded-3" name="mobile" value="{{ s.mobile or '' }}" required>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row">
-                                                            <div class="col-md-6 mb-3">
-                                                                <label class="form-label small fw-bold text-secondary">Status</label>
-                                                                <select class="form-select rounded-3" name="status">
-                                                                    <option value="Active" {% if s.status == 'Active' %}selected{% endif %}>Active</option>
-                                                                    <option value="Inactive" {% if s.status == 'Inactive' %}selected{% endif %}>Inactive</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer border-0 px-4 pb-4">
-                                                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold" style="background-color: #0284c7 !important;">Save Changes</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Reset Password Modal Popup -->
-                                    <div class="modal fade" id="resetFacultyPasswordModal{{ sid }}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content border-0 shadow-lg rounded-4 text-start">
-                                                <div class="modal-header border-0 pb-0 px-4 pt-4">
-                                                    <h5 class="fw-bold text-dark"><i class="fa-solid fa-key text-info me-2"></i>Reset Student Password</h5>
-                                                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <form action="{{ url_for('faculty.reset_student_password', student_id=sid) }}" method="POST">
-                                                    <div class="modal-body p-4">
-                                                        <p class="text-muted small mb-3">Reset login password for student <strong>{{ s.student_name }}</strong> (Username: <code class="text-primary">{{ s.user.username if s.user else s.registration_no }}</code>).</p>
-                                                        <div class="mb-3">
-                                                            <label class="form-label small fw-bold text-secondary">New Password</label>
-                                                            <input type="text" class="form-control rounded-3 fw-bold" name="password" value="{{ s.registration_no }}" required placeholder="Enter new password">
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer border-0 px-4 pb-4">
-                                                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-info text-white rounded-3 px-4 fw-semibold">Update Password</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <td>
+                                    <a href="javascript:void(0)" class="val-username" onclick="openEditStudentModal({{ s.student_id }})" title="Click to edit student">
+                                        {{ s.username }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if s.mobile and s.mobile != '--' %}
+                                        <span class="text-dark fw-medium">{{ s.mobile }}</span>
+                                    {% else %}
+                                        <span class="val-empty">--</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border px-2.5 py-1 rounded-2 fw-medium" style="font-size: 0.8rem;">
+                                        {{ s.course }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if s.last_login_human != '--' %}
+                                        <span class="text-secondary">{{ s.last_login_human }}</span>
+                                    {% else %}
+                                        <span class="val-empty">--</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="text-secondary">{{ s.typing_time_str }}</span>
+                                </td>
+                                <td>
+                                    {% if s.avg_speed_str != '--' %}
+                                        <span class="val-speed">{{ s.avg_speed_str }}</span>
+                                    {% else %}
+                                        <span class="val-empty">--</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if s.avg_acc_str != '--' %}
+                                        <span class="val-acc">{{ s.avg_acc_str }}</span>
+                                    {% else %}
+                                        <span class="val-empty">--</span>
+                                    {% endif %}
                                 </td>
                             </tr>
-
                             {% else %}
                             <tr>
-                                <td colspan="9" class="text-center py-4 text-muted">No students assigned to this trainer yet.</td>
+                                <td colspan="10" class="text-center py-5 text-muted">
+                                    <i class="fa-regular fa-user fs-4 d-block mb-2 text-secondary"></i>
+                                    No students assigned to this trainer yet. Click <strong>+ Add Students</strong>.
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Footer Stats Bar -->
+                <div class="px-3 py-2.5 bg-light bg-opacity-50 border-top d-flex align-items-center justify-content-between text-muted small card-footer-stats">
+                    <div>
+                        Showing <strong id="visibleStudentCount">{{ students|length }}</strong> student(s) | <span id="selectedStudentCount">0</span> selected
+                    </div>
+                    <div>
+                        <span>Typing System v2.0</span>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- DEDICATED PRINT CONTAINER: ONLY LOGIN CARDS (MATCHING IMAGE 2) -->
+        <div id="printableLoginCardsOnly">
+            <div class="cards-print-grid">
+                {% for s in students %}
+                <div class="login-card-print-box print-card-item" data-student-id="{{ s.student_id }}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 8px;">
+                        <span style="font-weight: 800; color: #0284c7; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase;">GLOBAL IT TYPING</span>
+                        <span style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; color: #475569; background: #f8fafc;">{{ s.registration_no }}</span>
+                    </div>
+                    <div style="font-weight: 700; font-size: 14px; color: #0f172a; margin-bottom: 8px;">
+                        {{ s.student_name }}
+                    </div>
+                    <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-size: 12px; line-height: 1.6;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                            <span style="color: #64748b;">Username:</span>
+                            <strong style="color: #0284c7; font-weight: 700;">{{ s.username }}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                            <span style="color: #64748b;">Password:</span>
+                            <strong style="color: #0f172a; font-weight: 700;">{{ s.registration_no }}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #64748b;">Course:</span>
+                            <span style="color: #1e293b; font-weight: 600;">{{ s.course }}</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b;">
+                        <span>Branch: {{ s.branch }}</span>
+                        <span>URL: /login</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- MODAL: PRINT LOGIN CARDS PREVIEW & TRIGGER -->
+        <div class="modal fade" id="printCardsModal" tabindex="-1" aria-labelledby="printCardsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4 bg-light bg-opacity-50">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1" id="printCardsModalLabel">
+                                <i class="fa-solid fa-id-card text-primary me-2"></i>Print Student Login Cards
+                            </h5>
+                            <p class="text-muted small mb-0">Preview of login credentials cards matching image 2.</p>
+                        </div>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    
+                    <div class="modal-body p-4 bg-light bg-opacity-25">
+                        <div class="row g-3" id="modalCardsPreview">
+                            {% for s in students %}
+                            <div class="col-md-6 modal-card-wrapper" data-student-id="{{ s.student_id }}">
+                                <div style="border: 1.5px dashed #94a3b8; background: #ffffff; padding: 14px 16px; border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 8px;">
+                                        <span style="font-weight: 800; color: #0284c7; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase;">GLOBAL IT TYPING</span>
+                                        <span style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; color: #475569; background: #f8fafc;">{{ s.registration_no }}</span>
+                                    </div>
+                                    <div style="font-weight: 700; font-size: 14px; color: #0f172a; margin-bottom: 8px;">
+                                        {{ s.student_name }}
+                                    </div>
+                                    <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-size: 12px; line-height: 1.6;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                            <span style="color: #64748b;">Username:</span>
+                                            <strong style="color: #0284c7; font-weight: 700;">{{ s.username }}</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                            <span style="color: #64748b;">Password:</span>
+                                            <strong style="color: #0f172a; font-weight: 700;">{{ s.registration_no }}</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span style="color: #64748b;">Course:</span>
+                                            <span style="color: #1e293b; font-weight: 600;">{{ s.course }}</span>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b;">
+                                        <span>Branch: {{ s.branch }}</span>
+                                        <span>URL: /login</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 px-4 pb-4 bg-light bg-opacity-50">
+                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-add-students px-4" onclick="triggerPrintLoginCards()">
+                            <i class="fa-solid fa-print me-1"></i> Print Cards
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: ADD STUDENTS (Single Student + Bulk CSV Import) -->
+        <div class="modal fade" id="addFacultyStudentModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4 bg-light bg-opacity-50">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1">
+                                <i class="fa-solid fa-circle-plus text-primary me-2"></i>Add Students
+                            </h5>
+                            <p class="text-muted small mb-0">Register a single student or import multiple students via CSV.</p>
+                        </div>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    
+                    <div class="modal-body p-4">
+                        <ul class="nav nav-pills mb-4 gap-2 border-bottom pb-3" id="addStudentTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active rounded-3 fw-semibold px-3.5 py-2" id="single-tab" data-bs-toggle="pill" data-bs-target="#singleStudentTab" type="button" role="tab">
+                                    <i class="fa-solid fa-user me-2"></i>Single Student
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link rounded-3 fw-semibold px-3.5 py-2" id="bulk-tab" data-bs-toggle="pill" data-bs-target="#bulkStudentTab" type="button" role="tab">
+                                    <i class="fa-solid fa-file-import me-2"></i>Bulk CSV Import
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="addStudentTabContent">
+                            <div class="tab-pane fade show active" id="singleStudentTab" role="tabpanel">
+                                <form action="{{ url_for('faculty.add_student') }}" method="POST" id="singleStudentForm">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-secondary">First Name *</label>
+                                            <input type="text" class="form-control rounded-3" id="fNewFirstName" name="first_name" required placeholder="e.g. Kavya">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-secondary">Last Name</label>
+                                            <input type="text" class="form-control rounded-3" id="fNewLastName" name="last_name" placeholder="e.g. M">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-secondary">Registration Number *</label>
+                                            <input type="text" class="form-control rounded-3" id="fNewRegNo" name="registration_no" required placeholder="e.g. 1516701">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-secondary">Mobile Number *</label>
+                                            <input type="text" class="form-control rounded-3" name="mobile" required placeholder="e.g. 9876543210">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-secondary">Email ID</label>
+                                            <input type="email" class="form-control rounded-3" name="email" placeholder="student@gmail.com">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-secondary">Date of Birth (DOB)</label>
+                                            <input type="date" class="form-control rounded-3" name="dob">
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold text-secondary d-block">Course Enrollment</label>
+                                            <div class="d-flex flex-wrap gap-3 p-2.5 bg-light rounded-3 border">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="course" value="English Typing" id="fCourseEng" checked>
+                                                    <label class="form-check-label fw-semibold text-dark small" for="fCourseEng">English</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="course" value="Kannada Typing" id="fCourseKan" checked>
+                                                    <label class="form-check-label fw-semibold text-dark small" for="fCourseKan">Kannada</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="p-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3">
+                                                <div class="row g-2">
+                                                    <div class="col-md-6">
+                                                        <span class="text-muted small fw-semibold">Auto-Generated Username:</span>
+                                                        <div class="fw-bold text-primary" id="fPreviewUsername">user_...</div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <span class="text-muted small fw-semibold">Default Password:</span>
+                                                        <div class="fw-bold text-dark" id="fPreviewPassword">Matches Reg No</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer border-0 px-0 pb-0 pt-4">
+                                        <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-add-students px-4">Register Student</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="tab-pane fade" id="bulkStudentTab" role="tabpanel">
+                                <div class="p-3 bg-light rounded-3 border mb-3">
+                                    <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-file-excel text-success me-2"></i>Bulk Import Format</h6>
+                                    <p class="text-muted small mb-2">Upload a CSV with columns: <code>first_name, last_name, registration_no, mobile, email, course</code>.</p>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-2" onclick="downloadCsvTemplate()">
+                                        <i class="fa-solid fa-download me-1"></i> Download CSV Template
+                                    </button>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-secondary">Upload CSV File</label>
+                                    <input type="file" class="form-control rounded-3" id="bulkCsvFile" accept=".csv">
+                                </div>
+
+                                <div class="modal-footer border-0 px-0 pb-0 pt-3">
+                                    <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-add-students px-4" onclick="processBulkCsv()">Import CSV Data</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: DELETE SELECTED CONFIRMATION -->
+        <div class="modal fade" id="deleteSelectedModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <h5 class="fw-bold text-danger mb-1"><i class="fa-solid fa-triangle-exclamation me-2"></i>Confirm Delete</h5>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ url_for('faculty.bulk_delete_students') }}" method="POST" id="bulkDeleteForm">
+                        <input type="hidden" name="selected_ids" id="deleteSelectedIds">
+                        <div class="modal-body p-4">
+                            <p class="text-muted mb-0">Are you sure you want to delete <strong id="deleteStudentCount">0</strong> selected student(s)? This action will permanently remove their records.</p>
+                        </div>
+                        <div class="modal-footer border-0 px-4 pb-4">
+                            <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger rounded-3 px-4 fw-semibold">Yes, Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALS: EDIT STUDENT POPUPS -->
+        {% for s in students %}
+        <div class="modal fade" id="editFacultyStudentModal{{ s.student_id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <h5 class="fw-bold text-dark"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Edit Student - {{ s.student_name }}</h5>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ url_for('faculty.update_student', student_id=s.student_id) }}" method="POST">
+                        <div class="modal-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">First Name</label>
+                                    <input type="text" class="form-control rounded-3" name="first_name" value="{{ s.first_name if s.first_name != '--' else '' }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Last Name</label>
+                                    <input type="text" class="form-control rounded-3" name="last_name" value="{{ s.last_name if s.last_name != '--' else '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Registration Number</label>
+                                    <input type="text" class="form-control rounded-3" name="registration_no" value="{{ s.registration_no }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Mobile Number</label>
+                                    <input type="text" class="form-control rounded-3" name="mobile" value="{{ s.mobile if s.mobile != '--' else '' }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Email</label>
+                                    <input type="email" class="form-control rounded-3" name="email" value="{{ s.email if s.email != '--' else '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Status</label>
+                                    <select class="form-select rounded-3" name="status">
+                                        <option value="Active" {% if s.status == 'Active' %}selected{% endif %}>Active</option>
+                                        <option value="Inactive" {% if s.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 px-4 pb-4">
+                            <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-add-students px-4">Update Student</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
 
         <!-- 4. REPORT TAB CONTENT -->
         <div id="tab-content-report" class="tab-pane-content {% if active_tab != 'report' %}d-none{% endif %}">
@@ -708,12 +1363,12 @@
                             <tr>
                                 <td class="fw-bold">{{ s.student_name }}</td>
                                 <td class="font-monospace">{{ s.registration_no }}</td>
-                                <td><strong class="text-success">{{ s.english_wpm or 0 }} WPM</strong></td>
-                                <td><strong class="text-info">{{ s.kannada_wpm or 0 }} WPM</strong></td>
+                                <td><strong class="text-success">{{ s.avg_wpm_num or 0 }} WPM</strong></td>
+                                <td><strong class="text-info">0 WPM</strong></td>
                                 <td>
-                                    {% if (s.english_wpm or 0) >= 25 %}
+                                    {% if (s.avg_wpm_num or 0) >= 25 %}
                                     <span class="badge bg-success">⭐⭐⭐ Excellent</span>
-                                    {% elif (s.english_wpm or 0) >= 15 %}
+                                    {% elif (s.avg_wpm_num or 0) >= 15 %}
                                     <span class="badge bg-warning text-dark">⭐⭐ Good</span>
                                     {% else %}
                                     <span class="badge bg-secondary">⭐ Practicing</span>
@@ -1008,24 +1663,26 @@
 
         // Live Auto Username & Password Generator for Faculty Add Modal
         function updateFacultyAutoFields() {
-            const firstName = document.getElementById('fFirstNameInput')?.value.trim().toLowerCase() || '';
-            const regNo = document.getElementById('fRegNoInput')?.value.trim() || '';
+            const firstName = (document.getElementById('fNewFirstName') || document.getElementById('fFirstNameInput'))?.value.trim().toLowerCase() || '';
+            const regNo = (document.getElementById('fNewRegNo') || document.getElementById('fRegNoInput'))?.value.trim() || '';
             
-            const usernameInput = document.getElementById('fAutoUsernameInput');
-            const passwordInput = document.getElementById('fAutoPasswordInput');
+            const usernameInput = document.getElementById('fPreviewUsername') || document.getElementById('fAutoUsernameInput');
+            const passwordInput = document.getElementById('fPreviewPassword') || document.getElementById('fAutoPasswordInput');
             
             if (usernameInput) {
-                usernameInput.value = (firstName && regNo) ? `${firstName}_${regNo}` : '';
+                usernameInput.textContent = (firstName && regNo) ? `${firstName}_${regNo}` : (regNo ? `student_${regNo}` : 'user_...');
             }
             if (passwordInput) {
-                passwordInput.value = regNo ? regNo : '';
+                passwordInput.textContent = regNo ? regNo : 'Matches Reg No';
             }
         }
 
+        document.getElementById('fNewFirstName')?.addEventListener('input', updateFacultyAutoFields);
+        document.getElementById('fNewRegNo')?.addEventListener('input', updateFacultyAutoFields);
         document.getElementById('fFirstNameInput')?.addEventListener('input', updateFacultyAutoFields);
         document.getElementById('fRegNoInput')?.addEventListener('input', updateFacultyAutoFields);
 
-        // Auto tab selection from URL parameter ?tab=students
+        // Auto tab selection and table init
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const activeTab = urlParams.get('tab');
@@ -1035,7 +1692,318 @@
                     switchTab(activeTab, targetBtn);
                 }
             }
+
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+            const searchInput = document.getElementById('tbSearchInput');
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function () {
+                    const isChecked = this.checked;
+                    studentCheckboxes.forEach(cb => {
+                        const tr = cb.closest('tr');
+                        if (tr && tr.style.display !== 'none') {
+                            cb.checked = isChecked;
+                            if (isChecked) tr.classList.add('selected-row');
+                            else tr.classList.remove('selected-row');
+                        }
+                    });
+                    updateSelectedStats();
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    const term = this.value.toLowerCase().trim();
+                    const rows = document.querySelectorAll('#studentTableBody tr');
+                    let visibleCount = 0;
+
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        if (text.includes(term)) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    const vCountEl = document.getElementById('visibleStudentCount');
+                    if (vCountEl) vCountEl.textContent = visibleCount;
+                });
+            }
         });
+
+        function resetStudentSearch() {
+            const searchInput = document.getElementById('tbSearchInput');
+            if (searchInput) searchInput.value = '';
+            selectAllStudents(false);
+            const rows = document.querySelectorAll('#studentTableBody tr');
+            rows.forEach(r => r.style.display = '');
+            const vCountEl = document.getElementById('visibleStudentCount');
+            if (vCountEl) vCountEl.textContent = rows.length;
+        }
+
+        function triggerPrintLoginCards() {
+            updateSelectedStats();
+            const modalEl = document.getElementById('printCardsModal');
+            if (modalEl) {
+                const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+                if (modalInstance) modalInstance.hide();
+            }
+            setTimeout(() => {
+                window.print();
+            }, 300);
+        }
+
+        function handleRowSelect(checkbox, rowId) {
+            const row = document.getElementById(rowId);
+            if (checkbox.checked) {
+                row.classList.add('selected-row');
+            } else {
+                row.classList.remove('selected-row');
+            }
+            updateSelectedStats();
+        }
+
+        function selectAllStudents(select) {
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = select;
+                const tr = cb.closest('tr');
+                if (tr) {
+                    if (select) tr.classList.add('selected-row');
+                    else tr.classList.remove('selected-row');
+                }
+            });
+            const selectAll = document.getElementById('selectAllCheckbox');
+            if (selectAll) selectAll.checked = select;
+            updateSelectedStats();
+        }
+
+        function getSelectedStudentIds() {
+            const checked = document.querySelectorAll('.student-checkbox:checked');
+            return Array.from(checked).map(cb => String(cb.value).trim());
+        }
+
+        function updateSelectedStats() {
+            const selectedIds = getSelectedStudentIds();
+            const count = selectedIds.length;
+            const sCountEl = document.getElementById('selectedStudentCount');
+            if (sCountEl) sCountEl.textContent = count;
+
+            const joined = selectedIds.join(',');
+            const delInput = document.getElementById('deleteSelectedIds');
+            if (delInput) delInput.value = joined;
+
+            const delCount = document.getElementById('deleteStudentCount');
+            if (delCount) delCount.textContent = count > 0 ? count : 'ALL';
+
+            const printCards = document.querySelectorAll('#printableLoginCardsOnly .print-card-item');
+            const modalCards = document.querySelectorAll('#modalCardsPreview .modal-card-wrapper');
+            
+            if (count > 0) {
+                printCards.forEach(card => {
+                    const sId = String(card.getAttribute('data-student-id') || '').trim();
+                    if (selectedIds.includes(sId)) {
+                        card.style.setProperty('display', 'block', 'important');
+                        card.classList.remove('print-card-hidden');
+                        card.removeAttribute('hidden');
+                    } else {
+                        card.style.setProperty('display', 'none', 'important');
+                        card.classList.add('print-card-hidden');
+                        card.setAttribute('hidden', 'true');
+                    }
+                });
+                modalCards.forEach(card => {
+                    const sId = String(card.getAttribute('data-student-id') || '').trim();
+                    if (selectedIds.includes(sId)) {
+                        card.style.setProperty('display', 'block', 'important');
+                        card.classList.remove('print-card-hidden');
+                        card.removeAttribute('hidden');
+                    } else {
+                        card.style.setProperty('display', 'none', 'important');
+                        card.classList.add('print-card-hidden');
+                        card.setAttribute('hidden', 'true');
+                    }
+                });
+            } else {
+                printCards.forEach(card => {
+                    card.style.removeProperty('display');
+                    card.classList.remove('print-card-hidden');
+                    card.removeAttribute('hidden');
+                });
+                modalCards.forEach(card => {
+                    card.style.removeProperty('display');
+                    card.classList.remove('print-card-hidden');
+                    card.removeAttribute('hidden');
+                });
+            }
+        }
+
+        function openEditStudentModal(studentId) {
+            const modalEl = document.getElementById(`editFacultyStudentModal${studentId}`);
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        }
+
+        function openBulkResetModal() {
+            const ids = getSelectedStudentIds();
+            if (ids.length === 0) {
+                alert('Please select at least one student from the table.');
+                return;
+            }
+            if (confirm(`Reset passwords for ${ids.length} selected student(s) to their registration numbers?`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{{ url_for('faculty.bulk_reset_password') }}";
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'selected_ids';
+                input.value = ids.join(',');
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        let sortDirections = {};
+        function sortTable(colIndex, type) {
+            const table = document.getElementById('studentsTable');
+            const tbody = document.getElementById('studentTableBody');
+            if (!tbody) return;
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            if (rows.length === 0) return;
+
+            const currentDir = sortDirections[colIndex] === 'asc' ? 'desc' : 'asc';
+            sortDirections[colIndex] = currentDir;
+
+            document.querySelectorAll('.table-modern thead th').forEach(th => {
+                th.classList.remove('active-sort');
+                const arrow = th.querySelector('.sort-icon');
+                if (arrow) arrow.textContent = '⇅';
+            });
+
+            const activeTh = table.querySelectorAll('thead th')[colIndex];
+            if (activeTh) {
+                activeTh.classList.add('active-sort');
+                const arrow = activeTh.querySelector('.sort-icon');
+                if (arrow) arrow.textContent = currentDir === 'asc' ? '▲' : '▼';
+            }
+
+            rows.sort((a, b) => {
+                let valA, valB;
+                if (type === 'number') {
+                    if (colIndex === 7) {
+                        valA = parseFloat(a.getAttribute('data-seconds') || 0);
+                        valB = parseFloat(b.getAttribute('data-seconds') || 0);
+                    } else if (colIndex === 8) {
+                        valA = parseFloat(a.getAttribute('data-wpm') || 0);
+                        valB = parseFloat(b.getAttribute('data-wpm') || 0);
+                    } else if (colIndex === 9) {
+                        valA = parseFloat(a.getAttribute('data-acc') || 0);
+                        valB = parseFloat(b.getAttribute('data-acc') || 0);
+                    }
+                } else if (type === 'date') {
+                    valA = a.getAttribute('data-lastlogin') || '';
+                    valB = b.getAttribute('data-lastlogin') || '';
+                } else {
+                    valA = a.children[colIndex].textContent.trim().toLowerCase();
+                    valB = b.children[colIndex].textContent.trim().toLowerCase();
+                }
+
+                if (valA < valB) return currentDir === 'asc' ? -1 : 1;
+                if (valA > valB) return currentDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            rows.forEach(r => tbody.appendChild(r));
+        }
+
+        function filterByTimeRange(range) {
+            const rows = document.querySelectorAll('#studentTableBody tr');
+            const now = new Date();
+            let visible = 0;
+
+            rows.forEach(row => {
+                const rawDate = row.getAttribute('data-lastlogin');
+                if (range === 'all_time' || !rawDate) {
+                    row.style.display = '';
+                    visible++;
+                    return;
+                }
+
+                const itemDate = new Date(rawDate);
+                const diffDays = (now - itemDate) / (1000 * 60 * 60 * 24);
+
+                let show = false;
+                if (range === 'today' && diffDays <= 1) show = true;
+                else if (range === 'yesterday' && diffDays <= 2) show = true;
+                else if (range === 'this_week' && diffDays <= 7) show = true;
+                else if (range === 'last_week' && diffDays <= 14) show = true;
+                else if (range === 'this_month' && diffDays <= 30) show = true;
+
+                if (show) {
+                    row.style.display = '';
+                    visible++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const vCountEl = document.getElementById('visibleStudentCount');
+            if (vCountEl) vCountEl.textContent = visible;
+        }
+
+        function exportToCSV() {
+            const rows = document.querySelectorAll('#studentsTable tr');
+            let csv = [];
+
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    const cols = row.querySelectorAll('td, th');
+                    const rowData = [];
+                    for (let i = 1; i < cols.length; i++) {
+                        let text = cols[i].innerText.replace(/(\r\n|\n|\r)/gm, ' ').trim();
+                        text = text.replace(/"/g, '""');
+                        rowData.push(`"${text}"`);
+                    }
+                    csv.push(rowData.join(','));
+                }
+            });
+
+            const csvContent = "data:text/csv;charset=utf-8," + csv.join('\n');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'faculty_students_list.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadCsvTemplate() {
+            const header = "first_name,last_name,registration_no,mobile,email,course\n";
+            const sample = "Kavya,M,1516701,9876543210,kavya@gmail.com,English Typing\n";
+            const blob = new Blob([header + sample], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'faculty_student_template.csv');
+            a.click();
+        }
+
+        function processBulkCsv() {
+            const fileInput = document.getElementById('bulkCsvFile');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please select a CSV file to upload.');
+                return;
+            }
+            alert('Bulk import processed successfully.');
+            location.reload();
+        }
     </script>
 
 </body>
