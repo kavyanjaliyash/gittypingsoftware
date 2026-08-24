@@ -18,8 +18,9 @@ class BlockStyleRenderer {
 
         lines.forEach((lineText, lineIdx) => {
             const rowEl = document.createElement("div");
-            rowEl.className = "d-flex flex-nowrap align-items-center w-100 py-1";
+            rowEl.className = "d-flex flex-nowrap align-items-center w-100 py-1 flex-shrink-0";
             rowEl.style.overflowX = "auto";
+            rowEl.style.flexShrink = "0";
 
             const segmentFn = window.segmentTextIntoGraphemes || function(txt) {
                 if (typeof Intl !== 'undefined' && Intl.Segmenter) {
@@ -54,6 +55,37 @@ class BlockStyleRenderer {
         // Set initial first block active
         if (this.spans.length > 0) {
             this.spans[0].className = "block-char active-char";
+            this.scrollToActiveSpan(this.spans[0]);
+        }
+    }
+
+    scrollToActiveSpan(span) {
+        if (!span) return;
+        const row = span.parentElement;
+        if (row) {
+            const spanLeft = span.offsetLeft;
+            const spanWidth = span.offsetWidth;
+            const rowWidth = row.clientWidth;
+            row.scrollTo({
+                left: spanLeft - rowWidth / 2 + spanWidth / 2,
+                behavior: 'smooth'
+            });
+        }
+        if (row && this.container) {
+            const containerRect = this.container.getBoundingClientRect();
+            const rowRect = row.getBoundingClientRect();
+            const visualTop = rowRect.top - containerRect.top;
+            const visualBottom = rowRect.bottom - containerRect.top;
+            const containerHeight = this.container.clientHeight;
+
+            // Only scroll vertically if the row is outside or near the edges of the visible area
+            if (visualTop < 5 || visualBottom > containerHeight - 5) {
+                const targetScrollTop = this.container.scrollTop + visualTop - (containerHeight / 2) + (rowRect.height / 2);
+                this.container.scrollTo({
+                    top: Math.max(0, targetScrollTop),
+                    behavior: 'smooth'
+                });
+            }
         }
     }
 
@@ -71,7 +103,7 @@ class BlockStyleRenderer {
         const nextIdx = idx + 1;
         if (nextIdx < this.spans.length && this.spans[nextIdx]) {
             this.spans[nextIdx].className = "block-char active-char";
-            this.spans[nextIdx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            this.scrollToActiveSpan(this.spans[nextIdx]);
         }
     }
 
@@ -88,7 +120,7 @@ class BlockStyleRenderer {
         // Set target span as active
         if (this.spans[newIdx]) {
             this.spans[newIdx].className = "block-char active-char";
-            this.spans[newIdx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            this.scrollToActiveSpan(this.spans[newIdx]);
         }
     }
 

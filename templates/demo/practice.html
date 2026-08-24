@@ -37,6 +37,7 @@
             position: sticky;
             top: 0;
             z-index: 1030;
+            flex-shrink: 0;
         }
 
         .demo-pill-badge {
@@ -59,13 +60,15 @@
             border-radius: 14px;
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-            padding: 14px 20px;
-            margin-bottom: 18px;
+            padding: 8px 16px;
+            margin-bottom: 8px;
+            flex-shrink: 0;
         }
 
         .portal-container {
             max-width: 1180px;
-            margin: 18px auto 40px auto;
+            width: 100%;
+            margin: 8px auto 12px auto;
             padding: 0 16px;
         }
 
@@ -81,7 +84,7 @@
             background: transparent !important;
             border: none !important;
             padding: 0 !important;
-            margin: 0 0 0.5rem 0 !important;
+            margin: 0 0 0.4rem 0 !important;
             box-shadow: none !important;
         }
 
@@ -112,13 +115,13 @@
             border: 1px solid #cfd5dc;
             border-radius: 8px;
             min-width: 56px;
-            height: 48px;
+            height: 54px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 1.18rem;
+            font-size: 1.2rem;
             color: #1e293b;
             box-shadow: 0 2.5px 0 #b3b9c2, 0 2px 5px rgba(0, 0, 0, 0.05);
             transition: all 0.12s ease;
@@ -128,12 +131,12 @@
             position: relative;
         }
         .keyboard-key .key-top {
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             color: #64748b;
             margin-bottom: -1px;
         }
         .keyboard-key .key-bottom {
-            font-size: 1.05rem;
+            font-size: 1.12rem;
             font-weight: 700;
             color: #1e293b;
         }
@@ -366,7 +369,7 @@
     <div class="lesson-container">
 
         <!-- Header Information Banner -->
-        <div class="card border-0 shadow-sm rounded-4 p-3.5 mb-3 bg-white d-flex flex-row justify-content-between align-items-center flex-wrap gap-2">
+        <div class="card border-0 shadow-sm rounded-4 p-2.5 px-3.5 mb-2 bg-white d-flex flex-row justify-content-between align-items-center flex-wrap gap-2 flex-shrink-0">
             <div>
                 <div class="d-flex align-items-center gap-2 mb-1">
                     <span class="badge {% if current_lesson.chapter == 'Advanced' %}bg-danger{% elif current_lesson.chapter == 'Intermediate' %}bg-primary{% else %}bg-success{% endif %} text-white rounded-pill px-3 py-1 font-monospace fw-bold">
@@ -400,8 +403,8 @@
         </div>
 
         <!-- 4. Interactive Clickable Segmented Screen Progress Bar -->
-        <div class="mb-3 p-3 bg-white rounded-4 border shadow-sm">
-            <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+        <div class="mb-2 p-2.5 bg-white rounded-4 border shadow-sm flex-shrink-0">
+            <div class="d-flex justify-content-between align-items-center mb-1.5 px-1">
                 <span class="text-secondary fw-bold font-monospace small">
                     <i class="fa-solid fa-mouse-pointer text-primary me-1"></i> Interactive Screens (Click any block to jump directly):
                 </span>
@@ -418,7 +421,7 @@
         <div id="typing-text-box"></div>
 
         <!-- 6. Standard PC / Windows Virtual Keyboard -->
-        <div class="virtual-keyboard mb-3">
+        <div class="virtual-keyboard mb-2 flex-shrink-0">
             <!-- Row 1: Numbers & Symbols -->
             <div class="keyboard-row">
                 <div class="keyboard-key" data-key="`"><span class="key-top">~</span><span class="key-bottom">`</span></div>
@@ -501,7 +504,7 @@
         </div>
 
         <!-- 7. Dynamic Finger Guidance Bar -->
-        <div class="card border-0 shadow-sm rounded-3 p-2.5 mb-3 bg-white d-flex flex-row align-items-center justify-content-between">
+        <div class="card border-0 shadow-sm rounded-3 p-2.5 mb-2 bg-white d-flex flex-row align-items-center justify-content-between flex-shrink-0">
             <div class="d-flex align-items-center gap-2" id="finger-guide-text">
                 <span class="text-primary fw-bold"><i class="fa-solid fa-hand-point-up me-1"></i> Hand Guide:</span>
                 <span class="text-muted">Start typing on your keyboard...</span>
@@ -516,7 +519,7 @@
         <input type="text" id="typing-input" style="opacity: 0; position: fixed; left: -9999px; top: -9999px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 
         <!-- 8. Bottom Action Controls Bar -->
-        <div class="d-flex justify-content-between align-items-center bg-white p-3.5 rounded-4 border shadow-sm">
+        <div class="d-flex justify-content-between align-items-center bg-white p-2.5 px-3.5 rounded-4 border shadow-sm flex-shrink-0">
             <div class="d-flex align-items-center gap-2">
                 <button id="retry-btn" type="button" class="btn btn-outline-secondary px-3.5 py-2 fw-semibold rounded-3 shadow-sm d-flex align-items-center gap-1.5">
                     <i class="fa-solid fa-rotate-right"></i> <span>Reset Screen</span>

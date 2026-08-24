@@ -41,7 +41,7 @@
     /* Centered uniform stage for typing screen, finger guide, and keyboard */
     .portal-container {
         max-width: 100% !important;
-        margin: 10px auto !important;
+        margin: 8px auto !important;
         padding: 0 16px !important;
     }
 
@@ -57,7 +57,7 @@
         background: transparent !important;
         border: none !important;
         padding: 0 !important;
-        margin: 0 0 0.5rem 0 !important;
+        margin: 0 0 0.4rem 0 !important;
         box-shadow: none !important;
     }
 
@@ -88,13 +88,13 @@
         border: 1px solid #cfd5dc;
         border-radius: 8px;
         min-width: 56px;
-        height: 48px;
+        height: 54px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         font-weight: 600;
-        font-size: 1.18rem;
+        font-size: 1.2rem;
         color: #1e293b;
         box-shadow: 0 2.5px 0 #b3b9c2, 0 2px 5px rgba(0, 0, 0, 0.05);
         transition: all 0.12s ease;
@@ -104,12 +104,12 @@
         position: relative;
     }
     .keyboard-key .key-top {
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         color: #64748b;
         margin-bottom: -1px;
     }
     .keyboard-key .key-bottom {
-        font-size: 1.05rem;
+        font-size: 1.12rem;
         font-weight: 700;
         color: #1e293b;
     }
@@ -332,7 +332,7 @@
 
 <div class="lesson-container w-100">
     <!-- Top Header Row: Lesson Title + Exit 'X' Button on Right -->
-    <div class="card border-0 shadow-sm px-4 py-2.5 bg-white rounded-4 mb-3 w-100">
+    <div class="card border-0 shadow-sm px-4 py-2 bg-white rounded-4 mb-2 w-100 flex-shrink-0">
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-2.5">
                 <span class="rounded-3 bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
@@ -350,7 +350,7 @@
     </div>
 
     {% if screens %}
-    <div class="card border-0 shadow-sm p-4 bg-white rounded-4 w-100">
+    <div class="card border-0 shadow-sm p-3.5 bg-white rounded-4 w-100">
         <h6 id="screen-title" class="text-muted text-uppercase fs-7 fw-bold mb-2.5" style="letter-spacing: 0.5px;"></h6>
         
         <!-- Typing Display Area with Matching 1140px Width -->
@@ -358,20 +358,20 @@
         </div>
 
         <!-- Finger Position Assistant Banner (Centered & High Legibility) -->
-        <div id="finger-guide-banner" class="d-flex align-items-center justify-content-center text-center p-2.5 mb-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3">
+        <div id="finger-guide-banner" class="d-flex align-items-center justify-content-center text-center p-2 mb-2 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3 flex-shrink-0">
             <div class="d-flex align-items-center justify-content-center gap-3">
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-size: 1rem; flex-shrink: 0;">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.9rem; flex-shrink: 0;">
                     <i class="fa-solid fa-hand-pointer"></i>
                 </div>
                 <div class="text-center">
-                    <span class="text-muted small fw-bold text-uppercase d-block mb-0.5" style="letter-spacing: 0.5px; font-size: 0.76rem;">Finger Position Guide</span>
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-0.5" style="letter-spacing: 0.5px; font-size: 0.72rem;">Finger Position Guide</span>
                     <h6 id="finger-guide-text" class="fw-bold text-primary mb-0 fs-6">Press key to begin practice...</h6>
                 </div>
             </div>
         </div>
 
         <!-- On-Screen Virtual Keyboard (Apple / TypingClub Style - 1140px Width) -->
-        <div class="virtual-keyboard-container position-relative mb-3">
+        <div class="virtual-keyboard-container position-relative mb-2 flex-shrink-0">
             <div id="virtual-keyboard" class="virtual-keyboard shadow-sm position-relative">
                 <!-- Row 1: Numbers & Symbols -->
                 <div class="keyboard-row">

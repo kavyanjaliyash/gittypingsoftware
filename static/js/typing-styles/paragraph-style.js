@@ -147,8 +147,16 @@ class ParagraphStyleRenderer {
             const line = span.closest(".paragraph-line") || span;
             const containerRect = this.flowContainer.getBoundingClientRect();
             const lineRect = line.getBoundingClientRect();
-            if (lineRect.bottom > containerRect.bottom - 15 || lineRect.top < containerRect.top + 15) {
-                line.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            const visualTop = lineRect.top - containerRect.top;
+            const visualBottom = lineRect.bottom - containerRect.top;
+            const containerHeight = this.flowContainer.clientHeight;
+
+            if (visualTop < 5 || visualBottom > containerHeight - 5) {
+                const targetScrollTop = this.flowContainer.scrollTop + visualTop - (containerHeight / 2) + (lineRect.height / 2);
+                this.flowContainer.scrollTo({
+                    top: Math.max(0, targetScrollTop),
+                    behavior: 'smooth'
+                });
             }
         }
     }
