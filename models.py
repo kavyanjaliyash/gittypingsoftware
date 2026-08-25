@@ -1,4 +1,5 @@
 from database import db
+from datetime import datetime
 
 class User(db.Model):
     __tablename__ = "users"
@@ -106,3 +107,15 @@ class TypingGame(db.Model):
     category = db.Column(db.String(100), default="Speed & Accuracy")
     difficulty = db.Column(db.String(50), default="Medium")
     status = db.Column(db.String(20), default="Active")
+
+class PasswordResetOTP(db.Model):
+    __tablename__ = "password_reset_otps"
+    otp_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
+    otp_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    attempts = db.Column(db.Integer, default=0)
+    used = db.Column(db.Boolean, default=False)
+
+    user = db.relationship("User", backref="reset_otps")
