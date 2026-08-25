@@ -140,30 +140,48 @@ def branch_details(branch_id):
 @admin_bp.route("/faculty", methods=["GET", "POST"])
 def faculty():
     if request.method == "POST":
-        user = User(
-            role="Faculty",
-            username=request.form["username"],
-            password_hash=request.form["password"],
-            status="Active"
-        )
-        db.session.add(user)
-        db.session.commit()
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
 
-        fac = Faculty(
-            branch_id=request.form["branch_id"],
-            faculty_name=request.form["faculty_name"],
-            qualification=request.form["qualification"],
-            experience=request.form["experience"],
-            mobile=request.form["mobile"],
-            email=request.form["email"],
-            user_id=user.user_id,
-            status="Active"
-        )
-        db.session.add(fac)
-        db.session.commit()
+        if not username or not password:
+            flash("Username and Password are required!", "danger")
+            return redirect(url_for("admin.faculty"))
 
-        fac.faculty_code = f"GIT{fac.faculty_id:04d}"
-        db.session.commit()
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash(f"Username '{username}' is already taken! Please choose a different username.", "danger")
+            return redirect(url_for("admin.faculty"))
+
+        try:
+            user = User(
+                role="Faculty",
+                username=username,
+                password_hash=password,
+                status="Active"
+            )
+            db.session.add(user)
+            db.session.flush()
+
+            fac = Faculty(
+                branch_id=request.form.get("branch_id"),
+                faculty_name=request.form.get("faculty_name"),
+                qualification=request.form.get("qualification"),
+                experience=request.form.get("experience"),
+                mobile=request.form.get("mobile"),
+                email=request.form.get("email"),
+                user_id=user.user_id,
+                status="Active"
+            )
+            db.session.add(fac)
+            db.session.flush()
+
+            fac.faculty_code = f"GIT{fac.faculty_id:04d}"
+            db.session.commit()
+            flash(f"Faculty '{fac.faculty_name}' created successfully!", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error creating faculty: {str(e)}", "danger")
+
         return redirect(url_for("admin.faculty"))
 
     faculties = Faculty.query.all()
