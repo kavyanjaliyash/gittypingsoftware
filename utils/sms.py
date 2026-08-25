@@ -64,17 +64,22 @@ def send_otp_sms(mobile_number, otp_code):
         print(f"[SMS Gateway Console] Sent OTP '{otp_code}' to {masked} (Provider: {provider})")
         return True, "OTP dispatched successfully."
 
-    # 2. Fast2SMS Provider (India)
+    # 2. Fast2SMS Provider (India - Smart OTP API)
     if provider == "fast2sms":
         try:
-            url = "https://www.fast2sms.com/dev/bulkV2"
+            otp_id = os.environ.get("FAST2SMS_OTP_ID", "").strip()
+            if not otp_id:
+                print("[SMS Gateway Warning] Fast2SMS failure: FAST2SMS_OTP_ID environment variable is missing.")
+                return False, "FAST2SMS_OTP_ID environment variable is missing."
+
+            url = "https://www.fast2sms.com/dev/otp/send"
             headers = {
                 "authorization": api_key,
                 "Content-Type": "application/x-www-form-urlencoded"
             }
             payload = {
+                "otp_id": otp_id,
                 "variables_values": str(otp_code),
-                "route": "otp",
                 "numbers": norm_mobile
             }
             data = urllib.parse.urlencode(payload).encode('utf-8')
@@ -83,10 +88,12 @@ def send_otp_sms(mobile_number, otp_code):
             with urllib.request.urlopen(req, timeout=10) as resp:
                 result = json.loads(resp.read().decode('utf-8'))
                 if result.get("return") is True:
-                    print(f"[SMS Gateway Fast2SMS] OTP sent successfully to {masked}.")
+                    print(f"[SMS Gateway Fast2SMS] Smart OTP sent successfully to {masked}.")
                     return True, "OTP dispatched successfully."
                 else:
-                    msg = result.get("message", ["Delivery failed"])[0] if isinstance(result.get("message"), list) else result.get("message", "Delivery failed")
+                    msg = result.get("message", ["Delivery failed"])
+                    if isinstance(msg, list):
+                        msg = msg[0] if msg else "Delivery failed"
                     print(f"[SMS Gateway Error] Fast2SMS failure: {msg}")
                     return False, f"SMS Delivery error: {msg}"
         except Exception as e:
