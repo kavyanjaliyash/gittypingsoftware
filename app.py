@@ -61,6 +61,18 @@ with app.app_context():
     except Exception as e:
         print(f"LMS Seeding notice: {e}")
 
+    try:
+        from seed_branches import seed_branches_data
+        seed_branches_data()
+    except Exception as e:
+        print(f"Branch Seeding notice: {e}")
+
+    try:
+        from seed_faculty import seed_faculty_data
+        seed_faculty_data()
+    except Exception as e:
+        print(f"Faculty Seeding notice: {e}")
+
 @app.route('/')
 def index():
     return redirect(url_for('auth.login'))
