@@ -55,6 +55,12 @@ with app.app_context():
         db.session.commit()
         print("Default Admin Created")
 
+    try:
+        from seed_lms import seed_lms_data
+        seed_lms_data()
+    except Exception as e:
+        print(f"LMS Seeding notice: {e}")
+
 @app.route('/')
 def index():
     return redirect(url_for('auth.login'))
